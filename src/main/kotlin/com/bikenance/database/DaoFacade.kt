@@ -1,6 +1,7 @@
 package com.bikenance.database
 
 import com.bikenance.model.User
+import com.bikenance.model.UserUpdate
 
 interface UserDaoFacade {
     suspend fun user(id: Int): User?
@@ -8,6 +9,6 @@ interface UserDaoFacade {
     suspend fun allUsers(): List<User>
     suspend fun filter(pattern: String): List<User>
     suspend fun createUser(title: String, body: String): User?
-    suspend fun editUser(id: Int, user: User): Boolean
+    suspend fun editUser(id: Int, user: UserUpdate): Boolean
     suspend fun deleteUser(id: Int): Boolean
 }

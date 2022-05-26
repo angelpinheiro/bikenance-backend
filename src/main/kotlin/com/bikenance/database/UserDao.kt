@@ -2,6 +2,7 @@ package com.bikenance.database
 
 import com.bikenance.database.DatabaseFactory.dbQuery
 import com.bikenance.model.User
+import com.bikenance.model.UserUpdate
 import com.bikenance.model.Users
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.like
@@ -39,10 +40,11 @@ class UserDao : UserDaoFacade {
         insertStatement.resultedValues?.singleOrNull()?.let(::resultRowToArticle)
     }
 
-    override suspend fun editUser(id: Int, user: User): Boolean = dbQuery {
-        Users.update({ Users.id eq id }) {
-            it[username] = user.username
-            it[password] = user.password
+    override suspend fun editUser(id: Int, user: UserUpdate): Boolean = dbQuery {
+        Users.update({ Users.id eq id }) { u ->
+            user.username?.let {u[username] = it }
+            user.password?.let {u[password] = it }
+            user.stravaToken?.let {u[stravaToken] = it }
         } > 0
     }
 
@@ -53,6 +55,7 @@ class UserDao : UserDaoFacade {
     private fun resultRowToArticle(row: ResultRow) = User(
         id = row[Users.id],
         username = row[Users.username],
+        stravaToken = row[Users.stravaToken],
         password = row[Users.password]
     )
 }
