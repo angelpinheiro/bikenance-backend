@@ -1,0 +1,1 @@
+rootProject.name = "com.anxops.ktor-bikenance-backend"
