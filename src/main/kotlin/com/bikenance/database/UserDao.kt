@@ -4,6 +4,7 @@ import com.bikenance.database.DatabaseFactory.dbQuery
 import com.bikenance.model.User
 import com.bikenance.model.Users
 import org.jetbrains.exposed.sql.*
+import org.jetbrains.exposed.sql.SqlExpressionBuilder.like
 
 
 class UserDao : UserDaoFacade {
@@ -22,6 +23,12 @@ class UserDao : UserDaoFacade {
 
     override suspend fun allUsers(): List<User> = dbQuery {
         Users.selectAll().map(::resultRowToArticle)
+    }
+
+    override suspend fun filter(pattern: String): List<User> = dbQuery {
+        Users.select { Users.username like "%$pattern%"}
+            .map(::resultRowToArticle)
+            .toList()
     }
 
     override suspend fun createUser(username: String, password: String): User? = dbQuery {
@@ -46,6 +53,6 @@ class UserDao : UserDaoFacade {
     private fun resultRowToArticle(row: ResultRow) = User(
         id = row[Users.id],
         username = row[Users.username],
-        password = "*"
+        password = row[Users.password]
     )
 }

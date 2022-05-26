@@ -1,15 +1,18 @@
 package com.bikenance.routing
 
-import com.bikenance.Articles
+import com.bikenance.database.UserDaoFacade
 import com.bikenance.model.User
 import com.bikenance.repository.UserRepository
 import io.ktor.resources.*
 import io.ktor.server.application.*
+import io.ktor.server.auth.*
 import io.ktor.server.request.*
 import io.ktor.server.resources.*
+import io.ktor.server.resources.put
 import io.ktor.server.response.*
-import io.ktor.server.routing.routing
+import io.ktor.server.routing.*
 import kotlinx.serialization.*
+import org.koin.ktor.ext.inject
 
 @Serializable
 @Resource("/users")
@@ -22,23 +25,29 @@ class Users(val filter: String? = null){
 
 fun Application.userRoutes() {
 
-    val userRepository = UserRepository()
-
     routing {
 
-        get<Users> { r ->
-            call.respond(userRepository.findAll())
-        }
+        val userRepository: UserRepository by inject()
 
-        get<Users.Id> {r ->
-            val u = userRepository.findById(r.id)
-            call.respond(u ?: "User not found")
-        }
+        authenticate {
 
-        put<Users.Id> {r ->
-            val user = call.receive<User>()
-            val u = userRepository.updateUser(r.id, user)
-            call.respond(u ?: "User not found")
+            get<Users> { r ->
+                when(r.filter) {
+                    null -> call.respond(userRepository.findAll())
+                    else -> call.respond(userRepository.search(r.filter))
+                }
+            }
+
+            get<Users.Id> { r ->
+                val u = userRepository.findById(r.id)
+                call.respond(u ?: "User not found")
+            }
+
+            put<Users.Id> { r ->
+                val user = call.receive<User>()
+                val u = userRepository.updateUser(r.id, user)
+                call.respond(u ?: "User not found")
+            }
         }
     }
 }

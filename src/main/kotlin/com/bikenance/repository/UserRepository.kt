@@ -1,15 +1,9 @@
 package com.bikenance.repository
 
-import com.bikenance.database.UserDao
-import com.bikenance.features.login.JwtConfig
-import com.bikenance.features.login.JwtGenerator
-import com.bikenance.features.login.data.LoginData
+import com.bikenance.database.UserDaoFacade
 import com.bikenance.model.User
 
-class UserRepository() {
-
-    // TODO: Inject
-    private val userDao = UserDao()
+class UserRepository(private val userDao: UserDaoFacade) {
 
     suspend fun findById(id: Int) = userDao.user(id)
 
@@ -17,8 +11,10 @@ class UserRepository() {
 
     suspend fun findAll() = userDao.allUsers()
 
+    suspend fun search(pattern: String) = userDao.filter(pattern)
+
     suspend fun updateUser(id: Int, user: User): User? {
-        if(userDao.editUser(id, user)){
+        if (userDao.editUser(id, user)) {
             return findById(id)
         }
         return null
