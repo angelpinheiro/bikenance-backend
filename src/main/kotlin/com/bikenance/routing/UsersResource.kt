@@ -44,7 +44,7 @@ fun Application.userRoutes() {
             get<Users.Id> { r ->
                 val u = userRepository.findById(r.id)
 
-                when(val token = u?.stravaToken) {
+                when(val token = u?.athleteToken) {
                     null -> call.respond(u ?: "User not found")
                     else -> call.respondText(StravaApi().athlete(token), ContentType.parse("application/json"))
                 }

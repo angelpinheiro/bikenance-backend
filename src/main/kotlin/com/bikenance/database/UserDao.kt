@@ -43,8 +43,8 @@ class UserDao : UserDaoFacade {
         val insertStatement = Users.insert { newUser ->
             newUser[username] = user.username
             newUser[password] = user.password
-            user.stravaToken?.let { newUser[stravaToken] = it }
-            user.stravaAthleteId?.let { newUser[stravaAthleteId] = it }
+            user.athleteId?.let { newUser[athleteId] = it }
+            user.athleteToken?.let { newUser[athleteToken] = it }
         }
         insertStatement.resultedValues?.singleOrNull()?.let(::resultRowToArticle)
     }
@@ -53,8 +53,8 @@ class UserDao : UserDaoFacade {
         Users.update({ Users.id eq id }) { u ->
             user.username?.let { u[username] = it }
             user.password?.let { u[password] = it }
-            user.stravaToken?.let { u[stravaToken] = it }
-            user.stravaAthleteId?.let { u[stravaAthleteId] = it }
+            user.athleteId?.let { u[athleteId] = it }
+            user.athleteToken?.let { u[athleteToken] = it }
         } > 0
     }
 
@@ -65,8 +65,8 @@ class UserDao : UserDaoFacade {
     private fun resultRowToArticle(row: ResultRow) = User(
         id = row[Users.id],
         username = row[Users.username],
-        stravaToken = row[Users.stravaToken],
-        stravaAthleteId = row[Users.stravaAthleteId],
-        password = row[Users.password]
+        password = row[Users.password],
+        athleteId = row[Users.athleteId],
+        athleteToken = row[Users.athleteToken],
     )
 }

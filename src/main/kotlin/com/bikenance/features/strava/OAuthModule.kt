@@ -1,5 +1,7 @@
 package com.bikenance.features.strava
 
+import com.bikenance.database.tables.AthleteEntity
+import com.bikenance.database.tables.Users
 import com.bikenance.features.strava.model.StravaAthlete
 import com.bikenance.model.AthleteVO
 import com.bikenance.model.UserUpdate
@@ -16,6 +18,7 @@ import io.ktor.server.auth.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import io.ktor.util.pipeline.*
+import org.jetbrains.exposed.sql.transactions.transaction
 import org.koin.ktor.ext.inject
 
 
@@ -70,12 +73,24 @@ fun Application.configureOAuth(config: StravaConfig) {
 
                 getAthleteParameter()?.let {
                     val vo = it.reSerialize<AthleteVO>()
-                    userUpdate.stravaAthleteId = vo.id
+                    userUpdate.athleteId = vo.id
                     userUpdate.username = "${vo.username} (${vo.firstname})"
+
+                    transaction {
+                        AthleteEntity.new {
+                            userId = 1
+                            athleteToken = accessToken
+                            athleteId = vo.id!! //TODO
+                            username = vo.username
+                            firstname = vo.firstname
+                        }
+                    }
+
+
                 }
 
                 accessToken?.let {
-                    userUpdate.stravaToken = it
+                    userUpdate.athleteToken = it
                     userRepository.updateUser(1, userUpdate)
                 }
                 call.respond("$accessToken")

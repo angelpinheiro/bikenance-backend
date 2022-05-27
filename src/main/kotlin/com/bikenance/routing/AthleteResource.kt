@@ -1,7 +1,9 @@
 package com.bikenance.routing
 
 import com.bikenance.database.tables.AthleteEntity
+import com.bikenance.features.strava.api.StravaApi
 import com.bikenance.model.AthleteVO
+import io.ktor.http.*
 import io.ktor.resources.*
 import io.ktor.server.application.*
 import io.ktor.server.auth.*
@@ -36,6 +38,16 @@ fun Application.athleteRoutes() {
                     }.toList()
                 }
                 call.respond(athletes)
+            }
+
+            get<Athletes.Id> { r ->
+
+                when(val token = transaction { AthleteEntity.findById(r.id)?.athleteToken }) {
+                    null -> call.respond("User not found")
+                    else -> call.respondText(StravaApi().athlete(token), ContentType.parse("application/json"))
+                }
+
+
             }
         }
     }
