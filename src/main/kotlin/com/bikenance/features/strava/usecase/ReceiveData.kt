@@ -23,17 +23,16 @@ data class EventData(
 
 class ReceiveDataUseCase {
 
-    private val eventTypes = listOf(EventData.TYPE_ACTIVITY, EventData.TYPE_ATHLETE)
 
     suspend fun handleEventData(eventData: EventData) {
-        println("Event data handler called")
-        if (eventTypes.contains(eventData.objectType)) {
-            println("Event data type: ${eventData.objectType}")
-            repeat(10) {
-                println("Executing background task ($it)")
-                delay(1000)
+        println("Received event data")
+        when (eventData.objectType) {
+            EventData.TYPE_ATHLETE -> {
+
             }
-            println("Done!")
+            EventData.TYPE_ACTIVITY -> {
+
+            }
         }
     }
 

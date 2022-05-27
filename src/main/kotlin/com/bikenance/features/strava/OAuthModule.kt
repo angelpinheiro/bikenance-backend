@@ -1,7 +1,12 @@
 package com.bikenance.features.strava
 
+import com.bikenance.features.strava.model.Athlete
 import com.bikenance.model.UserUpdate
 import com.bikenance.repository.UserRepository
+import com.fasterxml.jackson.databind.DeserializationFeature
+import com.fasterxml.jackson.databind.SerializationFeature
+import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import com.fasterxml.jackson.module.kotlin.readValue
 import io.ktor.client.*
 import io.ktor.client.engine.cio.*
 import io.ktor.client.plugins.logging.*
@@ -50,6 +55,7 @@ fun Application.configureOAuth(config: StravaConfig) {
          */
 
         val userRepository: UserRepository by inject()
+        val mapper = jacksonObjectMapper().disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
 
         authenticate("auth-oauth-strava") {
             get("/strava") {
@@ -58,8 +64,20 @@ fun Application.configureOAuth(config: StravaConfig) {
 
             get("/callback") {
                 val principal: OAuthAccessTokenResponse.OAuth2? = call.principal()
+
+                val athlete = principal?.extraParameters?.get("athlete")?.let {
+                    return@let mapper.readValue<Athlete>(it)
+                }
+
+                val userUpdate = UserUpdate()
+                athlete?.let {
+                    userUpdate.stravaAthleteId = athlete.id
+                    userUpdate.username= "${athlete.username} (${athlete.firstname})"
+                }
+
                 principal?.accessToken?.let {
-                    val u = userRepository.updateUser(1, UserUpdate(stravaToken = it))
+                    userUpdate.stravaToken = it
+                    userRepository.updateUser(1, userUpdate)
                 }
                 call.respond(" $principal, ${principal?.accessToken}")
             }

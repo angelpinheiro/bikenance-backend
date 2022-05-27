@@ -13,7 +13,7 @@ data class Activity(
     @JsonProperty("upload_id")
     var uploadId: Int? = null,
     @JsonProperty("athlete")
-    var athlete: Athlete? = Athlete(),
+    var athleteRef: AthleteRef? = AthleteRef(),
     @JsonProperty("name")
     var name: String? = null,
     @JsonProperty("distance")

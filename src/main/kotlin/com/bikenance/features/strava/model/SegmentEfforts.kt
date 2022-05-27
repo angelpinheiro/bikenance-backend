@@ -14,7 +14,7 @@ data class SegmentEfforts(
     @JsonProperty("activity")
     var activity: Activity? = Activity(),
     @JsonProperty("athlete")
-    var athlete: Athlete? = Athlete(),
+    var athleteRef: AthleteRef? = AthleteRef(),
     @JsonProperty("elapsed_time")
     var elapsedTime: Int? = null,
     @JsonProperty("moving_time")

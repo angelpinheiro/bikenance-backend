@@ -11,8 +11,8 @@ data class User(
 )
 
 data class UserUpdate(
-    val username: String? = null,
-    val password: String? = null,
-    val stravaToken: String? = null,
-    val stravaAthleteId: String? = null
+    var username: String? = null,
+    var password: String? = null,
+    var stravaToken: String? = null,
+    var stravaAthleteId: String? = null
 )
