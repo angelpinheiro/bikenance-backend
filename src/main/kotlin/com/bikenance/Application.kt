@@ -1,12 +1,14 @@
 package com.bikenance
 
 import com.bikenance.features.login.configureLogin
+import com.bikenance.features.strava.api.StravaApi
 import com.bikenance.features.strava.configureStrava
 import com.bikenance.modules.appModule
 import com.bikenance.modules.configureServer
 import com.bikenance.routing.userRoutes
 import io.ktor.server.application.*
 import io.ktor.server.netty.*
+import io.ktor.server.routing.*
 import org.koin.ktor.plugin.Koin
 import org.koin.logger.slf4jLogger
 

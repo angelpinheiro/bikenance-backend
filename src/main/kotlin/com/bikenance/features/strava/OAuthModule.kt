@@ -15,6 +15,12 @@ import org.koin.ktor.ext.inject
 
 fun Application.configureOAuth(config: StravaConfig) {
 
+    val clientId = environment.config.property("strava_webhooks.client_id").getString()
+    val clientSecret = environment.config.property("strava_webhooks.client_secret").getString()
+    val subscriptionUrl = environment.config.property("strava_webhooks.strava_subscribe_url").getString()
+    val apiUrl = environment.config.property("api.url").getString()
+
+
     authentication {
         oauth("auth-oauth-strava") {
             urlProvider = { "${config.apiUrl}/callback" }
@@ -26,7 +32,7 @@ fun Application.configureOAuth(config: StravaConfig) {
                     requestMethod = HttpMethod.Post,
                     clientId = config.clientId,
                     clientSecret = config.clientSecret,
-                    defaultScopes = listOf("read_all,activity:read_all"),
+                    defaultScopes = listOf("read_all,activity:read_all,profile:read_all"),
                 )
             }
             client = HttpClient(CIO) {
@@ -45,15 +51,17 @@ fun Application.configureOAuth(config: StravaConfig) {
 
         val userRepository: UserRepository by inject()
 
-        get("/callback") {
-            val token = call.parameters["code"]
-            val u = userRepository.updateUser(1, UserUpdate(stravaToken = token))
-            call.respond(u ?: "Update failed")
-        }
-
         authenticate("auth-oauth-strava") {
             get("/strava") {
                 call.respondRedirect("${config.apiUrl}/callback")
+            }
+
+            get("/callback") {
+                val principal: OAuthAccessTokenResponse.OAuth2? = call.principal()
+                principal?.accessToken?.let {
+                    val u = userRepository.updateUser(1, UserUpdate(stravaToken = it))
+                }
+                call.respond(" $principal, ${principal?.accessToken}")
             }
         }
     }

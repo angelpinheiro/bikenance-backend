@@ -9,6 +9,7 @@ interface UserDaoFacade {
     suspend fun allUsers(): List<User>
     suspend fun filter(pattern: String): List<User>
     suspend fun createUser(title: String, body: String): User?
+    suspend fun createUser(user: User): User?
     suspend fun editUser(id: Int, user: UserUpdate): Boolean
     suspend fun deleteUser(id: Int): Boolean
 }

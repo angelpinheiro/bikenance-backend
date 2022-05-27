@@ -1,6 +1,8 @@
-package com.bikenance.modules
+package com.bikenance.features.strava.routing
 
 import com.bikenance.features.strava.StravaConfig
+import com.bikenance.features.strava.usecase.EventData
+import com.bikenance.features.strava.usecase.ReceiveDataUseCase
 import io.ktor.client.*
 import io.ktor.client.engine.cio.*
 import io.ktor.client.plugins.logging.*
@@ -29,6 +31,8 @@ val client = HttpClient(CIO) {
 
 fun Application.stravaWebhookRouting(config: StravaConfig) {
 
+    val receiveDataUseCase = ReceiveDataUseCase()
+
     routing {
 
         /**
@@ -47,8 +51,12 @@ fun Application.stravaWebhookRouting(config: StravaConfig) {
          * Receive strava activity updates
          */
         post("/webhook") {
-            val body = call.receiveText()
-            println(body)
+            val eventData = call.receive<EventData>()
+            // launch a new coroutine for processing event data
+            // and return Ok to avoid strava request cancellation
+            application.launch {
+                receiveDataUseCase.handleEventData(eventData)
+            }
             call.respond(HttpStatusCode.OK)
         }
 

@@ -1,10 +1,13 @@
 package com.bikenance.database
 
-import com.bikenance.model.Users
-import kotlinx.coroutines.*
-import org.jetbrains.exposed.sql.*
-import org.jetbrains.exposed.sql.transactions.*
-import org.jetbrains.exposed.sql.transactions.experimental.*
+import com.bikenance.database.tables.Users
+import com.bikenance.model.User
+import com.bikenance.repository.UserRepository
+import kotlinx.coroutines.Dispatchers
+import org.jetbrains.exposed.sql.Database
+import org.jetbrains.exposed.sql.SchemaUtils
+import org.jetbrains.exposed.sql.transactions.experimental.newSuspendedTransaction
+import org.jetbrains.exposed.sql.transactions.transaction
 
 object DatabaseFactory {
 
@@ -19,4 +22,13 @@ object DatabaseFactory {
 
     suspend fun <T> dbQuery(block: suspend () -> T): T =
         newSuspendedTransaction(Dispatchers.IO) { block() }
+
+
+    suspend fun populateDatabase() {
+        val userRepository = UserRepository(UserDao())
+        if(userRepository.findAll().isEmpty()) {
+            userRepository.create(User(-1, "angel", "angel_secret"))
+            userRepository.create(User(-1, "admin", "admin_secret"))
+        }
+    }
 }

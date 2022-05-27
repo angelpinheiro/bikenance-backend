@@ -1,17 +1,16 @@
 package com.bikenance.database
 
 import com.bikenance.database.DatabaseFactory.dbQuery
+import com.bikenance.database.tables.Users
 import com.bikenance.model.User
 import com.bikenance.model.UserUpdate
-import com.bikenance.model.Users
 import org.jetbrains.exposed.sql.*
-import org.jetbrains.exposed.sql.SqlExpressionBuilder.like
 
 
 class UserDao : UserDaoFacade {
 
     override suspend fun user(id: Int): User? = dbQuery {
-        Users.select { Users.id eq id}
+        Users.select { Users.id eq id }
             .map(::resultRowToArticle)
             .singleOrNull()
     }
@@ -27,7 +26,7 @@ class UserDao : UserDaoFacade {
     }
 
     override suspend fun filter(pattern: String): List<User> = dbQuery {
-        Users.select { Users.username like "%$pattern%"}
+        Users.select { Users.username like "%$pattern%" }
             .map(::resultRowToArticle)
             .toList()
     }
@@ -40,11 +39,22 @@ class UserDao : UserDaoFacade {
         insertStatement.resultedValues?.singleOrNull()?.let(::resultRowToArticle)
     }
 
+    override suspend fun createUser(user: User): User? = dbQuery {
+        val insertStatement = Users.insert { newUser ->
+            newUser[username] = user.username
+            newUser[password] = user.password
+            user.stravaToken?.let { newUser[stravaToken] = it }
+            user.stravaAthleteId?.let { newUser[stravaAthleteId] = it }
+        }
+        insertStatement.resultedValues?.singleOrNull()?.let(::resultRowToArticle)
+    }
+
     override suspend fun editUser(id: Int, user: UserUpdate): Boolean = dbQuery {
         Users.update({ Users.id eq id }) { u ->
-            user.username?.let {u[username] = it }
-            user.password?.let {u[password] = it }
-            user.stravaToken?.let {u[stravaToken] = it }
+            user.username?.let { u[username] = it }
+            user.password?.let { u[password] = it }
+            user.stravaToken?.let { u[stravaToken] = it }
+            user.stravaAthleteId?.let { u[stravaAthleteId] = it }
         } > 0
     }
 
@@ -56,6 +66,7 @@ class UserDao : UserDaoFacade {
         id = row[Users.id],
         username = row[Users.username],
         stravaToken = row[Users.stravaToken],
+        stravaAthleteId = row[Users.stravaAthleteId],
         password = row[Users.password]
     )
 }

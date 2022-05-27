@@ -1,9 +1,11 @@
 package com.bikenance.routing
 
 import com.bikenance.database.UserDaoFacade
+import com.bikenance.features.strava.api.StravaApi
 import com.bikenance.model.User
 import com.bikenance.model.UserUpdate
 import com.bikenance.repository.UserRepository
+import io.ktor.http.*
 import io.ktor.resources.*
 import io.ktor.server.application.*
 import io.ktor.server.auth.*
@@ -41,7 +43,13 @@ fun Application.userRoutes() {
 
             get<Users.Id> { r ->
                 val u = userRepository.findById(r.id)
-                call.respond(u ?: "User not found")
+
+                when(val token = u?.stravaToken) {
+                    null -> call.respond(u ?: "User not found")
+                    else -> call.respondText(StravaApi().athlete(token), ContentType.parse("application/json"))
+                }
+
+
             }
 
             put<Users.Id> { r ->

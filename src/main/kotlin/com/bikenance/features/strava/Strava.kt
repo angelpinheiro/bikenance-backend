@@ -1,6 +1,6 @@
 package com.bikenance.features.strava
 
-import com.bikenance.modules.stravaWebhookRouting
+import com.bikenance.features.strava.routing.stravaWebhookRouting
 import io.ktor.server.application.*
 
 

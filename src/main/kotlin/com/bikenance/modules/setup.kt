@@ -1,6 +1,7 @@
 package com.bikenance.modules
 
 import com.bikenance.database.DatabaseFactory
+import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.databind.SerializationFeature
 import io.ktor.serialization.jackson.*
 import io.ktor.server.application.*
@@ -10,11 +11,16 @@ import io.ktor.server.plugins.contentnegotiation.*
 import io.ktor.server.plugins.defaultheaders.*
 import io.ktor.server.request.*
 import io.ktor.server.resources.*
+import kotlinx.coroutines.launch
 import org.slf4j.event.Level
 
 fun Application.configureServer() {
 
     DatabaseFactory.init()
+
+    launch {
+        DatabaseFactory.populateDatabase()
+    }
 
     install(DefaultHeaders) {
         header("X-Engine", "Ktor")
@@ -23,6 +29,7 @@ fun Application.configureServer() {
     install(ContentNegotiation) {
         jackson {
             enable(SerializationFeature.INDENT_OUTPUT)
+            disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
         }
     }
 
