@@ -1,8 +1,9 @@
 package com.bikenance.features.strava.model
 
+import com.bikenance.features.strava.StravaModel
 import com.fasterxml.jackson.annotation.JsonProperty
 
-data class Athlete(
+data class StravaAthlete(
     @JsonProperty("id") var id: String? = null,
     @JsonProperty("username") var username: String? = null,
     @JsonProperty("resource_state") var resourceState: Int? = null,
@@ -28,4 +29,4 @@ data class Athlete(
     @JsonProperty("measurement_preference") var measurementPreference: String? = null,
     @JsonProperty("ftp") var ftp: String? = null,
     @JsonProperty("weight") var weight: Int? = null
-)
+) : StravaModel<StravaAthlete>()

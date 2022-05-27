@@ -14,3 +14,4 @@ object Users : Table() {
     val stravaToken = text("strava_token").nullable()
     override val primaryKey = PrimaryKey(id)
 }
+

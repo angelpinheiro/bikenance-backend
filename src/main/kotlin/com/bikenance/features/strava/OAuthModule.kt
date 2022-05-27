@@ -1,10 +1,10 @@
 package com.bikenance.features.strava
 
-import com.bikenance.features.strava.model.Athlete
+import com.bikenance.features.strava.model.StravaAthlete
+import com.bikenance.model.AthleteVO
 import com.bikenance.model.UserUpdate
 import com.bikenance.repository.UserRepository
 import com.fasterxml.jackson.databind.DeserializationFeature
-import com.fasterxml.jackson.databind.SerializationFeature
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
 import io.ktor.client.*
@@ -15,6 +15,7 @@ import io.ktor.server.application.*
 import io.ktor.server.auth.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
+import io.ktor.util.pipeline.*
 import org.koin.ktor.ext.inject
 
 
@@ -63,24 +64,35 @@ fun Application.configureOAuth(config: StravaConfig) {
             }
 
             get("/callback") {
-                val principal: OAuthAccessTokenResponse.OAuth2? = call.principal()
-
-                val athlete = principal?.extraParameters?.get("athlete")?.let {
-                    return@let mapper.readValue<Athlete>(it)
-                }
 
                 val userUpdate = UserUpdate()
-                athlete?.let {
-                    userUpdate.stravaAthleteId = athlete.id
-                    userUpdate.username= "${athlete.username} (${athlete.firstname})"
+                val accessToken = getAccessToken()
+
+                getAthleteParameter()?.let {
+                    val vo = it.reSerialize<AthleteVO>()
+                    userUpdate.stravaAthleteId = vo.id
+                    userUpdate.username = "${vo.username} (${vo.firstname})"
                 }
 
-                principal?.accessToken?.let {
+                accessToken?.let {
                     userUpdate.stravaToken = it
                     userRepository.updateUser(1, userUpdate)
                 }
-                call.respond(" $principal, ${principal?.accessToken}")
+                call.respond("$accessToken")
             }
         }
+    }
+}
+
+
+fun PipelineContext<*, ApplicationCall>.getAccessToken(): String? {
+    val principal: OAuthAccessTokenResponse.OAuth2? = call.principal()
+    return principal?.accessToken
+}
+
+fun PipelineContext<*, ApplicationCall>.getAthleteParameter(): StravaAthlete? {
+    val principal: OAuthAccessTokenResponse.OAuth2? = call.principal()
+    return principal?.extraParameters?.get("athlete")?.let {
+        return@let mapper.readValue<StravaAthlete>(it)
     }
 }

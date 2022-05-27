@@ -1,6 +1,6 @@
 package com.bikenance.database
 
-import com.bikenance.database.tables.Users
+import com.bikenance.database.tables.*
 import com.bikenance.model.User
 import com.bikenance.repository.UserRepository
 import kotlinx.coroutines.Dispatchers
@@ -16,7 +16,7 @@ object DatabaseFactory {
         val jdbcURL = "jdbc:h2:file:./data/db"
         val database = Database.connect(jdbcURL, driverClassName)
         transaction(database) {
-            SchemaUtils.create(Users)
+            SchemaUtils.create(Users, AthletesTable)
         }
     }
 
@@ -26,9 +26,22 @@ object DatabaseFactory {
 
     suspend fun populateDatabase() {
         val userRepository = UserRepository(UserDao())
-        if(userRepository.findAll().isEmpty()) {
+
+        if (userRepository.findAll().isEmpty()) {
             userRepository.create(User(-1, "angel", "angel_secret"))
             userRepository.create(User(-1, "admin", "admin_secret"))
+
+
+            transaction {
+                AthleteEntity.new {
+                    athleteId = "1234"
+                    firstname = "Ángel"
+                    lastname = "Piñeiro"
+                    username = "roispiper"
+                }
+            }
+
+
         }
     }
 }

@@ -1,7 +1,5 @@
 package com.bikenance.model
 
-import org.jetbrains.exposed.sql.Table
-
 data class User(
     val id: Int,
     val username: String,
@@ -16,3 +14,5 @@ data class UserUpdate(
     var stravaToken: String? = null,
     var stravaAthleteId: String? = null
 )
+
+

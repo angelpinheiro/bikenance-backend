@@ -29,6 +29,7 @@ fun Application.configureServer() {
     install(ContentNegotiation) {
         jackson {
             enable(SerializationFeature.INDENT_OUTPUT)
+            enable(SerializationFeature.WRITE_SELF_REFERENCES_AS_NULL)
             disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
         }
     }
