@@ -6,6 +6,7 @@ import com.bikenance.model.UserUpdate
 interface UserDaoFacade {
     suspend fun user(id: Int): User?
     suspend fun user(username: String): User?
+    suspend fun findByAthleteId(athleteId: String): User?
     suspend fun allUsers(): List<User>
     suspend fun filter(pattern: String): List<User>
     suspend fun createUser(title: String, body: String): User?

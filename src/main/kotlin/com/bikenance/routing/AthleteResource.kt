@@ -31,9 +31,11 @@ fun Application.athleteRoutes() {
                     return@transaction AthleteEntity.all().sortedBy { it.username }.map {
                         AthleteVO(
                             it.athleteId,
+                            it.userId,
                             it.username,
                             it.firstname,
                             it.lastname,
+                            profilePhotoUrl = it.profilePhotoUrl
                         )
                     }.toList()
                 }
@@ -44,7 +46,7 @@ fun Application.athleteRoutes() {
 
                 when(val token = transaction { AthleteEntity.findById(r.id)?.athleteToken }) {
                     null -> call.respond("User not found")
-                    else -> call.respondText(StravaApi().athlete(token), ContentType.parse("application/json"))
+                    else -> call.respond(StravaApi().athlete(token))
                 }
 
 

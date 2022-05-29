@@ -21,6 +21,12 @@ class UserDao : UserDaoFacade {
             .singleOrNull()
     }
 
+    override suspend fun findByAthleteId(athleteId: String): User? = dbQuery {
+        Users.select { Users.athleteId eq athleteId }
+            .map(::resultRowToArticle)
+            .singleOrNull()
+    }
+
     override suspend fun allUsers(): List<User> = dbQuery {
         Users.selectAll().map(::resultRowToArticle)
     }

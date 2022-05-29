@@ -3,6 +3,7 @@ package com.bikenance.features.strava
 import com.bikenance.database.tables.AthleteEntity
 import com.bikenance.database.tables.Users
 import com.bikenance.features.strava.model.StravaAthlete
+import com.bikenance.features.strava.usecase.handleOAuthCallback
 import com.bikenance.model.AthleteVO
 import com.bikenance.model.UserUpdate
 import com.bikenance.repository.UserRepository
@@ -68,32 +69,13 @@ fun Application.configureOAuth(config: StravaConfig) {
 
             get("/callback") {
 
-                val userUpdate = UserUpdate()
-                val accessToken = getAccessToken()
+                val token = getAccessToken()
+                val athlete = getAthleteParameter()?.reSerialize<AthleteVO>()
 
-                getAthleteParameter()?.let {
-                    val vo = it.reSerialize<AthleteVO>()
-                    userUpdate.athleteId = vo.id
-                    userUpdate.username = "${vo.username} (${vo.firstname})"
-
-                    transaction {
-                        AthleteEntity.new {
-                            userId = 1
-                            athleteToken = accessToken
-                            athleteId = vo.id!! //TODO
-                            username = vo.username
-                            firstname = vo.firstname
-                        }
-                    }
-
-
+                if(token != null && athlete != null) {
+                    handleOAuthCallback(userRepository, token)
                 }
-
-                accessToken?.let {
-                    userUpdate.athleteToken = it
-                    userRepository.updateUser(1, userUpdate)
-                }
-                call.respond("$accessToken")
+                call.respond("$athlete")
             }
         }
     }

@@ -10,6 +10,8 @@ class UserRepository(private val userDao: UserDaoFacade) {
 
     suspend fun findById(id: Int) = userDao.user(id)
 
+    suspend fun findByAthleteId(athleteId: String) = userDao.findByAthleteId(athleteId)
+
     suspend fun findByUsername(username: String) = userDao.user(username)
 
     suspend fun findAll() = userDao.allUsers()
