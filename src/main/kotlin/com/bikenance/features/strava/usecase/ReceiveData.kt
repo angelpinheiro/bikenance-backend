@@ -40,7 +40,9 @@ class ReceiveDataUseCase() {
             EventData.TYPE_ACTIVITY -> {
                 user?.athleteToken?.let {
                     val activity = strava.withToken(it).activity(eventData.objectId)
-                    db.activities.insertOne(activity)
+                    if(activity.type == "Ride") {
+                        db.activities.insertOne(activity)
+                    }
                 }
             }
         }

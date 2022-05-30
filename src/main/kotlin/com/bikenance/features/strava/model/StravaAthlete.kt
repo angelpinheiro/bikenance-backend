@@ -1,13 +1,21 @@
 package com.bikenance.features.strava.model
 
 import com.bikenance.features.strava.StravaModel
-import com.bikenance.model.User
 import com.fasterxml.jackson.annotation.JsonProperty
 import org.bson.codecs.pojo.annotations.BsonId
 import org.bson.types.ObjectId
 import org.litote.kmongo.Id
 import org.litote.kmongo.id.toId
-import java.util.*
+
+
+data class StravaBike(
+    @JsonProperty("id") var id: String? = null,
+    @JsonProperty("primary") var primary: Boolean? = null,
+    @JsonProperty("name") var name: String? = null,
+    @JsonProperty("resource_state") var resourceState: Int? = null,
+    @JsonProperty("distance") var distance: Int? = null
+
+)
 
 data class StravaAthlete(
     @JsonProperty("id") var id: String,
@@ -35,7 +43,8 @@ data class StravaAthlete(
     @JsonProperty("measurement_preference") var measurementPreference: String? = null,
     @JsonProperty("ftp") var ftp: String? = null,
     @JsonProperty("weight") var weight: Int? = null,
+    @JsonProperty("bikes") var bikes: List<StravaBike>? = null,
 
     @BsonId
     val _id: Id<StravaAthlete> = ObjectId().toId()
-    ) : StravaModel<StravaAthlete>()
+) : StravaModel<StravaAthlete>()
