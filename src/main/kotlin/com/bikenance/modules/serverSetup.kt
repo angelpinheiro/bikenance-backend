@@ -15,11 +15,6 @@ import org.slf4j.event.Level
 
 fun Application.configureServer() {
 
-//    DatabaseFactory.init()
-
-//    launch {
-//        DatabaseFactory.populateDatabase()
-//    }
 
     install(DefaultHeaders) {
         header("X-Engine", "Ktor")
