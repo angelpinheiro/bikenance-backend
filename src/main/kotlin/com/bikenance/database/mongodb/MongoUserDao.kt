@@ -1,17 +1,14 @@
 package com.bikenance.database.mongodb
 
-import com.bikenance.database.UserDao
+
 import com.bikenance.database.UserDaoFacade
 import com.bikenance.model.User
 import com.bikenance.model.UserUpdate
-import org.litote.kmongo.eq
-import org.litote.kmongo.findOne
-import org.litote.kmongo.findOneById
-import org.litote.kmongo.regex
+import org.litote.kmongo.*
 
 class MongoUserDao(private val db: DB) : UserDaoFacade {
-    override suspend fun user(id: Int): User? {
-        return db.users.findOne(User::id eq id)
+    override suspend fun findById(id: String): User? {
+        return db.users.findOneById(id)
     }
 
     override suspend fun user(username: String): User? {
@@ -42,11 +39,11 @@ class MongoUserDao(private val db: DB) : UserDaoFacade {
         }
     }
 
-    override suspend fun editUser(id: Int, user: UserUpdate): Boolean {
+    override suspend fun editUser(id: String, user: UserUpdate): Boolean {
         TODO("Not yet implemented")
     }
 
-    override suspend fun deleteUser(id: Int): Boolean {
-        return db.users.deleteOne(User::id eq id).deletedCount > 0
+    override suspend fun deleteUser(id: String): Boolean {
+        return db.users.deleteOneById(id).deletedCount > 0
     }
 }

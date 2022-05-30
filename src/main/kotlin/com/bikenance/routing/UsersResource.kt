@@ -22,7 +22,7 @@ import org.koin.ktor.ext.inject
 class Users(val filter: String? = null){
     @Serializable
     @Resource("{id}")
-    class Id(val parent: Users = Users(), val id: Int)
+    class Id(val parent: Users = Users(), val id: String)
 }
 
 

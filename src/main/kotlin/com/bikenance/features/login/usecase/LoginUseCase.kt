@@ -1,6 +1,5 @@
 package com.bikenance.features.login.usecase
 
-import com.bikenance.database.UserDao
 import com.bikenance.features.login.JwtConfig
 import com.bikenance.features.login.JwtGenerator
 import com.bikenance.features.login.data.LoginData
@@ -12,7 +11,7 @@ data class LoginResult(
     val message: String? = null
 )
 
-class LoginUseCase(config: JwtConfig, val userRepository: UserRepository) {
+class LoginUseCase(config: JwtConfig, private val userRepository: UserRepository) {
 
     private val tokenGenerator = JwtGenerator(config)
 

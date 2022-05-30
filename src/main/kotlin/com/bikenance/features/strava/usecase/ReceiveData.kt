@@ -1,9 +1,7 @@
 package com.bikenance.features.strava.usecase
 
-import com.bikenance.database.UserDao
 import com.bikenance.database.mongodb.DB
 import com.bikenance.features.strava.api.Strava
-import com.bikenance.features.strava.api.StravaApi
 import com.bikenance.repository.UserRepository
 import com.fasterxml.jackson.annotation.JsonProperty
 
@@ -25,11 +23,10 @@ data class EventData(
 }
 
 
-class ReceiveDataUseCase() {
+class ReceiveDataUseCase(private val userRepository: UserRepository) {
 
     suspend fun handleEventData(db: DB, strava: Strava, eventData: EventData) {
 
-        val userRepository = UserRepository(UserDao())
         val user = userRepository.findByAthleteId(eventData.ownerId)
 
         println("Received event data ${eventData.ownerId}, ${user?.athleteToken}")
@@ -40,7 +37,7 @@ class ReceiveDataUseCase() {
             EventData.TYPE_ACTIVITY -> {
                 user?.athleteToken?.let {
                     val activity = strava.withToken(it).activity(eventData.objectId)
-                    if(activity.type == "Ride") {
+                    if (activity.type == "Ride") {
                         db.activities.insertOne(activity)
                     }
                 }

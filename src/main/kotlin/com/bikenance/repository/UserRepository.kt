@@ -10,7 +10,7 @@ class UserRepository(private val userDao: UserDaoFacade) {
 
     suspend fun create(username: String, password: String) = userDao.createUser(username,password)
 
-    suspend fun findById(id: Int) = userDao.user(id)
+    suspend fun findById(id: String) = userDao.user(id)
 
     suspend fun findByAthleteId(athleteId: String) = userDao.findByAthleteId(athleteId)
 
@@ -20,7 +20,7 @@ class UserRepository(private val userDao: UserDaoFacade) {
 
     suspend fun search(pattern: String) = userDao.filter(pattern)
 
-    suspend fun updateUser(id: Int, user: UserUpdate): User? {
+    suspend fun updateUser(id: String, user: UserUpdate): User? {
         if (userDao.editUser(id, user)) {
             return findById(id)
         }

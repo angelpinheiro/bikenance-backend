@@ -5,6 +5,7 @@ import com.bikenance.features.strava.StravaConfig
 import com.bikenance.features.strava.api.Strava
 import com.bikenance.features.strava.usecase.EventData
 import com.bikenance.features.strava.usecase.ReceiveDataUseCase
+import com.bikenance.repository.UserRepository
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
@@ -37,9 +38,10 @@ val client = HttpClient(CIO) {
 fun Application.stravaWebhookRouting(config: StravaConfig) {
 
     val db: DB by inject()
+    val userRepository: UserRepository by inject()
     val strava: Strava by inject()
 
-    val receiveDataUseCase = ReceiveDataUseCase()
+    val receiveDataUseCase = ReceiveDataUseCase(userRepository)
 
     routing {
 

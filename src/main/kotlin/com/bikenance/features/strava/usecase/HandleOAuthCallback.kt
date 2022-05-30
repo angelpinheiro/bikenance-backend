@@ -28,7 +28,7 @@ suspend fun handleOAuthCallback(strava: Strava, db: DB, authToken: String) {
         }
         else -> {
             db.users.updateOne(
-                User::id eq u.id, set(
+                User::_id eq u._id, set(
                     User::athleteId setTo stravaAthlete.id,
                     User::athleteToken setTo authToken
                 )

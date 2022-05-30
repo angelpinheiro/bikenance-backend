@@ -4,8 +4,6 @@ import com.bikenance.database.mongodb.DB
 import com.bikenance.features.strava.api.Strava
 import com.bikenance.features.strava.model.StravaAthlete
 import com.bikenance.features.strava.usecase.handleOAuthCallback
-import com.bikenance.model.Athlete
-import com.bikenance.repository.UserRepository
 import com.fasterxml.jackson.module.kotlin.readValue
 import io.ktor.client.*
 import io.ktor.client.engine.cio.*
@@ -58,14 +56,11 @@ fun Application.configureOAuth(config: StravaConfig) {
             }
 
             get("/callback") {
-
                 val token = getAccessToken()
-                val athlete = getAthleteParameter()?.reSerialize<Athlete>()
-
-                if (token != null && athlete != null) {
+                if (token != null) {
                     handleOAuthCallback(strava, db, token)
                 }
-                call.respond("$athlete")
+                call.respond("$token")
             }
         }
     }

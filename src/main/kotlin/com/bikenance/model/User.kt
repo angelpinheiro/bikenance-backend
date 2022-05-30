@@ -12,8 +12,7 @@ data class User(
     var athleteToken: String? = null,
 
     @BsonId
-    val _id: Id<User> = ObjectId().toId(),
-    val id: Int = -1,
+    val _id: Id<User> = ObjectId().toId()
 )
 
 data class UserUpdate(

@@ -33,7 +33,7 @@ fun Application.module() {
     configureStrava()
     configureLogin()
     userRoutes()
-    athleteRoutes()
+
     initializeMongo()
 
     routing {
@@ -41,6 +41,8 @@ fun Application.module() {
             call.respond("Bikenance Server running!")
         }
     }
+
+    athleteRoutes()
 
 
 }
