@@ -1,15 +1,15 @@
 package com.bikenance.features.strava.model
 
+import com.bikenance.model.User
 import com.fasterxml.jackson.annotation.JsonProperty
 import org.bson.codecs.pojo.annotations.BsonId
+import org.bson.types.ObjectId
 import org.litote.kmongo.Id
+import org.litote.kmongo.id.toId
+import java.util.*
 
 
 data class StravaActivity(
-
-    @BsonId
-    val _id: Id<StravaActivity>? = null,
-
     @JsonProperty("id")
     var id: String? = null,
     @JsonProperty("resource_state")
@@ -129,6 +129,8 @@ data class StravaActivity(
     @JsonProperty("segment_leaderboard_opt_out")
     var segmentLeaderboardOptOut: Boolean? = null,
     @JsonProperty("leaderboard_opt_out")
-    var leaderboardOptOut: Boolean? = null
+    var leaderboardOptOut: Boolean? = null,
 
+    @BsonId
+    val _id: Id<User>? = ObjectId(UUID.randomUUID().toString()).toId()
 )

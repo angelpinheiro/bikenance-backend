@@ -1,15 +1,18 @@
 package com.bikenance.features.strava.usecase
 
+import com.bikenance.database.mongodb.DB
 import com.bikenance.database.tables.AthleteEntity
 import com.bikenance.database.tables.AthletesTable
 import com.bikenance.features.strava.api.Strava
+import com.bikenance.features.strava.model.StravaAthlete
 import com.bikenance.model.User
 import com.bikenance.model.UserUpdate
 import com.bikenance.repository.UserRepository
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.jetbrains.exposed.sql.update
+import org.litote.kmongo.*
 
-suspend fun handleOAuthCallback(strava: Strava, userRepository: UserRepository, accessToken: String) {
+suspend fun handleOAuthCallbackOld(strava: Strava, userRepository: UserRepository, accessToken: String) {
 
 
     val stravaAthlete = strava.withToken(accessToken).athlete()
@@ -68,6 +71,44 @@ suspend fun handleOAuthCallback(strava: Strava, userRepository: UserRepository, 
                 it[profilePhotoUrl] = stravaAthlete.profile
             }
         }
+    }
+}
+
+
+suspend fun handleOAuthCallback(strava: Strava, db: DB, userRepository: UserRepository, authToken: String) {
+
+
+    val stravaAthlete = strava.withToken(authToken).athlete()
+
+    when (val u = db.users.findOne(User::athleteId eq stravaAthlete.id)) {
+        null -> {
+            db.users.insertOne(
+                User(
+                    -1,
+                    stravaAthlete.username ?: stravaAthlete.firstname ?: "None",
+                    ".",
+                    stravaAthlete.id,
+                    authToken
+                )
+            )
+
+        }
+        else -> {
+            db.users.updateOne(
+                User::id eq u.id, set(
+                    User::athleteId setTo stravaAthlete.id,
+                    User::athleteToken setTo authToken
+                )
+            )
+        }
+    }
+
+    val ath = db.athletes.findOne(StravaAthlete::id eq stravaAthlete.id)
+    if (ath == null)
+        db.athletes.insertOne(stravaAthlete)
+    else {
+        stravaAthlete.id = ath.id
+        db.athletes.updateOne(stravaAthlete)
     }
 }
 

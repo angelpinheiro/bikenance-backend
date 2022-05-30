@@ -1,13 +1,11 @@
 package com.bikenance.features.strava
 
+import com.bikenance.database.mongodb.DB
 import com.bikenance.features.strava.api.Strava
 import com.bikenance.features.strava.model.StravaAthlete
 import com.bikenance.features.strava.usecase.handleOAuthCallback
 import com.bikenance.model.AthleteVO
 import com.bikenance.repository.UserRepository
-import com.fasterxml.jackson.databind.DeserializationFeature
-import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
 import io.ktor.client.*
 import io.ktor.client.engine.cio.*
@@ -24,6 +22,7 @@ import org.koin.ktor.ext.inject
 fun Application.configureOAuth(config: StravaConfig) {
 
     val strava: Strava by inject()
+    val db: DB by inject()
     val userRepository: UserRepository by inject()
 
     authentication {
@@ -65,7 +64,7 @@ fun Application.configureOAuth(config: StravaConfig) {
                 val athlete = getAthleteParameter()?.reSerialize<AthleteVO>()
 
                 if (token != null && athlete != null) {
-                    handleOAuthCallback(strava, userRepository, token)
+                    handleOAuthCallback(strava, db, userRepository, token)
                 }
                 call.respond("$athlete")
             }

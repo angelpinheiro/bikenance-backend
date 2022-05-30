@@ -6,7 +6,7 @@ import com.bikenance.features.strava.api.Strava
 import com.bikenance.features.strava.usecase.EventData
 import com.bikenance.features.strava.usecase.ReceiveDataUseCase
 import com.fasterxml.jackson.annotation.JsonProperty
-import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
 import io.ktor.client.*
 import io.ktor.client.engine.cio.*
@@ -99,6 +99,8 @@ fun Application.stravaWebhookRouting(config: StravaConfig) {
 
 fun Application.subscribeToStravaWebhooks() {
 
+    val mapper: ObjectMapper by inject()
+
     // Flow:
     // 1) check subscriptions (* not implemented)
     // 2) if there are no subscriptions, or if current callback_url is not updated, delete old and create a new one
@@ -120,7 +122,6 @@ fun Application.subscribeToStravaWebhooks() {
             parameter(ReqParams.CLIENT_SECRET, clientSecret)
         }
 
-        val mapper = jacksonObjectMapper()
         val subsList = mapper.readValue<List<StravaSubscription>>(existResponse.bodyAsText())
         var deleted = false
 
