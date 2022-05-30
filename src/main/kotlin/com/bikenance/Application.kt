@@ -1,5 +1,6 @@
 package com.bikenance
 
+import com.bikenance.database.mongodb.initializeMongo
 import com.bikenance.features.login.configureLogin
 import com.bikenance.features.strava.configureStrava
 import com.bikenance.modules.appModule
@@ -33,6 +34,7 @@ fun Application.module() {
     configureLogin()
     userRoutes()
     athleteRoutes()
+    initializeMongo()
 
     routing {
         get("/") {

@@ -2,9 +2,7 @@ package com.bikenance.routing
 
 import com.bikenance.database.tables.AthleteEntity
 import com.bikenance.features.strava.api.Strava
-import com.bikenance.features.strava.api.StravaApi
-import com.bikenance.model.AthleteVO
-import io.ktor.http.*
+import com.bikenance.model.Athlete
 import io.ktor.resources.*
 import io.ktor.server.application.*
 import io.ktor.server.auth.*
@@ -33,7 +31,7 @@ fun Application.athleteRoutes() {
             get<Athletes> { r ->
                 val athletes = transaction {
                     return@transaction AthleteEntity.all().sortedBy { it.username }.map {
-                        AthleteVO(
+                        Athlete(
                             it.athleteId,
                             it.userId,
                             it.username,

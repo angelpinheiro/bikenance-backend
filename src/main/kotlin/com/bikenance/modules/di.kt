@@ -1,9 +1,8 @@
 package com.bikenance.modules
 
-import com.bikenance.database.UserDao
 import com.bikenance.database.UserDaoFacade
 import com.bikenance.database.mongodb.DB
-import com.bikenance.database.mongodb.createDatabase
+import com.bikenance.database.mongodb.MongoUserDao
 import com.bikenance.features.strava.api.Strava
 import com.bikenance.repository.UserRepository
 import com.fasterxml.jackson.databind.DeserializationFeature
@@ -17,12 +16,17 @@ import org.koin.dsl.module
 
 val appModule = module {
 
-    single<UserDaoFacade> { UserDao() }
-
-    single { UserRepository(get()) }
 
     single {
         DB()
+    }
+
+    single<UserDaoFacade> {
+        MongoUserDao(get())
+    }
+
+    single {
+        UserRepository(get())
     }
 
     single {
@@ -31,7 +35,9 @@ val appModule = module {
         }
     }
 
-    single { Strava(get()) }
+    single {
+        Strava(get())
+    }
 
     single {
         jacksonObjectMapper()

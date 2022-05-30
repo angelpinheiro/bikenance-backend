@@ -8,6 +8,8 @@ class UserRepository(private val userDao: UserDaoFacade) {
 
     suspend fun create(user: User) = userDao.createUser(user)
 
+    suspend fun create(username: String, password: String) = userDao.createUser(username,password)
+
     suspend fun findById(id: Int) = userDao.user(id)
 
     suspend fun findByAthleteId(athleteId: String) = userDao.findByAthleteId(athleteId)

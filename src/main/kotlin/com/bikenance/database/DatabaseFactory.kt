@@ -28,18 +28,8 @@ object DatabaseFactory {
         val userRepository = UserRepository(UserDao())
 
         if (userRepository.findAll().isEmpty()) {
-            userRepository.create(User(1, "angel", "angel_secret"))
-            userRepository.create(User(2, "admin", "admin_secret"))
-//            transaction {
-//                AthleteEntity.new {
-//                    athleteId = "1234"
-//                    firstname = "Ángel"
-//                    lastname = "Piñeiro"
-//                    username = "roispiper"
-//                }
-//            }
-
-
+            userRepository.create(User(id=1, username = "angel", password =  "angel_secret"))
+            userRepository.create(User(id=2, username = "admin", password =  "admin_secret"))
         }
     }
 }

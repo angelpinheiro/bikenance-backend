@@ -2,7 +2,7 @@ package com.bikenance.model
 
 import com.fasterxml.jackson.annotation.JsonProperty
 
-data class AthleteVO(
+data class Athlete(
     @JsonProperty("id") var id: String? = null,
     @JsonProperty("userid") var userId: Int? = null,
     @JsonProperty("username") var username: String? = null,
