@@ -1,11 +1,15 @@
 package com.bikenance.features.strava.routing
 
+import com.bikenance.database.mongodb.DB
 import com.bikenance.features.strava.StravaConfig
+import com.bikenance.features.strava.api.Strava
 import com.bikenance.features.strava.usecase.EventData
 import com.bikenance.features.strava.usecase.ReceiveDataUseCase
+import com.fasterxml.jackson.annotation.JsonProperty
+import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import com.fasterxml.jackson.module.kotlin.readValue
 import io.ktor.client.*
 import io.ktor.client.engine.cio.*
-import io.ktor.client.plugins.logging.*
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
@@ -14,6 +18,7 @@ import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import kotlinx.coroutines.*
+import org.koin.ktor.ext.inject
 import kotlin.time.Duration.Companion.seconds
 
 object ReqParams {
@@ -26,10 +31,13 @@ object ReqParams {
 const val VERIFY_TOKEN = "BIKENANCE_VERIFY_TOKEN"
 
 val client = HttpClient(CIO) {
-    install(Logging)
+//    install(Logging)
 }
 
 fun Application.stravaWebhookRouting(config: StravaConfig) {
+
+    val db: DB by inject()
+    val strava: Strava by inject()
 
     val receiveDataUseCase = ReceiveDataUseCase()
 
@@ -55,7 +63,7 @@ fun Application.stravaWebhookRouting(config: StravaConfig) {
             // launch a new coroutine for processing event data
             // and return Ok to avoid strava request cancellation
             application.launch {
-                receiveDataUseCase.handleEventData(eventData)
+                receiveDataUseCase.handleEventData(db, strava, eventData)
             }
             call.respond(HttpStatusCode.OK)
         }
@@ -106,17 +114,43 @@ fun Application.subscribeToStravaWebhooks() {
 
         //  wait for app engine to deploy routes (refactor)
         delay(5.seconds)
-        val response = client.post(subscriptionUrl) {
+
+        val existResponse = client.get(subscriptionUrl) {
             parameter(ReqParams.CLIENT_ID, clientId)
             parameter(ReqParams.CLIENT_SECRET, clientSecret)
-            parameter(ReqParams.CALLBACK_URL, "$apiUrl/webhook")
-            parameter(ReqParams.VERIFY_TOKEN, VERIFY_TOKEN)
         }
 
-        if (response.status == HttpStatusCode.OK) {
-            println("SUCCESS: Webhook subscription created.")
-        } else {
-            println("WARNING: Could not create webhook subscription.")
+        val mapper = jacksonObjectMapper()
+        val subsList = mapper.readValue<List<StravaSubscription>>(existResponse.bodyAsText())
+        var deleted = false
+
+        subsList.forEach { sub ->
+            if (sub.callbackUrl != "$apiUrl/webhook") {
+                println("Deleting subscription with id ${sub.id}")
+                client.delete(subscriptionUrl + "/" + sub.id) {
+                    parameter("id", sub.id)
+                    parameter(ReqParams.CLIENT_ID, clientId)
+                    parameter(ReqParams.CLIENT_SECRET, clientSecret)
+                }
+                deleted = true
+            }
+        }
+
+        if (deleted) {
+            println("Creating new subscription...")
+
+            val response = client.post(subscriptionUrl) {
+                parameter(ReqParams.CLIENT_ID, clientId)
+                parameter(ReqParams.CLIENT_SECRET, clientSecret)
+                parameter(ReqParams.CALLBACK_URL, "$apiUrl/webhook")
+                parameter(ReqParams.VERIFY_TOKEN, VERIFY_TOKEN)
+            }
+
+            if (response.status == HttpStatusCode.Created) {
+                println("SUCCESS: Webhook subscription created.")
+            } else {
+                println("WARNING: Could not create webhook subscription. ${response.status}")
+            }
         }
     }
 }
@@ -130,4 +164,13 @@ data class WebhookEvent(
     val subscription_id: Long
 )
 
+data class StravaSubscription(
+    @JsonProperty("id") var id: Int? = null,
+    @JsonProperty("resource_state") var resourceState: Int? = null,
+    @JsonProperty("application_id") var applicationId: Int? = null,
+    @JsonProperty("callback_url") var callbackUrl: String? = null,
+    @JsonProperty("created_at") var createdAt: String? = null,
+    @JsonProperty("updated_at") var updatedAt: String? = null
+
+)
 

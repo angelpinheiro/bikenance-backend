@@ -2,16 +2,17 @@ package com.bikenance.features.strava.usecase
 
 import com.bikenance.database.tables.AthleteEntity
 import com.bikenance.database.tables.AthletesTable
-import com.bikenance.features.strava.api.StravaApi
+import com.bikenance.features.strava.api.Strava
 import com.bikenance.model.User
 import com.bikenance.model.UserUpdate
 import com.bikenance.repository.UserRepository
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.jetbrains.exposed.sql.update
 
-suspend fun handleOAuthCallback(userRepository: UserRepository, accessToken: String) {
+suspend fun handleOAuthCallback(strava: Strava, userRepository: UserRepository, accessToken: String) {
 
-    val stravaAthlete = StravaApi().athlete(accessToken)
+
+    val stravaAthlete = strava.withToken(accessToken).athlete()
     val authAthleteId = stravaAthlete.id!!
     var newUser = false
 

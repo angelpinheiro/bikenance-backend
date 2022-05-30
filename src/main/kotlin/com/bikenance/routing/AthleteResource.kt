@@ -1,6 +1,7 @@
 package com.bikenance.routing
 
 import com.bikenance.database.tables.AthleteEntity
+import com.bikenance.features.strava.api.Strava
 import com.bikenance.features.strava.api.StravaApi
 import com.bikenance.model.AthleteVO
 import io.ktor.http.*
@@ -12,6 +13,7 @@ import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import kotlinx.serialization.Serializable
 import org.jetbrains.exposed.sql.transactions.transaction
+import org.koin.ktor.ext.inject
 
 @Serializable
 @Resource("/athletes")
@@ -23,6 +25,8 @@ class Athletes(val filter: String? = null) {
 
 
 fun Application.athleteRoutes() {
+
+    val strava: Strava by inject()
 
     routing {
         authenticate {
@@ -46,7 +50,7 @@ fun Application.athleteRoutes() {
 
                 when(val token = transaction { AthleteEntity.findById(r.id)?.athleteToken }) {
                     null -> call.respond("User not found")
-                    else -> call.respond(StravaApi().athlete(token))
+                    else -> call.respond(strava.withToken(token).athlete())
                 }
 
 

@@ -1,17 +1,23 @@
 package com.bikenance.features.strava.model
 
 import com.fasterxml.jackson.annotation.JsonProperty
+import org.bson.codecs.pojo.annotations.BsonId
+import org.litote.kmongo.Id
 
 
-data class Activity(
+data class StravaActivity(
+
+    @BsonId
+    val _id: Id<StravaActivity>? = null,
+
     @JsonProperty("id")
-    var id: Int? = null,
+    var id: String? = null,
     @JsonProperty("resource_state")
     var resourceState: Int? = null,
     @JsonProperty("external_id")
     var externalId: String? = null,
     @JsonProperty("upload_id")
-    var uploadId: Int? = null,
+    var uploadId: String? = null,
     @JsonProperty("athlete")
     var athleteRef: AthleteRef? = AthleteRef(),
     @JsonProperty("name")

@@ -1,13 +1,12 @@
 package com.bikenance.features.strava
 
-import com.bikenance.database.tables.AthleteEntity
-import com.bikenance.database.tables.Users
+import com.bikenance.features.strava.api.Strava
 import com.bikenance.features.strava.model.StravaAthlete
 import com.bikenance.features.strava.usecase.handleOAuthCallback
 import com.bikenance.model.AthleteVO
-import com.bikenance.model.UserUpdate
 import com.bikenance.repository.UserRepository
 import com.fasterxml.jackson.databind.DeserializationFeature
+import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
 import io.ktor.client.*
@@ -19,17 +18,13 @@ import io.ktor.server.auth.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import io.ktor.util.pipeline.*
-import org.jetbrains.exposed.sql.transactions.transaction
 import org.koin.ktor.ext.inject
 
 
 fun Application.configureOAuth(config: StravaConfig) {
 
-    val clientId = environment.config.property("strava_webhooks.client_id").getString()
-    val clientSecret = environment.config.property("strava_webhooks.client_secret").getString()
-    val subscriptionUrl = environment.config.property("strava_webhooks.strava_subscribe_url").getString()
-    val apiUrl = environment.config.property("api.url").getString()
-
+    val strava: Strava by inject()
+    val userRepository: UserRepository by inject()
 
     authentication {
         oauth("auth-oauth-strava") {
@@ -59,9 +54,6 @@ fun Application.configureOAuth(config: StravaConfig) {
          * and stores the token in the user with id '1'
          */
 
-        val userRepository: UserRepository by inject()
-        val mapper = jacksonObjectMapper().disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
-
         authenticate("auth-oauth-strava") {
             get("/strava") {
                 call.respondRedirect("${config.apiUrl}/callback")
@@ -72,8 +64,8 @@ fun Application.configureOAuth(config: StravaConfig) {
                 val token = getAccessToken()
                 val athlete = getAthleteParameter()?.reSerialize<AthleteVO>()
 
-                if(token != null && athlete != null) {
-                    handleOAuthCallback(userRepository, token)
+                if (token != null && athlete != null) {
+                    handleOAuthCallback(strava, userRepository, token)
                 }
                 call.respond("$athlete")
             }

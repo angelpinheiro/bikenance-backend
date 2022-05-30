@@ -11,7 +11,7 @@ data class Laps(
     @JsonProperty("name")
     var name: String? = null,
     @JsonProperty("activity")
-    var activity: Activity? = Activity(),
+    var activity: StravaActivity? = StravaActivity(),
     @JsonProperty("athlete")
     var athleteRef: AthleteRef? = AthleteRef(),
     @JsonProperty("elapsed_time")

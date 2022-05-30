@@ -9,7 +9,7 @@ data class StravaConfig(
     val clientId: String,
     val clientSecret: String,
     val subscriptionUrl: String,
-    val subscribeOnLaunch: Boolean = false
+    val subscribeOnLaunch: Boolean = true
 )
 
 fun Application.configureStrava() {
