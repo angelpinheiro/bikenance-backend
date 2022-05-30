@@ -23,6 +23,8 @@ object StravaApiEndpoints {
 
 class Strava(private val client: HttpClient) {
 
+
+
     fun withToken(token: String): StravaApi {
         return StravaApi(token, this)
     }

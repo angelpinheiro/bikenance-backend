@@ -60,7 +60,7 @@ fun Application.configureOAuth(config: StravaConfig) {
                 if (token != null) {
                     handleOAuthCallback(strava, db, token)
                 }
-                call.respond("$token")
+                call.respondRedirect("bikenance://redirect?code=$token")
             }
         }
     }

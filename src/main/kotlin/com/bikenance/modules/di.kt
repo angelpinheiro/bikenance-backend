@@ -8,9 +8,11 @@ import com.bikenance.repository.UserRepository
 import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.databind.SerializationFeature
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import com.typesafe.config.ConfigFactory
 import io.ktor.client.*
 import io.ktor.client.engine.cio.*
 import io.ktor.client.plugins.logging.*
+import org.koin.dsl.koinApplication
 import org.koin.dsl.module
 
 
