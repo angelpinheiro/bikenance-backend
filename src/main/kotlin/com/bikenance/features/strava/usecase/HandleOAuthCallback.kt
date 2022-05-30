@@ -37,8 +37,7 @@ suspend fun handleOAuthCallback(strava: Strava, db: DB, authToken: String) {
     if (ath == null)
         db.athletes.insertOne(stravaAthlete)
     else {
-        stravaAthlete.id = ath.id
-        db.athletes.updateOne(stravaAthlete)
+        db.athletes.updateOneById(ath._id, stravaAthlete)
     }
 }
 

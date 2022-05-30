@@ -132,5 +132,5 @@ data class StravaActivity(
     var leaderboardOptOut: Boolean? = null,
 
     @BsonId
-    val _id: Id<User>? = ObjectId(UUID.randomUUID().toString()).toId()
+    val _id: Id<StravaActivity>? = ObjectId().toId()
 )

@@ -34,5 +34,8 @@ data class StravaAthlete(
     @JsonProperty("date_preference") var datePreference: String? = null,
     @JsonProperty("measurement_preference") var measurementPreference: String? = null,
     @JsonProperty("ftp") var ftp: String? = null,
-    @JsonProperty("weight") var weight: Int? = null
+    @JsonProperty("weight") var weight: Int? = null,
+
+    @BsonId
+    val _id: Id<StravaAthlete> = ObjectId().toId()
     ) : StravaModel<StravaAthlete>()
