@@ -2,7 +2,6 @@ package com.bikenance.repository
 
 import com.bikenance.database.UserDaoFacade
 import com.bikenance.model.User
-import com.bikenance.model.UserUpdate
 
 class UserRepository(private val userDao: UserDaoFacade) {
 
@@ -12,6 +11,8 @@ class UserRepository(private val userDao: UserDaoFacade) {
 
     suspend fun findById(id: String) = userDao.user(id)
 
+    suspend fun findByToken(token: String) = userDao.findByToken(token)
+
     suspend fun findByAthleteId(athleteId: String) = userDao.findByAthleteId(athleteId)
 
     suspend fun findByUsername(username: String) = userDao.user(username)
@@ -20,8 +21,8 @@ class UserRepository(private val userDao: UserDaoFacade) {
 
     suspend fun search(pattern: String) = userDao.filter(pattern)
 
-    suspend fun updateUser(id: String, user: UserUpdate): User? {
-        if (userDao.editUser(id, user)) {
+    suspend fun updateUser(id: String, user: User): User? {
+        if (userDao.updateUser(id, user)) {
             return findById(id)
         }
         return null

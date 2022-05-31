@@ -7,9 +7,9 @@ import com.bikenance.features.strava.model.StravaAthlete
 import com.bikenance.model.User
 import org.litote.kmongo.*
 
-suspend fun handleOAuthCallback(strava: Strava, db: DB, authToken: AuthData) {
+suspend fun handleOAuthCallback(strava: Strava, db: DB, auth: AuthData) {
 
-    val stravaClient = strava.withToken(authToken.accessToken);
+    val stravaClient = strava.withAuth(auth);
     val stravaAthlete = stravaClient.athlete() //TODO may be null
 
     when (val u = db.users.findOne(User::athleteId eq stravaAthlete.id)) {
@@ -19,7 +19,7 @@ suspend fun handleOAuthCallback(strava: Strava, db: DB, authToken: AuthData) {
                     stravaAthlete.username ?: stravaAthlete.firstname ?: "None",
                     ".",
                     stravaAthlete.id,
-                    authToken
+                    auth
                 )
             )
 
@@ -28,7 +28,7 @@ suspend fun handleOAuthCallback(strava: Strava, db: DB, authToken: AuthData) {
             db.users.updateOne(
                 User::_id eq u._id, set(
                     User::athleteId setTo stravaAthlete.id,
-                    User::authData setTo authToken
+                    User::authData setTo auth
                 )
             )
         }

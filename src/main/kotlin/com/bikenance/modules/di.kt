@@ -42,7 +42,7 @@ val appModule = module {
     }
 
     single {
-        Strava(get(), get())
+        Strava(get(), get(), get())
     }
 
     single {

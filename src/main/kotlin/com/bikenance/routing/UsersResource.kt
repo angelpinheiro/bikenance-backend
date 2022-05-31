@@ -1,5 +1,6 @@
 package com.bikenance.routing
 
+import com.bikenance.model.User
 import com.bikenance.model.UserUpdate
 import com.bikenance.repository.UserRepository
 import io.ktor.resources.*
@@ -49,7 +50,7 @@ fun Application.userRoutes() {
             }
 
             put<Users.Id> { r ->
-                val user = call.receive<UserUpdate>()
+                val user = call.receive<User>()
                 val u = userRepository.updateUser(r.id, user)
                 call.respond(u ?: "User not found")
             }

@@ -5,6 +5,8 @@ import com.bikenance.features.login.config.AppConfig
 import com.bikenance.features.strava.api.Strava
 import com.bikenance.features.strava.model.StravaAthlete
 import com.bikenance.features.strava.usecase.handleOAuthCallback
+import com.bikenance.modules.authData
+import com.bikenance.repository.UserRepository
 import com.fasterxml.jackson.module.kotlin.readValue
 import io.ktor.client.*
 import io.ktor.client.engine.cio.*
@@ -29,6 +31,7 @@ fun Application.configureOAuth() {
     val config: AppConfig by inject()
     val strava: Strava by inject()
     val db: DB by inject()
+    val userRepository : UserRepository by inject()
 
     authentication {
         oauth("auth-oauth-strava") {
@@ -53,11 +56,25 @@ fun Application.configureOAuth() {
 
     routing {
 
+        // TEST STRAVA OAUTH REFRESH TOKENS
+        get("/athlete/{token}") {
+            val r = call.parameters["token"]?.let {
+                userRepository.findByToken(it)?.authData?.let {auth->
+                    // auth.expiresAt = 0 // Force token refresh
+                    val stravaClient = strava.withAuth(auth);
+                    call.respond(stravaClient.athlete())
+                    true
+                }
+            }
+            if(r == null){
+                call.respond("WTF")
+            }
+        }
+
         /**
          * Route for testing purposes. Authorizes a user using the strava OAuth API,
          * and stores the token in the user with id '1'
          */
-
         authenticate("auth-oauth-strava") {
 
             get("/strava") {
@@ -65,7 +82,7 @@ fun Application.configureOAuth() {
             }
 
             get("/callback") {
-                val token = getAccessToken()
+                val token = oAuthData()
                 val isApp = call.request.headers["user-agent"]?.let { isMobileUserAgentRegex(it) } ?: false
 
                 if (token != null) {
@@ -84,14 +101,14 @@ fun Application.configureOAuth() {
 }
 
 data class AuthData(
-    val accessToken: String,
-    val refreshToken: String?,
-    val expiresIn: Long,
-    val expiresAt: Long,
+    var accessToken: String,
+    var refreshToken: String?,
+    var expiresIn: Long,
+    var expiresAt: Long,
     var scope: String = ""
 )
 
-fun PipelineContext<*, ApplicationCall>.getAccessToken(): AuthData? {
+fun PipelineContext<*, ApplicationCall>.oAuthData(): AuthData? {
     val principal: OAuthAccessTokenResponse.OAuth2? = call.principal()
     return principal?.let {
         val expiration = Instant.now().plusSeconds(it.expiresIn - 10).toEpochMilli()

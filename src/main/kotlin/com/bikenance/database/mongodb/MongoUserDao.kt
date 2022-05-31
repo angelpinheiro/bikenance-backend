@@ -2,8 +2,8 @@ package com.bikenance.database.mongodb
 
 
 import com.bikenance.database.UserDaoFacade
+import com.bikenance.features.strava.AuthData
 import com.bikenance.model.User
-import com.bikenance.model.UserUpdate
 import org.litote.kmongo.*
 
 class MongoUserDao(private val db: DB) : UserDaoFacade {
@@ -29,21 +29,25 @@ class MongoUserDao(private val db: DB) : UserDaoFacade {
 
     override suspend fun createUser(username: String, password: String): User? {
         return db.users.insertOne(User(username = username, password = password)).let {
-            db.users.findOneById(it.insertedId)
+            it.insertedId?.let { id -> db.users.findOneById(id) }
         }
     }
 
     override suspend fun createUser(user: User): User? {
         return db.users.insertOne(user).let {
-            db.users.findOneById(it.insertedId)
+            it.insertedId?.let { id -> db.users.findOneById(id) }
         }
     }
 
-    override suspend fun editUser(id: String, user: UserUpdate): Boolean {
-        TODO("Not yet implemented")
+    override suspend fun updateUser(id: String, user: User): Boolean {
+        return db.users.updateOneById(id, user).modifiedCount > 0
     }
 
     override suspend fun deleteUser(id: String): Boolean {
         return db.users.deleteOneById(id).deletedCount > 0
+    }
+
+    override suspend fun findByToken(token: String): User? {
+        return db.users.findOne(User::authData / AuthData::accessToken eq token)
     }
 }

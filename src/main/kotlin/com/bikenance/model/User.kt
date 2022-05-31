@@ -5,6 +5,7 @@ import org.bson.codecs.pojo.annotations.BsonId
 import org.bson.types.ObjectId
 import org.litote.kmongo.Id
 import org.litote.kmongo.id.toId
+import org.litote.kmongo.json
 
 data class User(
     val username: String,
@@ -15,6 +16,11 @@ data class User(
     @BsonId
     val _id: Id<User> = ObjectId().toId()
 )
+{
+    fun id(): String {
+        return _id.json
+    }
+}
 
 data class UserUpdate(
     var username: String? = null,
