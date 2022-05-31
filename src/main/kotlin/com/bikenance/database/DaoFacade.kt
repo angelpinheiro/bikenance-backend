@@ -4,14 +4,14 @@ import com.bikenance.model.User
 import com.bikenance.model.UserUpdate
 
 interface UserDaoFacade {
-    suspend fun findById(id: String): User?
-    suspend fun user(username: String): User?
-    suspend fun findByAthleteId(athleteId: String): User?
-    suspend fun allUsers(): List<User>
+    suspend fun getById(id: String): User?
+    suspend fun getByUsername(username: String): User?
+    suspend fun getByAthleteId(athleteId: String): User?
+    suspend fun findAll(): List<User>
     suspend fun filter(pattern: String): List<User>
-    suspend fun createUser(title: String, body: String): User?
-    suspend fun createUser(user: User): User?
-    suspend fun updateUser(id: String, user: User): Boolean
-    suspend fun deleteUser(id: String): Boolean
-    suspend fun findByToken(token: String): User?
+    suspend fun create(title: String, body: String): User?
+    suspend fun create(user: User): User?
+    suspend fun update(id: String, user: User): Boolean
+    suspend fun delete(id: String): Boolean
+    suspend fun getByAccessToken(token: String): User?
 }

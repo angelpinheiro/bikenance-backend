@@ -5,25 +5,25 @@ import com.bikenance.model.User
 
 class UserRepository(private val userDao: UserDaoFacade) {
 
-    suspend fun create(user: User) = userDao.createUser(user)
+    suspend fun create(user: User) = userDao.create(user)
 
-    suspend fun create(username: String, password: String) = userDao.createUser(username,password)
+    suspend fun create(username: String, password: String) = userDao.create(username, password)
 
-    suspend fun findById(id: String) = userDao.user(id)
+    suspend fun getById(id: String) = userDao.getById(id)
 
-    suspend fun findByToken(token: String) = userDao.findByToken(token)
+    suspend fun getByToken(token: String) = userDao.getByAccessToken(token)
 
-    suspend fun findByAthleteId(athleteId: String) = userDao.findByAthleteId(athleteId)
+    suspend fun getByAthleteId(athleteId: String) = userDao.getByAthleteId(athleteId)
 
-    suspend fun findByUsername(username: String) = userDao.user(username)
+    suspend fun getByUsername(username: String) = userDao.getByUsername(username)
 
-    suspend fun findAll() = userDao.allUsers()
+    suspend fun findAll() = userDao.findAll()
 
-    suspend fun search(pattern: String) = userDao.filter(pattern)
+    suspend fun filter(pattern: String) = userDao.filter(pattern)
 
-    suspend fun updateUser(id: String, user: User): User? {
-        if (userDao.updateUser(id, user)) {
-            return findById(id)
+    suspend fun update(id: String, user: User): User? {
+        if (userDao.update(id, user)) {
+            return getById(id)
         }
         return null
     }

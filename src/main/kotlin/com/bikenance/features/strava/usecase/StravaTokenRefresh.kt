@@ -45,11 +45,11 @@ class StravaTokenRefresh(
 
     private suspend fun updateUserAuthInDB(user: User, auth: AuthData) {
         user.authData = auth
-        userRepository.updateUser(user.id(), user)
+        userRepository.update(user.id(), user)
     }
 
     private suspend fun findTargetUser(auth: AuthData): User? {
-        return userRepository.findByToken(auth.accessToken);
+        return userRepository.getByToken(auth.accessToken);
     }
 
     private suspend fun refreshAccessToken(token: String): RefreshTokenResponse {

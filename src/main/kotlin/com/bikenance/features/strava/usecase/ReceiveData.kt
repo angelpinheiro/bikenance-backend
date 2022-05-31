@@ -17,7 +17,7 @@ class ReceiveDataUseCase(private val userRepository: UserRepository) {
 
     suspend fun handleEventData(db: DB, strava: Strava, eventData: EventData) {
         println("Event data $eventData")
-        userRepository.findByAthleteId(eventData.ownerId)?.let { user ->
+        userRepository.getByAthleteId(eventData.ownerId)?.let { user ->
             println("Event: ${eventData.aspectType.type} ${eventData.objectType.type}")
             when (eventData.objectType) {
                 ObjectType.ACTIVITY -> {

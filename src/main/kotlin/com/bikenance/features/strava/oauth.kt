@@ -5,7 +5,6 @@ import com.bikenance.features.login.config.AppConfig
 import com.bikenance.features.strava.api.Strava
 import com.bikenance.features.strava.model.StravaAthlete
 import com.bikenance.features.strava.usecase.handleOAuthCallback
-import com.bikenance.modules.authData
 import com.bikenance.repository.UserRepository
 import com.fasterxml.jackson.module.kotlin.readValue
 import io.ktor.client.*
@@ -59,7 +58,7 @@ fun Application.configureOAuth() {
         // TEST STRAVA OAUTH REFRESH TOKENS
         get("/athlete/{token}") {
             val r = call.parameters["token"]?.let {
-                userRepository.findByToken(it)?.authData?.let {auth->
+                userRepository.getByToken(it)?.authData?.let { auth->
                     // auth.expiresAt = 0 // Force token refresh
                     val stravaClient = strava.withAuth(auth);
                     call.respond(stravaClient.athlete())

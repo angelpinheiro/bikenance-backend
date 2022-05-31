@@ -1,7 +1,6 @@
 package com.bikenance.routing
 
 import com.bikenance.model.User
-import com.bikenance.model.UserUpdate
 import com.bikenance.repository.UserRepository
 import io.ktor.resources.*
 import io.ktor.server.application.*
@@ -34,12 +33,12 @@ fun Application.userRoutes() {
             get<Users> { r ->
                 when(r.filter) {
                     null -> call.respond(userRepository.findAll())
-                    else -> call.respond(userRepository.search(r.filter))
+                    else -> call.respond(userRepository.filter(r.filter))
                 }
             }
 
             get<Users.Id> { r ->
-                val u = userRepository.findById(r.id)
+                val u = userRepository.getById(r.id)
 
                 when(val token = u?.authData) {
                     null -> call.respond(u ?: "User not found")
@@ -51,7 +50,7 @@ fun Application.userRoutes() {
 
             put<Users.Id> { r ->
                 val user = call.receive<User>()
-                val u = userRepository.updateUser(r.id, user)
+                val u = userRepository.update(r.id, user)
                 call.respond(u ?: "User not found")
             }
         }

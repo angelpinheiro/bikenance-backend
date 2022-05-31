@@ -16,7 +16,7 @@ class LoginUseCase(config: JwtConfig, private val userRepository: UserRepository
     private val tokenGenerator = JwtGenerator(config)
 
     suspend fun loginUser(loginData: LoginData): LoginResult {
-        val u = userRepository.findByUsername(loginData.username)
+        val u = userRepository.getByUsername(loginData.username)
         return if (u != null && u.password == loginData.password) {
             LoginResult(true, tokenGenerator.generateToken(loginData))
         } else {
@@ -25,7 +25,7 @@ class LoginUseCase(config: JwtConfig, private val userRepository: UserRepository
     }
 
     suspend fun registerUser(user: LoginData): LoginResult {
-        return if (userRepository.findByUsername(user.username) == null) {
+        return if (userRepository.getByUsername(user.username) == null) {
             val u = userRepository.create(user.username, user.password)
             LoginResult(true, tokenGenerator.generateToken(user))
         } else {
