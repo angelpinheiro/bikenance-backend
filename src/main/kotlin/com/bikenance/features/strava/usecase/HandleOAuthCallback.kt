@@ -1,17 +1,16 @@
 package com.bikenance.features.strava.usecase
 
 import com.bikenance.database.mongodb.DB
+import com.bikenance.features.strava.AuthData
 import com.bikenance.features.strava.api.Strava
-import com.bikenance.features.strava.model.StravaActivity
 import com.bikenance.features.strava.model.StravaAthlete
 import com.bikenance.model.User
 import org.litote.kmongo.*
-import java.time.LocalDateTime
 
-suspend fun handleOAuthCallback(strava: Strava, db: DB, authToken: String) {
+suspend fun handleOAuthCallback(strava: Strava, db: DB, authToken: AuthData) {
 
-    val stravaClient = strava.withToken(authToken);
-    val stravaAthlete = stravaClient.athlete()
+    val stravaClient = strava.withToken(authToken.accessToken);
+    val stravaAthlete = stravaClient.athlete() //TODO may be null
 
     when (val u = db.users.findOne(User::athleteId eq stravaAthlete.id)) {
         null -> {
@@ -29,32 +28,29 @@ suspend fun handleOAuthCallback(strava: Strava, db: DB, authToken: String) {
             db.users.updateOne(
                 User::_id eq u._id, set(
                     User::athleteId setTo stravaAthlete.id,
-                    User::athleteToken setTo authToken
+                    User::authData setTo authToken
                 )
             )
         }
     }
 
     val ath = db.athletes.findOne(StravaAthlete::id eq stravaAthlete.id)
+    // get detailed gear
+    stravaAthlete.detailedGear = stravaAthlete.bikeRefs?.map { ref ->
+        stravaClient.bike(ref.id)
+    }
     if (ath == null) {
-        stravaAthlete.gear = stravaAthlete.bikeRefs?.map { ref ->
-            stravaClient.bike(ref.id)
-        }
         db.athletes.insertOne(stravaAthlete)
     } else {
-        stravaAthlete.gear = stravaAthlete.bikeRefs?.map { ref ->
-            stravaClient.bike(ref.id)
-        }
         db.athletes.updateOneById(ath._id, stravaAthlete)
     }
 
     // get activities from the last month
 
-    stravaClient.activities(LocalDateTime.now().minusMonths(1)).filter { it.type == "Ride" }.forEach { activity ->
-        if (db.activities.findOne(StravaActivity::id eq activity.id) == null)
-            db.activities.insertOne(activity)
-    }
-
+//    stravaClient.activities(LocalDateTime.now().minusMonths(1)).forEach { activity ->
+//        if (db.activities.findOne(StravaActivity::id eq activity.id) == null)
+//            db.activities.insertOne(activity)
+//    }
 
 }
 

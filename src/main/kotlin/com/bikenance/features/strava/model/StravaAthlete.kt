@@ -48,6 +48,6 @@ data class StravaAthlete(
     @JsonProperty("ftp") var ftp: String? = null,
     @JsonProperty("weight") var weight: Int? = null,
     @JsonProperty("bikes") var bikeRefs: List<StravaBikeRef>? = null,
-    @JsonProperty("gear") var gear: List<StravaBike>? = null
+    @JsonProperty("detailedGear") var detailedGear: List<StravaDetailedGear>? = null
 
     ) : StravaModel<StravaAthlete>()

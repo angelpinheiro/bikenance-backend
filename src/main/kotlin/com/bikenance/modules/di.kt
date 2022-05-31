@@ -3,6 +3,7 @@ package com.bikenance.modules
 import com.bikenance.database.UserDaoFacade
 import com.bikenance.database.mongodb.DB
 import com.bikenance.database.mongodb.MongoUserDao
+import com.bikenance.features.login.config.AppConfig
 import com.bikenance.features.strava.api.Strava
 import com.bikenance.repository.UserRepository
 import com.fasterxml.jackson.databind.DeserializationFeature
@@ -18,6 +19,9 @@ import org.koin.dsl.module
 
 val appModule = module {
 
+    single{
+        AppConfig()
+    }
 
     single {
         DB()
@@ -38,7 +42,7 @@ val appModule = module {
     }
 
     single {
-        Strava(get())
+        Strava(get(), get())
     }
 
     single {

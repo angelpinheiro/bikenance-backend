@@ -1,6 +1,5 @@
 package com.bikenance.features.strava.model
 
-import com.bikenance.model.User
 import com.fasterxml.jackson.annotation.JsonProperty
 import org.bson.codecs.pojo.annotations.BsonId
 import org.bson.types.ObjectId
@@ -12,10 +11,10 @@ import java.util.*
 data class StravaActivity(
 
     @BsonId
-    val _id: Id<StravaActivity>? = ObjectId().toId(),
+    val _id: Id<StravaActivity> = ObjectId().toId(),
 
     // strava do not send this, it's filled after
-    val bike: StravaBike? = null,
+    val bike: StravaDetailedGear? = null,
 
     @JsonProperty("id")
     var id: String? = null,

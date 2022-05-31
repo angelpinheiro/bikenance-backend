@@ -12,9 +12,9 @@ data class SegmentEfforts(
     @JsonProperty("name")
     var name: String? = null,
     @JsonProperty("activity")
-    var activity: StravaActivity? = StravaActivity(),
+    var activity: StravaActivity? = null,
     @JsonProperty("athlete")
-    var athleteRef: AthleteRef? = AthleteRef(),
+    var athleteRef: AthleteRef? = null,
     @JsonProperty("elapsed_time")
     var elapsedTime: Int? = null,
     @JsonProperty("moving_time")

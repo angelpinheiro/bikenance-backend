@@ -1,10 +1,11 @@
 package com.bikenance
 
-import com.bikenance.database.mongodb.initializeMongo
+import com.bikenance.database.mongodb.configureMongoDB
+import com.bikenance.features.login.config.loadConfig
 import com.bikenance.features.login.configureLogin
 import com.bikenance.features.strava.configureStrava
 import com.bikenance.modules.appModule
-import com.bikenance.modules.configureServer
+import com.bikenance.modules.configurePlugins
 import com.bikenance.routing.athleteRoutes
 import com.bikenance.routing.userRoutes
 import io.ktor.server.application.*
@@ -29,12 +30,17 @@ fun Application.module() {
         modules(appModule)
     }
 
-    configureServer()
-    configureStrava()
-    configureLogin()
-    userRoutes()
+    loadConfig()
 
-    initializeMongo()
+    configurePlugins()
+
+    configureLogin()
+
+    configureStrava()
+
+    configureMongoDB()
+
+    // routes
 
     routing {
         get("/") {
@@ -42,6 +48,7 @@ fun Application.module() {
         }
     }
 
+    userRoutes()
     athleteRoutes()
 
 

@@ -22,7 +22,7 @@ class DB(mongoDatabase: MongoDatabase = createDatabase()) {
     val athletes = mongoDatabase.getCollection<StravaAthlete>()
 }
 
-fun Application.initializeMongo() {
+fun Application.configureMongoDB() {
 
     val db: DB by inject()
 

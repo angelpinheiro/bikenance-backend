@@ -5,7 +5,7 @@ import com.fasterxml.jackson.annotation.JsonProperty
 data class AthleteRef(
 
     @JsonProperty("id")
-    var id: Int? = null,
+    var id: String,
     @JsonProperty("resource_state")
     var resourceState: Int? = null
 

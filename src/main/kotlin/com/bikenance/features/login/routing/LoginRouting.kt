@@ -24,6 +24,9 @@ fun Route.login(config: JwtConfig) {
 
     val loginUseCase = LoginUseCase(config, userRepository)
 
+    /**
+     *
+     */
     post("/login") {
         val user = call.receive<LoginData>()
         val loginResult = loginUseCase.loginUser(user)

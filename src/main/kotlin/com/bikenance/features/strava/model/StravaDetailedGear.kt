@@ -3,7 +3,7 @@ package com.bikenance.features.strava.model
 import com.fasterxml.jackson.annotation.JsonProperty
 
 
-data class StravaBike(
+data class StravaDetailedGear(
 
     @JsonProperty("id") var id: String? = null,
     @JsonProperty("primary") var primary: Boolean? = null,

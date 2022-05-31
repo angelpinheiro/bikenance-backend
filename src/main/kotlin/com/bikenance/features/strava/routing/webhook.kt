@@ -1,9 +1,10 @@
 package com.bikenance.features.strava.routing
 
 import com.bikenance.database.mongodb.DB
-import com.bikenance.features.strava.StravaConfig
+import com.bikenance.features.login.config.AppConfig
 import com.bikenance.features.strava.api.Strava
-import com.bikenance.features.strava.usecase.EventData
+import com.bikenance.features.strava.model.EventData
+import com.bikenance.features.strava.model.StravaRequestParams
 import com.bikenance.features.strava.usecase.ReceiveDataUseCase
 import com.bikenance.repository.UserRepository
 import com.fasterxml.jackson.annotation.JsonProperty
@@ -22,12 +23,6 @@ import kotlinx.coroutines.*
 import org.koin.ktor.ext.inject
 import kotlin.time.Duration.Companion.seconds
 
-object ReqParams {
-    const val CLIENT_ID = "client_id"
-    const val CLIENT_SECRET = "client_secret"
-    const val CALLBACK_URL = "callback_url"
-    const val VERIFY_TOKEN = "verify_token"
-}
 
 const val VERIFY_TOKEN = "BIKENANCE_VERIFY_TOKEN"
 
@@ -35,8 +30,9 @@ val client = HttpClient(CIO) {
 //    install(Logging)
 }
 
-fun Application.stravaWebhookRouting(config: StravaConfig) {
+fun Application.stravaWebhookRouting() {
 
+    val config: AppConfig by inject()
     val db: DB by inject()
     val userRepository: UserRepository by inject()
     val strava: Strava by inject()
@@ -49,9 +45,9 @@ fun Application.stravaWebhookRouting(config: StravaConfig) {
          * Returns current strava API subscriptions
          */
         get("/subscriptions") {
-            val response = client.get(config.subscriptionUrl) {
-                parameter(ReqParams.CLIENT_ID, config.clientId)
-                parameter(ReqParams.CLIENT_SECRET, config.clientSecret)
+            val response = client.get(config.strava.subscribeUrl) {
+                parameter(StravaRequestParams.CLIENT_ID, config.strava.clientId)
+                parameter(StravaRequestParams.CLIENT_SECRET, config.strava.clientSecret)
             }
             val responseText = String(response.readBytes())
             call.respondText(responseText, ContentType.parse("application/json"), HttpStatusCode.OK)
@@ -93,13 +89,13 @@ fun Application.stravaWebhookRouting(config: StravaConfig) {
         }
     }
 
-    if (config.subscribeOnLaunch) {
-        subscribeToStravaWebhooks()
+    if (config.strava.subscribeOnLaunch) {
+        subscribeToStravaWebhooks(config)
     }
 }
 
 
-fun Application.subscribeToStravaWebhooks() {
+fun Application.subscribeToStravaWebhooks(config: AppConfig) {
 
     val mapper: ObjectMapper by inject()
 
@@ -109,31 +105,26 @@ fun Application.subscribeToStravaWebhooks() {
 
     val scope = CoroutineScope(Job() + Dispatchers.IO)
 
-    val clientId = environment.config.property("strava_webhooks.client_id").getString()
-    val clientSecret = environment.config.property("strava_webhooks.client_secret").getString()
-    val subscriptionUrl = environment.config.property("strava_webhooks.strava_subscribe_url").getString()
-    val apiUrl = environment.config.property("api.url").getString()
-
     scope.launch {
 
         //  wait for app engine to deploy routes (refactor)
         delay(5.seconds)
 
-        val existResponse = client.get(subscriptionUrl) {
-            parameter(ReqParams.CLIENT_ID, clientId)
-            parameter(ReqParams.CLIENT_SECRET, clientSecret)
+        val existResponse = client.get(config.strava.subscribeUrl) {
+            parameter(StravaRequestParams.CLIENT_ID, config.strava.clientId)
+            parameter(StravaRequestParams.CLIENT_SECRET, config.strava.clientSecret)
         }
 
         val subsList = mapper.readValue<List<StravaSubscription>>(existResponse.bodyAsText())
         var deleted = false
 
         subsList.forEach { sub ->
-            if (sub.callbackUrl != "$apiUrl/webhook") {
+            if (sub.callbackUrl != "${config.api.url}/webhook" || config.strava.forceSubscribe) {
                 println("Deleting subscription with id ${sub.id}")
-                client.delete(subscriptionUrl + "/" + sub.id) {
+                client.delete(config.strava.subscribeUrl + "/" + sub.id) {
                     parameter("id", sub.id)
-                    parameter(ReqParams.CLIENT_ID, clientId)
-                    parameter(ReqParams.CLIENT_SECRET, clientSecret)
+                    parameter(StravaRequestParams.CLIENT_ID, config.strava.clientId)
+                    parameter(StravaRequestParams.CLIENT_SECRET, config.strava.clientSecret)
                 }
                 deleted = true
             }
@@ -142,11 +133,11 @@ fun Application.subscribeToStravaWebhooks() {
         if (deleted) {
             println("Creating new subscription...")
 
-            val response = client.post(subscriptionUrl) {
-                parameter(ReqParams.CLIENT_ID, clientId)
-                parameter(ReqParams.CLIENT_SECRET, clientSecret)
-                parameter(ReqParams.CALLBACK_URL, "$apiUrl/webhook")
-                parameter(ReqParams.VERIFY_TOKEN, VERIFY_TOKEN)
+            val response = client.post(config.strava.subscribeUrl) {
+                parameter(StravaRequestParams.CLIENT_ID, config.strava.clientId)
+                parameter(StravaRequestParams.CLIENT_SECRET, config.strava.clientSecret)
+                parameter(StravaRequestParams.CALLBACK_URL, "${config.api.url}apiUrl/webhook")
+                parameter(StravaRequestParams.VERIFY_TOKEN, VERIFY_TOKEN)
             }
 
             if (response.status == HttpStatusCode.Created) {

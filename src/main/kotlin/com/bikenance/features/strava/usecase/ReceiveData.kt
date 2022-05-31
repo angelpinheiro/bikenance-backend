@@ -2,48 +2,68 @@ package com.bikenance.features.strava.usecase
 
 import com.bikenance.database.mongodb.DB
 import com.bikenance.features.strava.api.Strava
+import com.bikenance.features.strava.model.AspectType
+import com.bikenance.features.strava.model.EventData
+import com.bikenance.features.strava.model.ObjectType
+import com.bikenance.features.strava.model.StravaActivity
+import com.bikenance.model.User
 import com.bikenance.repository.UserRepository
-import com.fasterxml.jackson.annotation.JsonProperty
-
-
-data class EventData(
-    @JsonProperty("aspect_type") var aspectType: String,
-    @JsonProperty("event_time") var eventTime: String,
-    @JsonProperty("object_id") var objectId: String,
-    @JsonProperty("object_type") var objectType: String,
-    @JsonProperty("owner_id") var ownerId: String,
-    @JsonProperty("subscription_id") var subscriptionId: String,
-) {
-    companion object {
-        const val TYPE_ATHLETE = "athlete"
-        const val TYPE_ACTIVITY = "activity"
-        const val ASPECT_CREATE = "create"
-        const val ASPECT_UPDATE = "update"
-    }
-}
+import org.litote.kmongo.eq
+import org.litote.kmongo.findOne
+import org.litote.kmongo.updateOneById
 
 
 class ReceiveDataUseCase(private val userRepository: UserRepository) {
 
     suspend fun handleEventData(db: DB, strava: Strava, eventData: EventData) {
-
-        val user = userRepository.findByAthleteId(eventData.ownerId)
-
-        println("Received event data ${eventData.ownerId}, ${user?.athleteToken}")
-        when (eventData.objectType) {
-            EventData.TYPE_ATHLETE -> {
-
-            }
-            EventData.TYPE_ACTIVITY -> {
-                user?.athleteToken?.let {
-                    val activity = strava.withToken(it).activity(eventData.objectId)
-                    if (activity.type == "Ride") {
-                        db.activities.insertOne(activity)
+        println("Event data $eventData")
+        userRepository.findByAthleteId(eventData.ownerId)?.let { user ->
+            println("Event: ${eventData.aspectType.type} ${eventData.objectType.type}")
+            when (eventData.objectType) {
+                ObjectType.ACTIVITY -> {
+                    when (eventData.aspectType) {
+                        AspectType.CREATE -> {
+                            handleActivityCreate(user, eventData, strava, db)
+                        }
+                        AspectType.UPDATE -> {
+                            handleActivityUpdate(user, eventData, strava, db)
+                        }
+                        AspectType.DELETE -> {
+                            handleActivityDelete(user, eventData, strava, db)
+                        }
                     }
+                }
+                ObjectType.ATHLETE -> {
+                    println("Received athlete update: $eventData")
                 }
             }
         }
     }
+
+    private suspend fun handleActivityCreate(user: User, eventData: EventData, strava: Strava, db: DB) {
+        println("handleActivityCreate")
+        user.authData?.accessToken?.let {
+            val activity = strava.withToken(it).activity(eventData.objectId)
+            db.activities.insertOne(activity)
+        }
+    }
+
+    private suspend fun handleActivityUpdate(user: User, eventData: EventData, strava: Strava, db: DB) {
+        println("handleActivityUpdate")
+        user.authData?.accessToken?.let {
+            strava.withToken(it).activity(eventData.objectId).let { new ->
+                when (val current = db.activities.findOne(StravaActivity::id eq eventData.objectId)) {
+                    null -> db.activities.insertOne(new)
+                    else -> db.activities.updateOneById(current._id, new)
+                }
+            }
+        }
+    }
+
+    private suspend fun handleActivityDelete(user: User, eventData: EventData, strava: Strava, db: DB) {
+        TODO("Not implemented yet")
+    }
+
 
 }
 

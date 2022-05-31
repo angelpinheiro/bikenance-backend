@@ -13,8 +13,7 @@ import io.ktor.server.resources.*
 import org.litote.kmongo.id.jackson.IdJacksonModule
 import org.slf4j.event.Level
 
-fun Application.configureServer() {
-
+fun Application.configurePlugins() {
 
     install(DefaultHeaders) {
         header("X-Engine", "Ktor")
