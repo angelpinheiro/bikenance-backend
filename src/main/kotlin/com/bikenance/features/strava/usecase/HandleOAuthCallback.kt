@@ -11,7 +11,6 @@ import java.time.LocalDateTime
 suspend fun handleOAuthCallback(strava: Strava, db: DB, authToken: String) {
 
     val stravaClient = strava.withToken(authToken);
-
     val stravaAthlete = stravaClient.athlete()
 
     when (val u = db.users.findOne(User::athleteId eq stravaAthlete.id)) {
@@ -37,9 +36,15 @@ suspend fun handleOAuthCallback(strava: Strava, db: DB, authToken: String) {
     }
 
     val ath = db.athletes.findOne(StravaAthlete::id eq stravaAthlete.id)
-    if (ath == null)
+    if (ath == null) {
+        stravaAthlete.gear = stravaAthlete.bikeRefs?.map { ref ->
+            stravaClient.bike(ref.id)
+        }
         db.athletes.insertOne(stravaAthlete)
-    else {
+    } else {
+        stravaAthlete.gear = stravaAthlete.bikeRefs?.map { ref ->
+            stravaClient.bike(ref.id)
+        }
         db.athletes.updateOneById(ath._id, stravaAthlete)
     }
 

@@ -10,6 +10,13 @@ import java.util.*
 
 
 data class StravaActivity(
+
+    @BsonId
+    val _id: Id<StravaActivity>? = ObjectId().toId(),
+
+    // strava do not send this, it's filled after
+    val bike: StravaBike? = null,
+
     @JsonProperty("id")
     var id: String? = null,
     @JsonProperty("resource_state")
@@ -19,7 +26,7 @@ data class StravaActivity(
     @JsonProperty("upload_id")
     var uploadId: String? = null,
     @JsonProperty("athlete")
-    var athleteRef: AthleteRef? = AthleteRef(),
+    var athleteRef: AthleteRef? = null,
     @JsonProperty("name")
     var name: String? = null,
     @JsonProperty("distance")
@@ -41,9 +48,9 @@ data class StravaActivity(
     @JsonProperty("utc_offset")
     var utcOffset: Int? = null,
     @JsonProperty("start_latlng")
-    var startLatlng: ArrayList<Double> = arrayListOf(),
+    var startLatlng: ArrayList<Double>? = null,
     @JsonProperty("end_latlng")
-    var endLatlng: ArrayList<Double> = arrayListOf(),
+    var endLatlng: ArrayList<Double>? = null,
     @JsonProperty("achievement_count")
     var achievementCount: Int? = null,
     @JsonProperty("kudos_count")
@@ -55,7 +62,7 @@ data class StravaActivity(
     @JsonProperty("photo_count")
     var photoCount: Int? = null,
     @JsonProperty("map")
-    var map: Map? = Map(),
+    var map: Map? = null,
     @JsonProperty("trainer")
     var trainer: Boolean? = null,
     @JsonProperty("commute")
@@ -109,17 +116,17 @@ data class StravaActivity(
     @JsonProperty("calories")
     var calories: Double? = null,
     @JsonProperty("segment_efforts")
-    var segmentEfforts: ArrayList<SegmentEfforts> = arrayListOf(),
+    var segmentEfforts: ArrayList<SegmentEfforts>? = null,
     @JsonProperty("splits_metric")
-    var splitsMetric: ArrayList<SplitsMetric> = arrayListOf(),
+    var splitsMetric: ArrayList<SplitsMetric>? = null,
     @JsonProperty("laps")
-    var laps: ArrayList<Laps> = arrayListOf(),
+    var laps: ArrayList<Laps>? = null,
     @JsonProperty("gear")
-    var gear: Gear? = Gear(),
+    var gear: Gear? = null,
     @JsonProperty("partner_brand_tag")
     var partnerBrandTag: String? = null,
     @JsonProperty("highlighted_kudosers")
-    var highlightedKudosers: ArrayList<HighlightedKudosers> = arrayListOf(),
+    var highlightedKudosers: ArrayList<HighlightedKudosers>? = null,
     @JsonProperty("hide_from_home")
     var hideFromHome: Boolean? = null,
     @JsonProperty("device_name")
@@ -130,7 +137,4 @@ data class StravaActivity(
     var segmentLeaderboardOptOut: Boolean? = null,
     @JsonProperty("leaderboard_opt_out")
     var leaderboardOptOut: Boolean? = null,
-
-    @BsonId
-    val _id: Id<StravaActivity>? = ObjectId().toId()
 )

@@ -2,6 +2,7 @@ package com.bikenance.features.strava.api
 
 import com.bikenance.features.strava.model.StravaActivity
 import com.bikenance.features.strava.model.StravaAthlete
+import com.bikenance.features.strava.model.StravaBike
 import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
@@ -16,14 +17,12 @@ import java.time.ZoneOffset
 
 object StravaApiEndpoints {
     const val athleteEndpoint = "https://www.strava.com/api/v3/athlete"
+    const val activitiesEndpoint = "https://www.strava.com/api/v3/activities/"
     fun activityEndpoint(activityId: String) = "https://www.strava.com/api/v3/activities/$activityId"
-
-    val activitiesEndpoint = "https://www.strava.com/api/v3/activities/"
+    fun bikeEndpoint(id: String) =  "https://www.strava.com/api/v3/gear/$id"
 }
 
 class Strava(private val client: HttpClient) {
-
-
 
     fun withToken(token: String): StravaApi {
         return StravaApi(token, this)
@@ -50,7 +49,13 @@ class Strava(private val client: HttpClient) {
             headers["Authorization"] = "Bearer $token"
             parameter("after ", from.toEpochSecond(ZoneOffset.UTC).toInt())
         }
+        return mapper.readValue(response.bodyAsText())
+    }
 
+    suspend fun bike(token: String, id: String): StravaBike {
+        val response = client.get(StravaApiEndpoints.bikeEndpoint(id)) {
+            headers["Authorization"] = "Bearer $token"
+        }
         return mapper.readValue(response.bodyAsText())
     }
 }
@@ -62,6 +67,7 @@ val mapper: ObjectMapper = jacksonObjectMapper()
 class StravaApi(private val token: String, private val functions: Strava) {
     suspend fun athlete(): StravaAthlete = functions.athlete(token)
     suspend fun activity(activityId: String): StravaActivity = functions.activity(token, activityId)
-
     suspend fun activities(from: LocalDateTime): List<StravaActivity> = functions.activities(token, from)
+
+    suspend fun bike(id: String): StravaBike = functions.bike(token, id)
 }

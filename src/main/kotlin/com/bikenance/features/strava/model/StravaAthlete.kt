@@ -8,8 +8,8 @@ import org.litote.kmongo.Id
 import org.litote.kmongo.id.toId
 
 
-data class StravaBike(
-    @JsonProperty("id") var id: String? = null,
+data class StravaBikeRef(
+    @JsonProperty("id") var id: String,
     @JsonProperty("primary") var primary: Boolean? = null,
     @JsonProperty("name") var name: String? = null,
     @JsonProperty("resource_state") var resourceState: Int? = null,
@@ -18,6 +18,10 @@ data class StravaBike(
 )
 
 data class StravaAthlete(
+
+    @BsonId
+    val _id: Id<StravaAthlete> = ObjectId().toId(),
+
     @JsonProperty("id") var id: String,
     @JsonProperty("username") var username: String? = null,
     @JsonProperty("resource_state") var resourceState: Int? = null,
@@ -43,8 +47,7 @@ data class StravaAthlete(
     @JsonProperty("measurement_preference") var measurementPreference: String? = null,
     @JsonProperty("ftp") var ftp: String? = null,
     @JsonProperty("weight") var weight: Int? = null,
-    @JsonProperty("bikes") var bikes: List<StravaBike>? = null,
+    @JsonProperty("bikes") var bikeRefs: List<StravaBikeRef>? = null,
+    @JsonProperty("gear") var gear: List<StravaBike>? = null
 
-    @BsonId
-    val _id: Id<StravaAthlete> = ObjectId().toId()
-) : StravaModel<StravaAthlete>()
+    ) : StravaModel<StravaAthlete>()
