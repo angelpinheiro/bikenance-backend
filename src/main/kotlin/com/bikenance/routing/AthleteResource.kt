@@ -6,7 +6,6 @@ import io.ktor.resources.*
 import io.ktor.server.application.*
 import io.ktor.server.auth.*
 import io.ktor.server.resources.*
-import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import kotlinx.serialization.Serializable
 import org.koin.ktor.ext.inject
@@ -29,11 +28,11 @@ fun Application.athleteRoutes() {
     routing {
         authenticate {
             get<Athletes> {
-                call.respond(db.athletes.find().toList())
+                apiResult { db.athletes.find().toList() }
             }
 
             get<Athletes.Id> { r ->
-                call.respond(db.athletes.findOne(StravaAthlete::id eq r.id) ?: "Not found")
+                apiResult { db.athletes.findOne(StravaAthlete::id eq r.id) }
             }
         }
     }

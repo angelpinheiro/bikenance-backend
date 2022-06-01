@@ -4,11 +4,15 @@ package com.bikenance.database.mongodb
 import com.bikenance.database.UserDaoFacade
 import com.bikenance.features.strava.AuthData
 import com.bikenance.model.User
+import com.bikenance.model.UserUpdate
+import com.mongodb.client.model.UpdateOptions
+import org.bson.types.ObjectId
+
 import org.litote.kmongo.*
 
 class MongoUserDao(private val db: DB) : UserDaoFacade {
     override suspend fun getById(id: String): User? {
-        return db.users.findOneById(id)
+        return db.users.findOneById(ObjectId(id))
     }
 
     override suspend fun getByUsername(username: String): User? {
@@ -39,12 +43,21 @@ class MongoUserDao(private val db: DB) : UserDaoFacade {
         }
     }
 
+    override suspend fun update(id: String, user: UserUpdate): Boolean {
+        return db.users.updateOneById(ObjectId(id), user).matchedCount > 0
+    }
+
     override suspend fun update(id: String, user: User): Boolean {
-        return db.users.updateOneById(id, user).modifiedCount > 0
+        return db.users.updateOneById(
+            ObjectId(id),
+            user,
+            UpdateOptions()
+
+        ).matchedCount > 0
     }
 
     override suspend fun delete(id: String): Boolean {
-        return db.users.deleteOneById(id).deletedCount > 0
+        return db.users.deleteOneById(ObjectId(id)).deletedCount > 0
     }
 
     override suspend fun getByAccessToken(token: String): User? {

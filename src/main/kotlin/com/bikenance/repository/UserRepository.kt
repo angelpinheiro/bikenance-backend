@@ -2,6 +2,7 @@ package com.bikenance.repository
 
 import com.bikenance.database.UserDaoFacade
 import com.bikenance.model.User
+import com.bikenance.model.UserUpdate
 
 class UserRepository(private val userDao: UserDaoFacade) {
 
@@ -20,6 +21,13 @@ class UserRepository(private val userDao: UserDaoFacade) {
     suspend fun findAll() = userDao.findAll()
 
     suspend fun filter(pattern: String) = userDao.filter(pattern)
+
+    suspend fun update(id: String, user: UserUpdate): User? {
+        if (userDao.update(id, user)) {
+            return getById(id)
+        }
+        return null
+    }
 
     suspend fun update(id: String, user: User): User? {
         if (userDao.update(id, user)) {

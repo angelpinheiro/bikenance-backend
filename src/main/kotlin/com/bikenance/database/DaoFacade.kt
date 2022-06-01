@@ -11,7 +11,8 @@ interface UserDaoFacade {
     suspend fun filter(pattern: String): List<User>
     suspend fun create(title: String, body: String): User?
     suspend fun create(user: User): User?
-    suspend fun update(id: String, user: User): Boolean
+    suspend fun update(id: String, user: UserUpdate): Boolean
     suspend fun delete(id: String): Boolean
     suspend fun getByAccessToken(token: String): User?
+    abstract suspend fun update(id: String, user: User): Boolean
 }
