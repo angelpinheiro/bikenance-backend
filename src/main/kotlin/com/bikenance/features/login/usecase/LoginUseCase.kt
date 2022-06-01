@@ -1,7 +1,8 @@
 package com.bikenance.features.login.usecase
 
-import com.bikenance.features.login.JwtConfig
-import com.bikenance.features.login.JwtGenerator
+import com.bikenance.features.login.config.JwtConfig
+import com.bikenance.features.login.config.JwtGenerator
+import com.bikenance.features.login.config.JwtMgr
 import com.bikenance.features.login.data.LoginData
 import com.bikenance.repository.UserRepository
 
@@ -11,14 +12,13 @@ data class LoginResult(
     val message: String? = null
 )
 
-class LoginUseCase(config: JwtConfig, private val userRepository: UserRepository) {
+class LoginUseCase(val jwt: JwtMgr, private val userRepository: UserRepository) {
 
-    private val tokenGenerator = JwtGenerator(config)
 
     suspend fun loginUser(loginData: LoginData): LoginResult {
         val u = userRepository.getByUsername(loginData.username)
         return if (u != null && u.password == loginData.password) {
-            LoginResult(true, tokenGenerator.generateToken(loginData))
+            LoginResult(true, jwt.generator.generateToken(u))
         } else {
             LoginResult(false, null, "Invalid credentials")
         }
@@ -26,8 +26,10 @@ class LoginUseCase(config: JwtConfig, private val userRepository: UserRepository
 
     suspend fun registerUser(user: LoginData): LoginResult {
         return if (userRepository.getByUsername(user.username) == null) {
-            val u = userRepository.create(user.username, user.password)
-            LoginResult(true, tokenGenerator.generateToken(user))
+            userRepository.create(user.username, user.password)?.let {
+                LoginResult(true, jwt.generator.generateToken(it))
+            } ?: LoginResult(false, null, "Sign up failed")
+
         } else {
             LoginResult(false, null, "Username not available")
         }

@@ -3,6 +3,8 @@ package com.bikenance.routing
 import com.bikenance.model.User
 import io.ktor.http.*
 import io.ktor.server.application.*
+import io.ktor.server.auth.*
+import io.ktor.server.auth.jwt.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import io.ktor.util.pipeline.*
@@ -34,6 +36,12 @@ suspend inline fun <T> PipelineContext<Unit, ApplicationCall>.apiResult(block: P
         ApiResult.Error(e.message)
     }
     call.respond(status = HttpStatusCode.fromValue(r.status), r)
+}
+
+
+fun PipelineContext<*, ApplicationCall>.authUserId(): String? {
+    val principal: JWTPrincipal? = call.principal()
+    return principal?.subject
 }
 
 fun Application.test() {

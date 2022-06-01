@@ -4,8 +4,9 @@ import com.bikenance.database.mongodb.DB
 import com.bikenance.features.login.config.AppConfig
 import com.bikenance.features.strava.api.Strava
 import com.bikenance.features.strava.model.StravaAthlete
-import com.bikenance.features.strava.usecase.handleOAuthCallback
+import com.bikenance.features.strava.usecase.StravaOAuthCallbackHandler
 import com.bikenance.repository.UserRepository
+import com.bikenance.routing.apiResult
 import com.fasterxml.jackson.module.kotlin.readValue
 import io.ktor.client.*
 import io.ktor.client.engine.cio.*
@@ -24,13 +25,13 @@ object StravaOAuthEndpoints {
     const val accessTokenUrl = "https://www.strava.com/api/v3/oauth/token"
 }
 
-
 fun Application.configureOAuth() {
 
     val config: AppConfig by inject()
     val strava: Strava by inject()
+    val oAuthCallbackHandler: StravaOAuthCallbackHandler by inject()
     val db: DB by inject()
-    val userRepository : UserRepository by inject()
+    val userRepository: UserRepository by inject()
 
     authentication {
         oauth("auth-oauth-strava") {
@@ -57,16 +58,13 @@ fun Application.configureOAuth() {
 
         // TEST STRAVA OAUTH REFRESH TOKENS
         get("/athlete/{token}") {
-            val r = call.parameters["token"]?.let {
-                userRepository.getByToken(it)?.authData?.let { auth->
-                    // auth.expiresAt = 0 // Force token refresh
-                    val stravaClient = strava.withAuth(auth);
-                    call.respond(stravaClient.athlete())
-                    true
+            apiResult{
+                call.parameters["token"]?.let {
+                    userRepository.getByToken(it)?.authData?.let { auth ->
+                        // auth.expiresAt = 0 // Force token refresh
+                        strava.withAuth(auth).athlete();
+                    }
                 }
-            }
-            if(r == null){
-                call.respond("WTF")
             }
         }
 
@@ -81,18 +79,19 @@ fun Application.configureOAuth() {
             }
 
             get("/callback") {
-                val token = oAuthData()
+                val authData = getOAuthData()
                 val isApp = call.request.headers["user-agent"]?.let { isMobileUserAgentRegex(it) } ?: false
+                var appToken: String? = null
 
-                if (token != null) {
-                    call.parameters["scope"]?.let { token.scope = it }
-                    handleOAuthCallback(strava, db, token)
+                if (authData != null) {
+                    call.parameters["scope"]?.let { authData.scope = it }
+                    appToken = oAuthCallbackHandler.handleOAuthCallback(strava, db, authData)
                 }
 
                 if (isApp)
-                    call.respondRedirect("bikenance://redirect?code=$token")
+                    call.respondRedirect("bikenance://redirect?code=$appToken")
                 else
-                    call.respond(token ?: "Auth failed")
+                    call.respond(appToken ?: "Auth failed")
 
             }
         }
@@ -107,7 +106,7 @@ data class AuthData(
     var scope: String = ""
 )
 
-fun PipelineContext<*, ApplicationCall>.oAuthData(): AuthData? {
+fun PipelineContext<*, ApplicationCall>.getOAuthData(): AuthData? {
     val principal: OAuthAccessTokenResponse.OAuth2? = call.principal()
     return principal?.let {
         val expiration = Instant.now().plusSeconds(it.expiresIn - 10).toEpochMilli()

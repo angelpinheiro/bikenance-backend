@@ -4,22 +4,23 @@ import com.bikenance.database.UserDaoFacade
 import com.bikenance.database.mongodb.DB
 import com.bikenance.database.mongodb.MongoUserDao
 import com.bikenance.features.login.config.AppConfig
+import com.bikenance.features.login.config.JwtConfig
+import com.bikenance.features.login.config.JwtMgr
 import com.bikenance.features.strava.api.Strava
+import com.bikenance.features.strava.usecase.StravaOAuthCallbackHandler
 import com.bikenance.repository.UserRepository
 import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.databind.SerializationFeature
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
-import com.typesafe.config.ConfigFactory
 import io.ktor.client.*
 import io.ktor.client.engine.cio.*
 import io.ktor.client.plugins.logging.*
-import org.koin.dsl.koinApplication
 import org.koin.dsl.module
 
 
 val appModule = module {
 
-    single{
+    single {
         AppConfig()
     }
 
@@ -43,6 +44,12 @@ val appModule = module {
 
     single {
         Strava(get(), get(), get())
+    }
+
+    single { StravaOAuthCallbackHandler(get(), get(), get()) }
+
+    single {
+        JwtMgr(JwtConfig())
     }
 
     single {

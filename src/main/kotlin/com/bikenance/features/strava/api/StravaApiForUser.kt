@@ -2,14 +2,11 @@ package com.bikenance.features.strava.api
 
 import com.bikenance.features.login.config.AppConfig
 import com.bikenance.features.strava.AuthData
-import com.bikenance.features.strava.StravaOAuthEndpoints
 import com.bikenance.features.strava.model.StravaActivity
 import com.bikenance.features.strava.model.StravaAthlete
 import com.bikenance.features.strava.model.StravaDetailedGear
-import com.bikenance.features.strava.model.StravaRequestParams
 import com.bikenance.features.strava.usecase.StravaTokenRefresh
 import com.bikenance.repository.UserRepository
-import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
@@ -17,12 +14,11 @@ import com.fasterxml.jackson.module.kotlin.readValue
 import io.ktor.client.*
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
-import java.time.Instant
+import io.ktor.http.*
 import java.time.LocalDateTime
 import java.time.ZoneOffset
 
 val supportedActivityTypes = listOf("Ride", "EBikeRide", "VirtualRide")
-
 
 
 object StravaApiEndpoints {
@@ -40,21 +36,21 @@ class Strava(private val client: HttpClient, val config: AppConfig, private val 
         return StravaApiForUser(auth, this)
     }
 
-    suspend fun athlete(auth: AuthData): StravaAthlete {
+    suspend fun athlete(auth: AuthData): StravaAthlete? {
         return authorizedGet(StravaApiEndpoints.athleteEndpoint, auth)
     }
 
-    suspend fun activity(auth: AuthData, activityId: String): StravaActivity {
+    suspend fun activity(auth: AuthData, activityId: String): StravaActivity? {
         return authorizedGet(StravaApiEndpoints.activityEndpoint(activityId), auth)
     }
 
-    suspend fun activities(auth: AuthData, from: LocalDateTime): List<StravaActivity> {
+    suspend fun activities(auth: AuthData, from: LocalDateTime): List<StravaActivity>? {
         return authorizedGet(StravaApiEndpoints.activitiesEndpoint, auth) {
             parameter("after", from.toEpochSecond(ZoneOffset.UTC).toInt())
         }
     }
 
-    suspend fun bike(auth: AuthData, id: String): StravaDetailedGear {
+    suspend fun bike(auth: AuthData, id: String): StravaDetailedGear? {
         return authorizedGet(StravaApiEndpoints.bikeEndpoint(id), auth)
     }
 
@@ -62,13 +58,18 @@ class Strava(private val client: HttpClient, val config: AppConfig, private val 
         url: String,
         auth: AuthData,
         block: HttpRequestBuilder.() -> Unit = {}
-    ): T {
+    ): T? {
         val token = refresher.refreshAccessTokenIfNecessary(auth).accessToken
         val r = client.prepareGet(url) {
             headers["Authorization"] = "Bearer $token"
             block()
+        }.execute()
+
+        return if (r.status.isSuccess()) {
+            mapper.readValue(r.bodyAsText())
+        } else {
+            null
         }
-        return mapper.readValue<T>(r.execute().bodyAsText())
     }
 }
 
@@ -76,8 +77,8 @@ val mapper: ObjectMapper = jacksonObjectMapper()
     .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
 
 class StravaApiForUser(private val auth: AuthData, private val strava: Strava) {
-    suspend fun athlete(): StravaAthlete = strava.athlete(auth)
-    suspend fun activity(activityId: String): StravaActivity = strava.activity(auth, activityId)
-    suspend fun activities(from: LocalDateTime): List<StravaActivity> = strava.activities(auth, from)
-    suspend fun bike(id: String): StravaDetailedGear = strava.bike(auth, id)
+    suspend fun athlete(): StravaAthlete? = strava.athlete(auth)
+    suspend fun activity(activityId: String): StravaActivity? = strava.activity(auth, activityId)
+    suspend fun activities(from: LocalDateTime): List<StravaActivity>? = strava.activities(auth, from)
+    suspend fun bike(id: String): StravaDetailedGear? = strava.bike(auth, id)
 }

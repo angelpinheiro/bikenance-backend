@@ -51,7 +51,7 @@ class ReceiveDataUseCase(private val userRepository: UserRepository) {
     private suspend fun handleActivityUpdate(user: User, eventData: EventData, strava: Strava, db: DB) {
         println("handleActivityUpdate")
         user.authData?.let {
-            strava.withAuth(it).activity(eventData.objectId).let { new ->
+            strava.withAuth(it).activity(eventData.objectId)?.let { new ->
                 when (val current = db.activities.findOne(StravaActivity::id eq eventData.objectId)) {
                     null -> db.activities.insertOne(new)
                     else -> db.activities.updateOneById(current._id, new)

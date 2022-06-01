@@ -1,16 +1,13 @@
-package com.bikenance.modules
+package com.bikenance.features.login.routing
 
-import com.bikenance.features.login.JwtConfig
+import com.bikenance.features.login.config.JwtMgr
 import com.bikenance.features.login.data.AuthData
 import com.bikenance.features.login.data.LoginData
 import com.bikenance.features.login.usecase.LoginUseCase
 import com.bikenance.repository.UserRepository
-import com.fasterxml.jackson.databind.SerializationFeature
 import io.ktor.http.*
-import io.ktor.serialization.jackson.*
 import io.ktor.server.application.*
 import io.ktor.server.auth.*
-import io.ktor.server.plugins.contentnegotiation.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
@@ -18,11 +15,12 @@ import org.koin.ktor.ext.inject
 
 val ApplicationCall.authData get() = authentication.principal<LoginData>()?.let { AuthData(it.username)  }
 
-fun Route.login(config: JwtConfig) {
+fun Route.login() {
 
     val userRepository: UserRepository by inject()
+    val jwtMgr: JwtMgr by inject()
 
-    val loginUseCase = LoginUseCase(config, userRepository)
+    val loginUseCase = LoginUseCase(jwtMgr, userRepository)
 
     /**
      *

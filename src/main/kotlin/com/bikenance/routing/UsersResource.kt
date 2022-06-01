@@ -24,6 +24,10 @@ class Users(val filter: String? = null) {
     class Username(val parent: Users = Users(), val username: String)
 }
 
+@Serializable
+@Resource("/profile")
+class Profile()
+
 
 fun Application.userRoutes() {
 
@@ -54,6 +58,14 @@ fun Application.userRoutes() {
                 val user = call.receive<UserUpdate>()
                 apiResult {
                     userRepository.update(r.id, user)
+                }
+            }
+
+            get<Profile> { r ->
+                apiResult {
+                    authUserId()?.let {
+                        userRepository.getById(it)
+                    }
                 }
             }
         }

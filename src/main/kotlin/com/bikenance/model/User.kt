@@ -18,7 +18,7 @@ data class User(
 )
 {
     fun id(): String {
-        return _id.json
+        return _id.toString()
     }
 }
 
