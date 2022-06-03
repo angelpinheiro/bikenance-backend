@@ -85,7 +85,7 @@ fun Application.configureOAuth() {
 
                 if (authData != null) {
                     call.parameters["scope"]?.let { authData.scope = it }
-                    appToken = oAuthCallbackHandler.handleOAuthCallback(strava, db, authData)
+                    appToken = oAuthCallbackHandler.handleOAuthCallback(authData)
                 }
 
                 if (isApp)

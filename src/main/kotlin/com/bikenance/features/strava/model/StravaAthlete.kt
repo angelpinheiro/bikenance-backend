@@ -1,6 +1,7 @@
 package com.bikenance.features.strava.model
 
 import com.bikenance.features.strava.StravaModel
+import com.bikenance.model.Profile
 import com.fasterxml.jackson.annotation.JsonProperty
 import org.bson.codecs.pojo.annotations.BsonId
 import org.bson.types.ObjectId
@@ -14,7 +15,6 @@ data class StravaBikeRef(
     @JsonProperty("name") var name: String? = null,
     @JsonProperty("resource_state") var resourceState: Int? = null,
     @JsonProperty("distance") var distance: Int? = null
-
 )
 
 data class StravaAthlete(
@@ -50,4 +50,10 @@ data class StravaAthlete(
     @JsonProperty("bikes") var bikeRefs: List<StravaBikeRef>? = null,
     @JsonProperty("detailedGear") var detailedGear: List<StravaDetailedGear>? = null
 
-    ) : StravaModel<StravaAthlete>()
+    ) : StravaModel<StravaAthlete>() {
+        fun toProfile() : Profile {
+            return Profile(
+                id, username,
+            )
+        }
+    }

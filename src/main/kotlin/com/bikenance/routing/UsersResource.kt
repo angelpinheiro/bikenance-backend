@@ -1,7 +1,10 @@
 package com.bikenance.routing
 
+import com.bikenance.database.mongodb.DB
+import com.bikenance.features.strava.model.StravaAthlete
 import com.bikenance.model.UserUpdate
 import com.bikenance.repository.UserRepository
+import io.ktor.http.*
 import io.ktor.resources.*
 import io.ktor.server.application.*
 import io.ktor.server.auth.*
@@ -11,6 +14,9 @@ import io.ktor.server.resources.put
 import io.ktor.server.routing.*
 import kotlinx.serialization.Serializable
 import org.koin.ktor.ext.inject
+import org.litote.kmongo.eq
+import org.litote.kmongo.findOne
+import org.litote.kmongo.findOneById
 
 @Serializable
 @Resource("/users")
@@ -24,12 +30,11 @@ class Users(val filter: String? = null) {
     class Username(val parent: Users = Users(), val username: String)
 }
 
-@Serializable
-@Resource("/profile")
-class Profile()
-
 
 fun Application.userRoutes() {
+
+    val userRepository: UserRepository by inject()
+    val db: DB by inject()
 
     routing {
 
@@ -61,13 +66,7 @@ fun Application.userRoutes() {
                 }
             }
 
-            get<Profile> { r ->
-                apiResult {
-                    authUserId()?.let {
-                        userRepository.getById(it)
-                    }
-                }
-            }
+
         }
     }
 }

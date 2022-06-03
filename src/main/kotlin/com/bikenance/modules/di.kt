@@ -1,13 +1,13 @@
 package com.bikenance.modules
 
-import com.bikenance.database.UserDaoFacade
-import com.bikenance.database.mongodb.DB
-import com.bikenance.database.mongodb.MongoUserDao
+import com.bikenance.database.UserDao
+import com.bikenance.database.mongodb.*
 import com.bikenance.features.login.config.AppConfig
 import com.bikenance.features.login.config.JwtConfig
 import com.bikenance.features.login.config.JwtMgr
 import com.bikenance.features.strava.api.Strava
 import com.bikenance.features.strava.usecase.StravaOAuthCallbackHandler
+import com.bikenance.model.Profile
 import com.bikenance.repository.UserRepository
 import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.databind.SerializationFeature
@@ -28,8 +28,21 @@ val appModule = module {
         DB()
     }
 
-    single<UserDaoFacade> {
+    single { DAOS(get()) }
+
+    single<UserDao> {
         MongoUserDao(get())
+    }
+    single {
+        MongoProfileDao(get())
+    }
+
+    single {
+        MongoBikeDao(get())
+    }
+
+    single {
+        MongoBikeRideDao(get())
     }
 
     single {

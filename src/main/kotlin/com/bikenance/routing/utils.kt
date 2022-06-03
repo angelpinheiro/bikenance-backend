@@ -39,6 +39,21 @@ suspend inline fun <T> PipelineContext<Unit, ApplicationCall>.apiResult(block: P
 }
 
 
+suspend inline fun <reified T : Any> PipelineContext<Unit, ApplicationCall>.apiResponse(block: PipelineContext<Unit, ApplicationCall>.() -> T?) {
+    val r = try {
+        when (val b = block()) {
+            null -> call.respond("Fail")
+            else -> call.respond(b)
+        }
+    } catch (e: CancellationException) {
+        throw e
+    } catch (e: Exception) {
+        call.respond("Fail")
+    }
+
+}
+
+
 fun PipelineContext<*, ApplicationCall>.authUserId(): String? {
     val principal: JWTPrincipal? = call.principal()
     return principal?.subject

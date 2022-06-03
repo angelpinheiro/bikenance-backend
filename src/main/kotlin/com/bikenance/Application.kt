@@ -7,6 +7,7 @@ import com.bikenance.features.strava.configureStrava
 import com.bikenance.modules.appModule
 import com.bikenance.modules.configurePlugins
 import com.bikenance.routing.athleteRoutes
+import com.bikenance.routing.profileRoutes
 import com.bikenance.routing.test
 import com.bikenance.routing.userRoutes
 import io.ktor.server.application.*
@@ -51,6 +52,7 @@ fun Application.module() {
 
     userRoutes()
     athleteRoutes()
+    profileRoutes()
     test()
 
 

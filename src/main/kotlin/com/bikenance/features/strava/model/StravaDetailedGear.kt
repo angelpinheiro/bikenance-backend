@@ -12,6 +12,7 @@ data class StravaDetailedGear(
     @JsonProperty("brand_name") var brandName: String? = null,
     @JsonProperty("model_name") var modelName: String? = null,
     @JsonProperty("frame_type") var frameType: Int? = null,
-    @JsonProperty("description") var description: String? = null
+    @JsonProperty("description") var description: String? = null,
+    @JsonProperty("name") var name: String? = null
 
 )

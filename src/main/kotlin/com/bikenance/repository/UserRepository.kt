@@ -1,10 +1,10 @@
 package com.bikenance.repository
 
-import com.bikenance.database.UserDaoFacade
+import com.bikenance.database.UserDao
 import com.bikenance.model.User
 import com.bikenance.model.UserUpdate
 
-class UserRepository(private val userDao: UserDaoFacade) {
+class UserRepository(private val userDao: UserDao) {
 
     suspend fun create(user: User) = userDao.create(user)
 

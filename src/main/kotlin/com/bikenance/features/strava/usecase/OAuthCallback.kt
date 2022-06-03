@@ -11,8 +11,9 @@ import org.litote.kmongo.*
 import java.time.LocalDateTime
 
 
-class StravaOAuthCallbackHandler(strava: Strava, db: DB, private val jwtMgr: JwtMgr) {
-    suspend fun handleOAuthCallback(strava: Strava, db: DB, auth: AuthData): String? {
+class StravaOAuthCallbackHandler(val strava: Strava, val db: DB, private val jwtMgr: JwtMgr) {
+    // TODO Refactor
+    suspend fun handleOAuthCallback(auth: AuthData): String? {
 
         val stravaClient = strava.withAuth(auth);
         val stravaAthlete = stravaClient.athlete() //TODO may be null
@@ -44,7 +45,10 @@ class StravaOAuthCallbackHandler(strava: Strava, db: DB, private val jwtMgr: Jwt
             val ath = db.athletes.findOne(StravaAthlete::id eq stravaAthlete.id)
             // get detailed gear
             stravaAthlete.detailedGear = stravaAthlete.bikeRefs?.mapNotNull { ref ->
-                stravaClient.bike(ref.id)
+                stravaClient.bike(ref.id)?.apply {
+                    this.name = ref.name
+                }
+
             }
             if (ath == null) {
                 db.athletes.insertOne(stravaAthlete)
