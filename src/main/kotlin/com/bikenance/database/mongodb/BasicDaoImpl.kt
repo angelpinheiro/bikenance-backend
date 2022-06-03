@@ -7,14 +7,14 @@ import org.litote.kmongo.findOneById
 import org.litote.kmongo.updateOneById
 
 
-interface IBasicDao<T> {
+interface BasicDao<T> {
     suspend fun getById(id: String): T?
     suspend  fun delete(id: String): Boolean
     suspend  fun create(item: T): T?
     suspend  fun update(id: String, item: T): Boolean
 }
 
-abstract class BasicDao<T : Any>(val collection: MongoCollection<T>) : IBasicDao<T> {
+abstract class BasicDaoImpl<T : Any>(val collection: MongoCollection<T>) : BasicDao<T> {
 
     override suspend fun getById(id: String): T? {
         return collection.findOneById(ObjectId(id))

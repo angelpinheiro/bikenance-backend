@@ -3,15 +3,13 @@ package com.bikenance.database.mongodb
 
 import com.bikenance.database.UserDao
 import com.bikenance.features.strava.AuthData
-import com.bikenance.model.Profile
 import com.bikenance.model.User
 import com.bikenance.model.UserUpdate
-import com.mongodb.client.model.UpdateOptions
 import org.bson.types.ObjectId
 
 import org.litote.kmongo.*
 
-class MongoUserDao(private val db: DB) : BasicDao<User>(db.users), UserDao {
+class MongoUserDao(private val db: DB) : BasicDaoImpl<User>(db.users), UserDao {
 
     override suspend fun getByUsername(username: String): User? {
         return db.users.findOne(User::username eq username)

@@ -1,9 +1,10 @@
 package com.bikenance.database
 
-import com.bikenance.database.mongodb.IBasicDao
+import com.bikenance.database.mongodb.BasicDao
+import com.bikenance.features.strava.model.StravaAthlete
 import com.bikenance.model.*
 
-interface UserDao : IBasicDao<User> {
+interface UserDao : BasicDao<User> {
     suspend fun getByUsername(username: String): User?
     suspend fun getByAthleteId(athleteId: String): User?
     suspend fun findAll(): List<User>
@@ -15,20 +16,25 @@ interface UserDao : IBasicDao<User> {
 }
 
 
-interface ProfileDao : IBasicDao<Profile> {
+interface ProfileDao : BasicDao<Profile> {
     suspend fun getByUserId(id: String): Profile?
 }
 
-interface BikeDao : IBasicDao<Bike> {
+
+interface BikeDao : BasicDao<Bike> {
     suspend fun getByStravaId(id: String): Bike?
     suspend fun getByUserId(id: String): List<Bike>
 }
 
-interface BikeRideDao : IBasicDao<BikeRide> {
+interface BikeRideDao : BasicDao<BikeRide> {
     suspend fun getByStravaId(id: String): BikeRide?
     suspend fun getByBikeId(id: String): BikeRide?
     suspend fun getByUserId(id: String): List<BikeRide>
 
+}
+
+interface StravaAthleteDao : BasicDao<StravaAthlete> {
+    suspend fun getByAthleteId(id: String): StravaAthlete?
 }
 
 
