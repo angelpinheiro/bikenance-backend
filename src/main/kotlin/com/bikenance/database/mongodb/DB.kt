@@ -1,5 +1,7 @@
 package com.bikenance.database.mongodb
 
+import ch.qos.logback.classic.Level
+import ch.qos.logback.classic.LoggerContext
 import com.bikenance.database.*
 import com.bikenance.features.strava.model.StravaActivity
 import com.bikenance.features.strava.model.StravaAthlete
@@ -7,19 +9,26 @@ import com.bikenance.model.Bike
 import com.bikenance.model.BikeRide
 import com.bikenance.model.Profile
 import com.bikenance.model.User
+import com.mongodb.MongoClientSettings
 import com.mongodb.client.MongoDatabase
 import io.ktor.server.application.*
 import org.koin.ktor.ext.inject
 import org.litote.kmongo.KMongo
 import org.litote.kmongo.getCollection
+import org.slf4j.LoggerFactory
 
 fun createDatabase(): MongoDatabase {
+
+    val loggerContext = LoggerFactory.getILoggerFactory() as LoggerContext
+    val rootLogger = loggerContext.getLogger("org.mongodb.driver")
+    rootLogger.level = Level.OFF
+
     val client = KMongo.createClient()
     return client.getDatabase("stravadb")
 }
 
 
-class DB(mongoDatabase: MongoDatabase = createDatabase()) {
+class DB(mongoDatabase: MongoDatabase) {
     val database = mongoDatabase
     val users = mongoDatabase.getCollection<User>()
     val activities = mongoDatabase.getCollection<StravaActivity>()

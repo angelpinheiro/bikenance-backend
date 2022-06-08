@@ -8,6 +8,9 @@ import io.ktor.server.auth.jwt.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import io.ktor.util.pipeline.*
+import java.text.SimpleDateFormat
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 import java.util.concurrent.CancellationException
 
 sealed class ApiResult<T>(
@@ -33,6 +36,7 @@ suspend inline fun <T> PipelineContext<Unit, ApplicationCall>.apiResult(block: P
     } catch (e: CancellationException) {
         throw e
     } catch (e: Exception) {
+        println(e)
         ApiResult.Error(e.message)
     }
     call.respond(status = HttpStatusCode.fromValue(r.status), r)
@@ -53,6 +57,10 @@ suspend inline fun <reified T : Any> PipelineContext<Unit, ApplicationCall>.apiR
 
 }
 
+val dtf: DateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss'Z'")
+fun LocalDateTime.formatAsIsoDate(): String? {
+    return dtf.format(this)
+}
 
 fun PipelineContext<*, ApplicationCall>.authUserId(): String? {
     val principal: JWTPrincipal? = call.principal()

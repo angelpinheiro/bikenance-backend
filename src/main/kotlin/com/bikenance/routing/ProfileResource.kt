@@ -17,6 +17,10 @@ import kotlinx.serialization.Serializable
 import org.koin.ktor.ext.inject
 import org.litote.kmongo.eq
 import org.litote.kmongo.findOne
+import java.time.LocalDateTime
+import java.time.ZoneId
+import java.time.format.DateTimeFormatter
+import java.util.Date
 
 
 @Serializable
@@ -87,6 +91,9 @@ fun Application.profileRoutes() {
                         dao.profileDao.getByUserId(userId)?.let {
                             it.firstname = update.firstName
                             it.lastname = update.lastName
+                            if(it.createdAt == null) {
+                                it.createdAt = LocalDateTime.now().formatAsIsoDate()
+                            }
                             dao.profileDao.update(it.oid(), it)
                         }
 
