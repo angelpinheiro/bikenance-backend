@@ -1,6 +1,7 @@
 package com.bikenance.database
 
 import com.bikenance.database.mongodb.BasicDao
+import com.bikenance.features.strava.model.StravaActivity
 import com.bikenance.features.strava.model.StravaAthlete
 import com.bikenance.model.*
 
@@ -37,4 +38,5 @@ interface StravaAthleteDao : BasicDao<StravaAthlete> {
     suspend fun getByAthleteId(id: String): StravaAthlete?
 }
 
+interface StravaActivityDao : BasicDao<StravaActivity>
 

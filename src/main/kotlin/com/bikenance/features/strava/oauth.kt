@@ -85,7 +85,7 @@ fun Application.configureOAuth() {
 
                 if (authData != null) {
                     call.parameters["scope"]?.let { authData.scope = it }
-                    appToken = oAuthCallbackHandler.handleOAuthCallback(authData)
+                    appToken = oAuthCallbackHandler.handleCallback(authData)
                 }
 
                 if (isApp)

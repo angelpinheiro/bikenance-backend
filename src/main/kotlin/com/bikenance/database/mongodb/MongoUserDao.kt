@@ -1,8 +1,12 @@
 package com.bikenance.database.mongodb
 
 
+import com.bikenance.database.StravaActivityDao
+import com.bikenance.database.StravaAthleteDao
 import com.bikenance.database.UserDao
 import com.bikenance.features.strava.AuthData
+import com.bikenance.features.strava.model.StravaActivity
+import com.bikenance.features.strava.model.StravaAthlete
 import com.bikenance.model.User
 import com.bikenance.model.UserUpdate
 import org.bson.types.ObjectId
@@ -42,3 +46,11 @@ class MongoUserDao(private val db: DB) : BasicDaoImpl<User>(db.users), UserDao {
         return db.users.findOne(User::authData / AuthData::accessToken eq token)
     }
 }
+
+class MongoStravaAthleteDao(private val db: DB) : BasicDaoImpl<StravaAthlete>(db.athletes), StravaAthleteDao {
+    override suspend fun getByAthleteId(id: String): StravaAthlete? {
+        return db.athletes.findOne(StravaAthlete::id eq id)
+    }
+}
+
+class MongoStravaActivityDao(private val db: DB) : BasicDaoImpl<StravaActivity>(db.activities), StravaActivityDao

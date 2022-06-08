@@ -3,7 +3,6 @@ package com.bikenance.features.login.config
 import com.auth0.jwt.JWT
 import com.auth0.jwt.JWTVerifier
 import com.auth0.jwt.algorithms.Algorithm
-import com.bikenance.features.login.data.LoginData
 import com.bikenance.features.strava.AuthData
 import com.bikenance.features.strava.model.StravaAthlete
 import com.bikenance.model.User
@@ -37,13 +36,13 @@ class JwtGenerator(private val config: JwtConfig) {
      * Produce a token for user / password login
      */
     fun generateToken(user: User): String = JWT.create()
-        .withSubject(user.id())
+        .withSubject(user.oid())
         .withIssuer(config.issuer)
         .withExpiresAt(getExpiration())  // optional
         .sign(config.algorithm)
 
     fun generateToken(user: User, athlete: StravaAthlete, authData: AuthData ): String = JWT.create()
-        .withSubject(user.id())
+        .withSubject(user.oid())
         .withIssuer(config.issuer)
         .withExpiresAt(Date(authData.expiresAt*1000)) // same as strava token
         .sign(config.algorithm)

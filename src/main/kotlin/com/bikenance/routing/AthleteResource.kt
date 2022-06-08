@@ -2,7 +2,6 @@ package com.bikenance.routing
 
 import com.bikenance.database.mongodb.DB
 import com.bikenance.features.strava.model.StravaAthlete
-import com.bikenance.model.User
 import io.ktor.resources.*
 import io.ktor.server.application.*
 import io.ktor.server.auth.*
@@ -12,7 +11,6 @@ import kotlinx.serialization.Serializable
 import org.koin.ktor.ext.inject
 import org.litote.kmongo.eq
 import org.litote.kmongo.findOne
-import org.litote.kmongo.findOneById
 
 @Serializable
 @Resource("/athletes")

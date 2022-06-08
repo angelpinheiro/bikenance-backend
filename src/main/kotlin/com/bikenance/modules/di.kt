@@ -59,7 +59,7 @@ val appModule = module {
         Strava(get(), get(), get())
     }
 
-    single { StravaOAuthCallbackHandler(get(), get(), get()) }
+    single { StravaOAuthCallbackHandler(get(), get(), get(), get()) }
 
     single {
         JwtMgr(JwtConfig())

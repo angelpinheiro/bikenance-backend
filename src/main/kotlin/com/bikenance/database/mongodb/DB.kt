@@ -1,9 +1,6 @@
 package com.bikenance.database.mongodb
 
-import com.bikenance.database.BikeDao
-import com.bikenance.database.BikeRideDao
-import com.bikenance.database.ProfileDao
-import com.bikenance.database.UserDao
+import com.bikenance.database.*
 import com.bikenance.features.strava.model.StravaActivity
 import com.bikenance.features.strava.model.StravaAthlete
 import com.bikenance.model.Bike
@@ -37,6 +34,9 @@ class DAOS(db: DB) {
     val profileDao : ProfileDao = MongoProfileDao(db)
     val bikeDao : BikeDao = MongoBikeDao(db)
     val bikeRideDao: BikeRideDao = MongoBikeRideDao(db)
+
+    val stravaAthleteDao: StravaAthleteDao = MongoStravaAthleteDao(db)
+    val stravaActivityDao: StravaActivityDao = MongoStravaActivityDao(db)
 }
 
 

@@ -1,17 +1,10 @@
 package com.bikenance.features.strava.model
 
+import com.bikenance.database.mongodb.MongoModel
 import com.fasterxml.jackson.annotation.JsonProperty
-import org.bson.codecs.pojo.annotations.BsonId
-import org.bson.types.ObjectId
-import org.litote.kmongo.Id
-import org.litote.kmongo.id.toId
-import java.util.*
 
 
 data class StravaActivity(
-
-    @BsonId
-    val _id: Id<StravaActivity> = ObjectId().toId(),
 
     // strava do not send this, it's filled after
     val bike: StravaDetailedGear? = null,
@@ -136,4 +129,4 @@ data class StravaActivity(
     var segmentLeaderboardOptOut: Boolean? = null,
     @JsonProperty("leaderboard_opt_out")
     var leaderboardOptOut: Boolean? = null,
-)
+) : MongoModel<StravaActivity>()

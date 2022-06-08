@@ -45,7 +45,7 @@ class StravaTokenRefresh(
 
     private suspend fun updateUserAuthInDB(user: User, auth: AuthData) {
         user.authData = auth
-        userRepository.update(user.id(), user)
+        userRepository.update(user.oid(), user)
     }
 
     private suspend fun findTargetUser(auth: AuthData): User? {
