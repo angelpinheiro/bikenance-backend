@@ -2,7 +2,12 @@ package com.bikenance.routing
 
 import com.bikenance.database.mongodb.DAOS
 import com.bikenance.database.mongodb.DB
+import com.bikenance.features.strava.api.Strava
+import com.bikenance.features.strava.api.supportedActivityTypes
+import com.bikenance.features.strava.model.StravaActivity
 import com.bikenance.features.strava.model.StravaAthlete
+import com.bikenance.model.Bike
+import com.bikenance.model.BikeRide
 import com.bikenance.model.ExtendedProfile
 import com.bikenance.model.SetupProfileUpdate
 import com.bikenance.repository.UserRepository
@@ -18,9 +23,6 @@ import org.koin.ktor.ext.inject
 import org.litote.kmongo.eq
 import org.litote.kmongo.findOne
 import java.time.LocalDateTime
-import java.time.ZoneId
-import java.time.format.DateTimeFormatter
-import java.util.Date
 
 
 @Serializable
@@ -33,6 +35,10 @@ class Profile() {
     @Serializable
     @Resource("/setup")
     class Setup(val parent: Profile = Profile())
+
+    @Serializable
+    @Resource("/bikes/{bikeId}")
+    class Bike(val parent: Profile = Profile(), val bikeId: String)
 }
 
 
@@ -51,6 +57,7 @@ suspend fun getUserProfile(dao: DAOS, userId: String, includeDraftBikes: Boolean
 
 fun Application.profileRoutes() {
 
+    val strava: Strava by inject()
     val dao: DAOS by inject()
     val db: DB by inject()
 
@@ -80,6 +87,26 @@ fun Application.profileRoutes() {
                 }
             }
 
+            get<Profile.Bike> { r ->
+                apiResult {
+                    val authUserId = authUserId()
+                    authUserId?.let { userId ->
+                        dao.bikeDao.getById(r.bikeId)
+                    }
+                }
+            }
+
+            put<Profile.Bike> { r ->
+                val bike = call.receive<Bike>()
+                apiResult {
+                    val authUserId = authUserId()
+                    authUserId?.let { userId ->
+                        dao.bikeDao.update(r.bikeId, bike)
+                        dao.bikeDao.getById(r.bikeId)
+                    }
+                }
+            }
+
             put<Profile.Setup> {
                 val update = call.receive<SetupProfileUpdate>()
                 println(update)
@@ -87,11 +114,16 @@ fun Application.profileRoutes() {
                     val authUserId = authUserId()
                     authUserId?.let { userId ->
 
+                        val user = dao.userDao.getById(authUserId)
 
                         dao.profileDao.getByUserId(userId)?.let {
                             it.firstname = update.firstName
                             it.lastname = update.lastName
-                            if(it.createdAt == null) {
+                            update.profilePhotoUrl?.let { newPhotoUrl ->
+                                it.profilePhotoUrl = newPhotoUrl
+                            }
+
+                            if (it.createdAt == null) {
                                 it.createdAt = LocalDateTime.now().formatAsIsoDate()
                             }
                             dao.profileDao.update(it.oid(), it)
@@ -101,10 +133,40 @@ fun Application.profileRoutes() {
                             it.draft = !update.synchronizedBikesIds.contains(it.oid())
                             dao.bikeDao.update(it.oid(), it)
                         }
+
+
+                        val bikes = dao.bikeDao.getByUserId(userId)
+
+                        user?.authData?.let { authData ->
+                            val stravaClient = strava.withAuth(authData);
+                            val activities = stravaClient.activities(LocalDateTime.now().minusMonths(6))
+
+                            activities?.forEach { activity ->
+
+                                if (db.activities.findOne(StravaActivity::id eq activity.id) == null) {
+
+                                    val syncStravaBikeIds = bikes.filter { !it.draft }.map { it.stravaId }
+                                    val supported = supportedActivityTypes.contains(activity.type)
+                                    if (syncStravaBikeIds.contains(activity.gearId) && supported) {
+                                        db.activities.insertOne(activity)
+                                        val ride = BikeRide(
+                                            userId = user.oid(),
+                                            stravaId = activity.id,
+                                            bikeId = bikes.firstOrNull { it.stravaId == activity.gearId }?.oid(),
+                                            name = activity.name,
+                                            distance = activity.distance,
+                                            movingTime = activity.movingTime,
+                                            elapsedTime = activity.elapsedTime,
+                                            dateTime = activity.startDate,
+                                            totalElevationGain = activity.totalElevationGain,
+                                        )
+                                        dao.bikeRideDao.create(ride)
+                                    }
+                                }
+                            }
+                        }
                         getUserProfile(dao, userId, true)
                     }
-
-
                 }
             }
 

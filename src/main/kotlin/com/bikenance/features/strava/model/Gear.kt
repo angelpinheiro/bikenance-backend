@@ -13,6 +13,6 @@ data class Gear(
     @JsonProperty("resource_state")
     var resourceState: Int? = null,
     @JsonProperty("distance")
-    var distance: Int? = null
+    var distance: Long? = null
 
 )

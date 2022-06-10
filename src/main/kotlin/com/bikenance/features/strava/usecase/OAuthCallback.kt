@@ -141,24 +141,24 @@ class StravaOAuthCallbackHandler(val strava: Strava, val db: DB, val dao: DAOS, 
             }
         }
 
-        // get and create last strava activities
-        stravaClient.activities(LocalDateTime.now().minusMonths(1))?.forEach { activity ->
-            if (db.activities.findOne(StravaActivity::id eq activity.id) == null) {
-                db.activities.insertOne(activity)
-                val ride = BikeRide(
-                    userId = newUser.oid(),
-                    stravaId = activity.id,
-                    bikeId = bikes?.firstOrNull { it.stravaId == activity.gearId }?.oid(),
-                    name = activity.name,
-                    distance = activity.distance,
-                    movingTime = activity.movingTime,
-                    elapsedTime = activity.elapsedTime,
-                    dateTime = activity.startDate, //TODO Set
-                    totalElevationGain = activity.totalElevationGain,
-                )
-                dao.bikeRideDao.create(ride)
-            }
-        }
+//        // get and create last strava activities
+//        stravaClient.activities(LocalDateTime.now().minusMonths(1))?.forEach { activity ->
+//            if (db.activities.findOne(StravaActivity::id eq activity.id) == null) {
+//                db.activities.insertOne(activity)
+//                val ride = BikeRide(
+//                    userId = newUser.oid(),
+//                    stravaId = activity.id,
+//                    bikeId = bikes?.firstOrNull { it.stravaId == activity.gearId }?.oid(),
+//                    name = activity.name,
+//                    distance = activity.distance,
+//                    movingTime = activity.movingTime,
+//                    elapsedTime = activity.elapsedTime,
+//                    dateTime = activity.startDate, //TODO Set
+//                    totalElevationGain = activity.totalElevationGain,
+//                )
+//                dao.bikeRideDao.create(ride)
+//            }
+//        }
     }
 }
 

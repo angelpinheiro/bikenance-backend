@@ -8,7 +8,7 @@ data class StravaDetailedGear(
     @JsonProperty("id") var id: String? = null,
     @JsonProperty("primary") var primary: Boolean? = null,
     @JsonProperty("resource_state") var resourceState: Int? = null,
-    @JsonProperty("distance") var distance: Int? = null,
+    @JsonProperty("distance") var distance: Long? = null,
     @JsonProperty("brand_name") var brandName: String? = null,
     @JsonProperty("model_name") var modelName: String? = null,
     @JsonProperty("frame_type") var frameType: Int? = null,

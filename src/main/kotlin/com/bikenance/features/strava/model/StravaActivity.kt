@@ -22,7 +22,7 @@ data class StravaActivity(
     @JsonProperty("name")
     var name: String? = null,
     @JsonProperty("distance")
-    var distance: Int? = null,
+    var distance: Long? = null,
     @JsonProperty("moving_time")
     var movingTime: Int? = null,
     @JsonProperty("elapsed_time")

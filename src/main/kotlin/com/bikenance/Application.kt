@@ -6,10 +6,7 @@ import com.bikenance.features.login.configureLogin
 import com.bikenance.features.strava.configureStrava
 import com.bikenance.modules.appModule
 import com.bikenance.modules.configurePlugins
-import com.bikenance.routing.athleteRoutes
-import com.bikenance.routing.profileRoutes
-import com.bikenance.routing.test
-import com.bikenance.routing.userRoutes
+import com.bikenance.routing.*
 import io.ktor.server.application.*
 import io.ktor.server.netty.*
 import io.ktor.server.response.*
@@ -48,11 +45,15 @@ fun Application.module() {
         get("/") {
             call.respond("Bikenance Server running!")
         }
+        get("/wh") {
+            call.respond("Bikenance Server WH!")
+        }
     }
 
     userRoutes()
     athleteRoutes()
     profileRoutes()
+    imageRoutes()
     test()
 
 

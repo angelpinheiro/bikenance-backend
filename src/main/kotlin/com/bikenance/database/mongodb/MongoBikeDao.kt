@@ -14,4 +14,9 @@ class MongoBikeDao(db: DB) : BasicDaoImpl<Bike>(db.bikes), BikeDao {
         return collection.find(Bike::userId eq id).toList()
     }
 
+    override suspend fun getByUserIdAndBikeId(userId: String, bikeId: String): Bike? {
+        TODO()
+        //return collection.findOne(Bike::userId eq bikeId)
+    }
+
 }

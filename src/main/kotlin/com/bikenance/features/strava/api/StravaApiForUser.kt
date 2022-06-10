@@ -23,7 +23,7 @@ val supportedActivityTypes = listOf("Ride", "EBikeRide", "VirtualRide")
 
 object StravaApiEndpoints {
     const val athleteEndpoint = "https://www.strava.com/api/v3/athlete"
-    const val activitiesEndpoint = "https://www.strava.com/api/v3/activities/"
+    const val activitiesEndpoint = "https://www.strava.com/api/v3/activities/?per_page=100"
     fun activityEndpoint(activityId: String) = "https://www.strava.com/api/v3/activities/$activityId"
     fun bikeEndpoint(id: String) = "https://www.strava.com/api/v3/gear/$id"
 }

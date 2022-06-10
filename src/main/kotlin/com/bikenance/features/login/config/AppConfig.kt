@@ -15,9 +15,14 @@ class StravaConfig(
     val forceSubscribe : Boolean = false
 )
 
+class StorageConfig(
+    val imageUploadFolder: String
+)
+
 class AppConfig {
     lateinit var api: ApiConfig
     lateinit var strava: StravaConfig
+    lateinit var storage: StorageConfig
 }
 
 fun Application.loadConfig() {
@@ -26,6 +31,10 @@ fun Application.loadConfig() {
 
     config.api = ApiConfig(
         environment.config.property("api.url").getString()
+    )
+
+    config.storage = StorageConfig(
+        environment.config.property("storage.image_upload_folder").getString()
     )
 
     config.strava = StravaConfig(

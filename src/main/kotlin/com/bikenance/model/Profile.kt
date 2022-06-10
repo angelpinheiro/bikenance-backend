@@ -30,7 +30,7 @@ class Bike(
     @JsonProperty("name") var name: String? = null,
     @JsonProperty("brand_name") var brandName: String? = null,
     @JsonProperty("model_name") var modelName: String? = null,
-    @JsonProperty("distance") var distance: Int? = null,
+    @JsonProperty("distance") var distance: Long? = null,
     @JsonProperty("photo_url") var photoUrl: String? = null,
     @JsonProperty("draft") var draft: Boolean = false,
     @JsonProperty("current_year_distance") var currentYearDistance: Int? = null,
@@ -42,7 +42,7 @@ class BikeRide(
     @JsonProperty("bike_id") var bikeId: String? = null,
     @JsonProperty("strava_activity_id") var stravaId: String? = null,
     @JsonProperty("name") var name: String? = null,
-    @JsonProperty("distance") var distance: Int? = null,
+    @JsonProperty("distance") var distance: Long? = null,
     @JsonProperty("moving_time") var movingTime: Int? = null,
     @JsonProperty("elapsed_time") var elapsedTime: Int? = null,
     @JsonProperty("total_elevation_gain") var totalElevationGain: Int? = null,
@@ -54,5 +54,6 @@ class BikeRide(
 data class SetupProfileUpdate(
     @JsonProperty("firstName") val firstName: String,
     @JsonProperty("lastName") val lastName: String,
+    @JsonProperty("profilePhotoUrl") val profilePhotoUrl: String?,
     @JsonProperty("synchronizedBikesIds") val synchronizedBikesIds: List<String>
 )

@@ -108,7 +108,7 @@ fun Application.subscribeToStravaWebhooks(config: AppConfig) {
     scope.launch {
 
         //  wait for app engine to deploy routes (refactor)
-        delay(5.seconds)
+        delay(1.seconds)
 
         val existResponse = client.get(config.strava.subscribeUrl) {
             parameter(StravaRequestParams.CLIENT_ID, config.strava.clientId)
@@ -130,16 +130,17 @@ fun Application.subscribeToStravaWebhooks(config: AppConfig) {
             }
         }
 
-        if (deleted) {
+        if (subsList.isEmpty() || deleted) {
             println("Creating new subscription...")
 
             val response = client.post(config.strava.subscribeUrl) {
                 parameter(StravaRequestParams.CLIENT_ID, config.strava.clientId)
                 parameter(StravaRequestParams.CLIENT_SECRET, config.strava.clientSecret)
-                parameter(StravaRequestParams.CALLBACK_URL, "${config.api.url}apiUrl/webhook")
+                parameter(StravaRequestParams.CALLBACK_URL, "${config.api.url}/webhook")
                 parameter(StravaRequestParams.VERIFY_TOKEN, VERIFY_TOKEN)
             }
 
+            println(response.bodyAsText())
             if (response.status == HttpStatusCode.Created) {
                 println("SUCCESS: Webhook subscription created.")
             } else {
