@@ -16,6 +16,7 @@ import io.ktor.server.application.*
 import io.ktor.server.auth.*
 import io.ktor.server.request.*
 import io.ktor.server.resources.*
+import io.ktor.server.resources.post
 import io.ktor.server.resources.put
 import io.ktor.server.routing.*
 import kotlinx.serialization.Serializable
@@ -37,8 +38,15 @@ class Profile() {
     class Setup(val parent: Profile = Profile())
 
     @Serializable
-    @Resource("/bikes/{bikeId}")
-    class Bike(val parent: Profile = Profile(), val bikeId: String)
+    @Resource("/bikes")
+    class Bikes(val parent: Profile = Profile()) {
+
+        @Serializable
+        @Resource("{bikeId}")
+        class Bike(val parent: Bikes = Bikes(), val bikeId: String)
+
+    }
+
 }
 
 
@@ -87,7 +95,7 @@ fun Application.profileRoutes() {
                 }
             }
 
-            get<Profile.Bike> { r ->
+            get<Profile.Bikes.Bike> { r ->
                 apiResult {
                     val authUserId = authUserId()
                     authUserId?.let { userId ->
@@ -96,7 +104,7 @@ fun Application.profileRoutes() {
                 }
             }
 
-            put<Profile.Bike> { r ->
+            put<Profile.Bikes.Bike> { r ->
                 val bike = call.receive<Bike>()
                 apiResult {
                     val authUserId = authUserId()
@@ -107,9 +115,30 @@ fun Application.profileRoutes() {
                 }
             }
 
+            delete<Profile.Bikes.Bike> { r ->
+                apiResult {
+                    val authUserId = authUserId()
+                    authUserId?.let { userId ->
+                        dao.bikeDao.delete(r.bikeId)
+                    }
+                }
+            }
+
+            post<Profile.Bikes> { r ->
+                val bike = call.receive<Bike>()
+                val authUserId = authUserId()
+                println("Post to probile/bikes: ${bike._id}")
+
+                apiResult {
+                    authUserId?.let { userId ->
+                        bike.userId = userId
+                        dao.bikeDao.create(bike)
+                    }
+                }
+            }
+
             put<Profile.Setup> {
                 val update = call.receive<SetupProfileUpdate>()
-                println(update)
                 apiResult {
                     val authUserId = authUserId()
                     authUserId?.let { userId ->

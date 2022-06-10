@@ -17,6 +17,9 @@ abstract class MongoModel<T>(
     fun oid(): String {
         return _id.toString()
     }
+    fun generateId() {
+//        _id = ObjectId().toId()
+    }
 }
 
 interface BasicDao<T> {
@@ -38,7 +41,6 @@ abstract class BasicDaoImpl<T : MongoModel<T>>(val collection: MongoCollection<T
 
     override suspend fun create(item: T): T? {
         return collection.insertOne(item).let {
-            println("wasAcknowledged ${it.wasAcknowledged()}, ${item.oid()}")
             collection.findOneById(item._id)
         }
     }

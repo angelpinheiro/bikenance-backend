@@ -25,7 +25,7 @@ val appModule = module {
     }
 
     single {
-        DB(createDatabase())
+        DB(createDatabase(get()))
     }
 
     single { DAOS(get()) }

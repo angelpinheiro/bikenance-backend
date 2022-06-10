@@ -29,14 +29,14 @@ sealed class ApiResult<T>(
 
 suspend inline fun <T> PipelineContext<Unit, ApplicationCall>.apiResult(block: PipelineContext<Unit, ApplicationCall>.() -> T?) {
     val r = try {
-        when (block()) {
+        when (val r = block()) {
             null -> ApiResult.Error("Not found", status = HttpStatusCode.NotFound)
-            else -> ApiResult.Success(block())
+            else -> ApiResult.Success(r)
         }
     } catch (e: CancellationException) {
         throw e
     } catch (e: Exception) {
-        println(e)
+        e.printStackTrace()
         ApiResult.Error(e.message)
     }
     call.respond(status = HttpStatusCode.fromValue(r.status), r)

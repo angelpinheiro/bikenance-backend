@@ -7,6 +7,10 @@ class ApiConfig(
     val url: String
 )
 
+class DBConfig(
+    val host: String
+)
+
 class StravaConfig(
     val clientId: String,
     val clientSecret: String,
@@ -21,6 +25,7 @@ class StorageConfig(
 
 class AppConfig {
     lateinit var api: ApiConfig
+    lateinit var db: DBConfig
     lateinit var strava: StravaConfig
     lateinit var storage: StorageConfig
 }
@@ -31,6 +36,10 @@ fun Application.loadConfig() {
 
     config.api = ApiConfig(
         environment.config.property("api.url").getString()
+    )
+
+    config.db = DBConfig(
+        environment.config.property("db.host").getString()
     )
 
     config.storage = StorageConfig(

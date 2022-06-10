@@ -24,7 +24,7 @@ data class Profile(
     @JsonProperty("created_at") var createdAt: String? = null,
 ): MongoModel<Profile>()
 
-class Bike(
+data class Bike(
     @JsonProperty("user_id") var userId: String? = null,
     @JsonProperty("strava_gear_id") var stravaId: String? = null,
     @JsonProperty("name") var name: String? = null,
@@ -37,7 +37,7 @@ class Bike(
     @JsonProperty("current_month_distance") var currentMonthDistance: Int? = null,
 ) : MongoModel<Bike>()
 
-class BikeRide(
+data class BikeRide(
     @JsonProperty("user_id") var userId: String? = null,
     @JsonProperty("bike_id") var bikeId: String? = null,
     @JsonProperty("strava_activity_id") var stravaId: String? = null,

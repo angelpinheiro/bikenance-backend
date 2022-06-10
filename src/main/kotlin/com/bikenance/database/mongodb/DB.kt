@@ -3,6 +3,7 @@ package com.bikenance.database.mongodb
 import ch.qos.logback.classic.Level
 import ch.qos.logback.classic.LoggerContext
 import com.bikenance.database.*
+import com.bikenance.features.login.config.AppConfig
 import com.bikenance.features.strava.model.StravaActivity
 import com.bikenance.features.strava.model.StravaAthlete
 import com.bikenance.model.Bike
@@ -17,13 +18,13 @@ import org.litote.kmongo.KMongo
 import org.litote.kmongo.getCollection
 import org.slf4j.LoggerFactory
 
-fun createDatabase(): MongoDatabase {
+fun createDatabase(config: AppConfig): MongoDatabase {
 
     val loggerContext = LoggerFactory.getILoggerFactory() as LoggerContext
     val rootLogger = loggerContext.getLogger("org.mongodb.driver")
     rootLogger.level = Level.OFF
 
-    val client = KMongo.createClient()
+    val client = KMongo.createClient("mongodb://" + config.db.host)
     return client.getDatabase("stravadb")
 }
 
