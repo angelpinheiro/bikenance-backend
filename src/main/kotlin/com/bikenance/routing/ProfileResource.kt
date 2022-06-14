@@ -5,11 +5,7 @@ import com.bikenance.database.mongodb.DB
 import com.bikenance.features.strava.api.Strava
 import com.bikenance.features.strava.api.supportedActivityTypes
 import com.bikenance.features.strava.model.StravaActivity
-import com.bikenance.features.strava.model.StravaAthlete
-import com.bikenance.model.Bike
-import com.bikenance.model.BikeRide
-import com.bikenance.model.ExtendedProfile
-import com.bikenance.model.SetupProfileUpdate
+import com.bikenance.model.*
 import com.bikenance.repository.UserRepository
 import io.ktor.resources.*
 import io.ktor.server.application.*
@@ -28,24 +24,29 @@ import java.time.LocalDateTime
 
 @Serializable
 @Resource("/profile")
-class Profile() {
+class ProfilePath() {
+
     @Serializable
     @Resource("/extended")
-    class Extended(val parent: Profile = Profile(), val draft: Boolean = false)
+    class Extended(val parent: ProfilePath = ProfilePath(), val draft: Boolean = false)
 
     @Serializable
     @Resource("/setup")
-    class Setup(val parent: Profile = Profile())
+    class Setup(val parent: ProfilePath = ProfilePath())
 
     @Serializable
     @Resource("/bikes")
-    class Bikes(val parent: Profile = Profile()) {
+    class Bikes(val parent: ProfilePath = ProfilePath(), val draft: Boolean = false) {
 
         @Serializable
         @Resource("{bikeId}")
         class Bike(val parent: Bikes = Bikes(), val bikeId: String)
 
     }
+
+    @Serializable
+    @Resource("/rides")
+    class Rides(val parent: ProfilePath = ProfilePath())
 
 }
 
@@ -75,18 +76,56 @@ fun Application.profileRoutes() {
 
         authenticate {
 
-            get<Profile> { r ->
+            get<ProfilePath> { r ->
+                apiResult {
+                    val authUserId = authUserId()
+                    println("Profile for userId: $authUserId")
+                    authUserId?.let { userId ->
+                        dao.profileDao.getByUserId(userId)
+                    }
+                }
+            }
+
+            put<ProfilePath> { r ->
+                val update = call.receive<Profile>()
                 apiResult {
                     val authUserId = authUserId()
                     authUserId?.let { userId ->
-                        userRepository.getById(userId)?.let { user ->
-                            db.athletes.findOne(StravaAthlete::id eq user.athleteId)
+                        return@let dao.profileDao.getByUserId(userId)?.let {
+                            it.firstname = update.firstname
+                            it.lastname = update.lastname
+                            update.profilePhotoUrl?.let { newPhotoUrl ->
+                                it.profilePhotoUrl = newPhotoUrl
+                            }
+                            if (it.createdAt == null) {
+                                it.createdAt = LocalDateTime.now().formatAsIsoDate()
+                            }
+                            dao.profileDao.update(it.oid(), it)
+                            dao.profileDao.getByUserId(userId)
                         }
                     }
                 }
             }
 
-            get<Profile.Extended> { r ->
+            get<ProfilePath.Bikes> { r ->
+                apiResult {
+                    val authUserId = authUserId()
+                    authUserId?.let { userId ->
+                        dao.bikeDao.getByUserId(userId)
+                    }
+                }
+            }
+
+            get<ProfilePath.Rides> { r ->
+                apiResult {
+                    val authUserId = authUserId()
+                    authUserId?.let { userId ->
+                        dao.bikeRideDao.getByUserId(userId)
+                    }
+                }
+            }
+
+            get<ProfilePath.Extended> { r ->
                 apiResult {
                     val authUserId = authUserId()
                     authUserId?.let { userId ->
@@ -95,40 +134,47 @@ fun Application.profileRoutes() {
                 }
             }
 
-            get<Profile.Bikes.Bike> { r ->
+            get<ProfilePath.Bikes.Bike> { r ->
                 apiResult {
-                    val authUserId = authUserId()
-                    authUserId?.let { userId ->
-                        dao.bikeDao.getById(r.bikeId)
-                    }
+                    dao.bikeDao.getById(r.bikeId)
                 }
             }
 
-            put<Profile.Bikes.Bike> { r ->
-                val bike = call.receive<Bike>()
-                apiResult {
-                    val authUserId = authUserId()
-                    authUserId?.let { userId ->
-                        dao.bikeDao.update(r.bikeId, bike)
-                        dao.bikeDao.getById(r.bikeId)
-                    }
-                }
-            }
-
-            delete<Profile.Bikes.Bike> { r ->
-                apiResult {
-                    val authUserId = authUserId()
-                    authUserId?.let { userId ->
-                        dao.bikeDao.delete(r.bikeId)
-                    }
-                }
-            }
-
-            post<Profile.Bikes> { r ->
+            put<ProfilePath.Bikes.Bike> { r ->
                 val bike = call.receive<Bike>()
                 val authUserId = authUserId()
-                println("Post to probile/bikes: ${bike._id}")
 
+                apiResult {
+
+                    val user = dao.userDao.getById(authUserId ?: "") ?: throw Exception("User not found")
+                    val old = dao.bikeDao.getById(r.bikeId) ?: throw Exception("Bike not found")
+
+                    dao.bikeDao.update(r.bikeId, bike)
+                    val updated = dao.bikeDao.getById(r.bikeId) ?: throw Exception("Bike not found")
+
+                    // bike is being synchronized
+                    if (old.draft && !bike.draft) {
+                        syncBikeActivities(updated, user, strava, db, dao)
+                    }
+                    // bike is being removed
+                    else if (bike.draft && !old.draft) {
+                        removeBikeActivities(updated, user, strava, db, dao)
+                    }
+
+                    dao.bikeDao.getById(r.bikeId)
+
+                }
+            }
+
+            delete<ProfilePath.Bikes.Bike> { r ->
+                apiResult {
+                    dao.bikeDao.delete(r.bikeId)
+                }
+            }
+
+            post<ProfilePath.Bikes> { r ->
+                val bike = call.receive<Bike>()
+                val authUserId = authUserId()
                 apiResult {
                     authUserId?.let { userId ->
                         bike.userId = userId
@@ -137,7 +183,7 @@ fun Application.profileRoutes() {
                 }
             }
 
-            put<Profile.Setup> {
+            put<ProfilePath.Setup> {
                 val update = call.receive<SetupProfileUpdate>()
                 apiResult {
                     val authUserId = authUserId()
@@ -159,7 +205,7 @@ fun Application.profileRoutes() {
                         }
 
                         dao.bikeDao.getByUserId(userId).forEach {
-                            it.draft = !update.synchronizedBikesIds.contains(it.oid())
+                            it.draft = it.stravaId != null && !update.synchronizedBikesIds.contains(it.oid())
                             dao.bikeDao.update(it.oid(), it)
                         }
 
@@ -202,4 +248,42 @@ fun Application.profileRoutes() {
 
         }
     }
+}
+
+suspend fun syncBikeActivities(bike: Bike, user: User, strava: Strava, db: DB, dao: DAOS) {
+
+
+    println("Synchronizing bike activities: ${bike.oid()}")
+
+    val stravaClient = strava.withAuth(user.authData ?: throw Exception("User auth not found"));
+    val activities = stravaClient.activities(LocalDateTime.now().minusMonths(6))
+
+    activities?.forEach { activity ->
+
+        if (db.activities.findOne(StravaActivity::id eq activity.id) == null) {
+            val supported = supportedActivityTypes.contains(activity.type)
+            if (bike.stravaId == activity.gearId && supported) {
+                db.activities.insertOne(activity)
+                val ride = BikeRide(
+                    userId = user.oid(),
+                    stravaId = activity.id,
+                    bikeId = bike.oid(),
+                    name = activity.name,
+                    distance = activity.distance,
+                    movingTime = activity.movingTime,
+                    elapsedTime = activity.elapsedTime,
+                    dateTime = activity.startDate,
+                    totalElevationGain = activity.totalElevationGain,
+                )
+                dao.bikeRideDao.create(ride)
+            }
+        }
+    }
+}
+
+
+suspend fun removeBikeActivities(bike: Bike, user: User, strava: Strava, db: DB, dao: DAOS) {
+    println("Deleting bike activities: ${bike.oid()}")
+    db.activities.deleteMany(StravaActivity::gearId eq bike.stravaId)
+    db.bikeRides.deleteMany(BikeRide::bikeId eq bike.oid())
 }

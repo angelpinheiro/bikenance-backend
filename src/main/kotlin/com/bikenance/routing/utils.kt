@@ -8,53 +8,34 @@ import io.ktor.server.auth.jwt.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import io.ktor.util.pipeline.*
-import java.text.SimpleDateFormat
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.util.concurrent.CancellationException
 
-sealed class ApiResult<T>(
-    val success: Boolean = true,
-    val message: String? = null,
-    val status: Int = HttpStatusCode.OK.value,
-    val data: T? = null,
-) {
-    class Success<T>(data: T) : ApiResult<T>(data = data)
-    class Error<T>(
-        message: String? = null,
-        status: HttpStatusCode = HttpStatusCode.InternalServerError,
-        data: T? = null
-    ) : ApiResult<T>(false, message, status.value, data)
-}
+//sealed class ApiResult<T>(
+//    val success: Boolean = true,
+//    val message: String? = null,
+//    val status: Int = HttpStatusCode.OK.value,
+//) {
+//    class Success<T>(val data: T) : ApiResult<T>()
+//    class Error<T>(
+//        message: String? = null,
+//        status: HttpStatusCode = HttpStatusCode.InternalServerError,
+//    ) : ApiResult<T>(false, message, status.value)
+//}
 
-suspend inline fun <T> PipelineContext<Unit, ApplicationCall>.apiResult(block: PipelineContext<Unit, ApplicationCall>.() -> T?) {
-    val r = try {
-        when (val r = block()) {
-            null -> ApiResult.Error("Not found", status = HttpStatusCode.NotFound)
-            else -> ApiResult.Success(r)
+suspend inline fun <reified T : Any> PipelineContext<Unit, ApplicationCall>.apiResult(block: PipelineContext<Unit, ApplicationCall>.() -> T?) {
+    try {
+        when (val result = block()) {
+            null -> call.respond(HttpStatusCode.NotFound)
+            else -> call.respond(status = HttpStatusCode.OK, result)
         }
     } catch (e: CancellationException) {
         throw e
     } catch (e: Exception) {
-        e.printStackTrace()
-        ApiResult.Error(e.message)
+        e.printStackTrace() //TODO
+        call.respond(HttpStatusCode.InternalServerError, e.message ?: "Internal server error")
     }
-    call.respond(status = HttpStatusCode.fromValue(r.status), r)
-}
-
-
-suspend inline fun <reified T : Any> PipelineContext<Unit, ApplicationCall>.apiResponse(block: PipelineContext<Unit, ApplicationCall>.() -> T?) {
-    val r = try {
-        when (val b = block()) {
-            null -> call.respond("Fail")
-            else -> call.respond(b)
-        }
-    } catch (e: CancellationException) {
-        throw e
-    } catch (e: Exception) {
-        call.respond("Fail")
-    }
-
 }
 
 val dtf: DateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss'Z'")

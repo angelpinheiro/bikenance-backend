@@ -1,10 +1,8 @@
 package com.bikenance.routing
 
 import com.bikenance.database.mongodb.DB
-import com.bikenance.features.strava.model.StravaAthlete
 import com.bikenance.model.UserUpdate
 import com.bikenance.repository.UserRepository
-import io.ktor.http.*
 import io.ktor.resources.*
 import io.ktor.server.application.*
 import io.ktor.server.auth.*
@@ -14,9 +12,6 @@ import io.ktor.server.resources.put
 import io.ktor.server.routing.*
 import kotlinx.serialization.Serializable
 import org.koin.ktor.ext.inject
-import org.litote.kmongo.eq
-import org.litote.kmongo.findOne
-import org.litote.kmongo.findOneById
 
 @Serializable
 @Resource("/users")
@@ -24,6 +19,9 @@ class Users(val filter: String? = null) {
     @Serializable
     @Resource("{id}")
     class Id(val parent: Users = Users(), val id: String)
+    @Serializable
+    @Resource("messagingToken")
+    class MessagingToken(val parent: Users = Users())
 
     @Serializable
     @Resource("/u/{username}")
@@ -66,6 +64,19 @@ fun Application.userRoutes() {
                 }
             }
 
+            put<Users.MessagingToken> { r ->
+                val token = call.receive<String>()
+                val userId = authUserId()
+                apiResult {
+                    userId?.let {
+                        userRepository.getById(userId)?.let {
+                            it.firebaseToken = token
+                            userRepository.update(userId,it)
+                            true
+                        }
+                    } ?: false
+                }
+            }
 
         }
     }
