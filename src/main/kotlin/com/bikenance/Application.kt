@@ -1,16 +1,19 @@
 package com.bikenance
 
 import com.bikenance.database.mongodb.configureMongoDB
+import com.bikenance.features.firebase.MessageSender
 import com.bikenance.features.login.config.loadConfig
 import com.bikenance.features.login.configureLogin
 import com.bikenance.features.strava.configureStrava
 import com.bikenance.modules.appModule
 import com.bikenance.modules.configurePlugins
 import com.bikenance.routing.*
+import com.google.firebase.messaging.FirebaseMessaging
 import io.ktor.server.application.*
 import io.ktor.server.netty.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
+import org.koin.ktor.ext.inject
 import org.koin.ktor.plugin.Koin
 import org.koin.logger.slf4jLogger
 
@@ -23,6 +26,9 @@ fun main(args: Array<String>) = EngineMain.main(args)
  */
 @Suppress("unused")
 fun Application.module() {
+
+    val messageSender : MessageSender by inject()
+
 
     install(Koin) {
         slf4jLogger()
@@ -55,6 +61,8 @@ fun Application.module() {
     profileRoutes()
     imageRoutes()
     test()
+
+    messageSender.test()
 
 
 }

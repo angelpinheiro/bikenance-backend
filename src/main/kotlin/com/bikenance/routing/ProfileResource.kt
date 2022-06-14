@@ -5,6 +5,7 @@ import com.bikenance.database.mongodb.DB
 import com.bikenance.features.strava.api.Strava
 import com.bikenance.features.strava.api.supportedActivityTypes
 import com.bikenance.features.strava.model.StravaActivity
+import com.bikenance.features.strava.usecase.StravaBikeSync
 import com.bikenance.model.*
 import com.bikenance.repository.UserRepository
 import io.ktor.resources.*
@@ -69,6 +70,7 @@ fun Application.profileRoutes() {
     val strava: Strava by inject()
     val dao: DAOS by inject()
     val db: DB by inject()
+    val stravaBikeSync: StravaBikeSync by inject()
 
     routing {
 
@@ -152,13 +154,14 @@ fun Application.profileRoutes() {
                     dao.bikeDao.update(r.bikeId, bike)
                     val updated = dao.bikeDao.getById(r.bikeId) ?: throw Exception("Bike not found")
 
+
                     // bike is being synchronized
                     if (old.draft && !bike.draft) {
-                        syncBikeActivities(updated, user, strava, db, dao)
+                        stravaBikeSync.onBikeAdded(user, updated)
                     }
                     // bike is being removed
                     else if (bike.draft && !old.draft) {
-                        removeBikeActivities(updated, user, strava, db, dao)
+                        stravaBikeSync.onBikeRemoved(user, updated)
                     }
 
                     dao.bikeDao.getById(r.bikeId)
@@ -249,6 +252,9 @@ fun Application.profileRoutes() {
         }
     }
 }
+
+
+
 
 suspend fun syncBikeActivities(bike: Bike, user: User, strava: Strava, db: DB, dao: DAOS) {
 

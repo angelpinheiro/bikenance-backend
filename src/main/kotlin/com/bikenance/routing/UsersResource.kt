@@ -65,12 +65,15 @@ fun Application.userRoutes() {
             }
 
             put<Users.MessagingToken> { r ->
-                val token = call.receive<String>()
+                val tokenWrapper = call.receive<TokenWrapper>()
+
+                println("ReceivedToken [${tokenWrapper.token}]")
+
                 val userId = authUserId()
                 apiResult {
                     userId?.let {
                         userRepository.getById(userId)?.let {
-                            it.firebaseToken = token
+                            it.firebaseToken = tokenWrapper.token
                             userRepository.update(userId,it)
                             true
                         }
@@ -81,3 +84,7 @@ fun Application.userRoutes() {
         }
     }
 }
+
+data class TokenWrapper(
+    val token: String
+)

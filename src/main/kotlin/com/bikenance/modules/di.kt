@@ -2,10 +2,12 @@ package com.bikenance.modules
 
 import com.bikenance.database.UserDao
 import com.bikenance.database.mongodb.*
+import com.bikenance.features.firebase.MessageSender
 import com.bikenance.features.login.config.AppConfig
 import com.bikenance.features.login.config.JwtConfig
 import com.bikenance.features.login.config.JwtMgr
 import com.bikenance.features.strava.api.Strava
+import com.bikenance.features.strava.usecase.StravaBikeSync
 import com.bikenance.features.strava.usecase.StravaOAuthCallbackHandler
 import com.bikenance.model.Profile
 import com.bikenance.repository.UserRepository
@@ -60,6 +62,14 @@ val appModule = module {
     }
 
     single { StravaOAuthCallbackHandler(get(), get(), get(), get()) }
+
+    single {
+        MessageSender(get(), get(), get())
+    }
+
+    single {
+        StravaBikeSync(get(), get(), get(), get())
+    }
 
     single {
         JwtMgr(JwtConfig())
