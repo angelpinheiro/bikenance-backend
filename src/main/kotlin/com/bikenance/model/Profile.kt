@@ -33,6 +33,7 @@ data class Bike(
     @JsonProperty("distance") var distance: Long? = null,
     @JsonProperty("photo_url") var photoUrl: String? = null,
     @JsonProperty("draft") var draft: Boolean = false,
+    @JsonProperty("type") var type: String = "mtb", // mtb | road | electric | gravel | ...
     @JsonProperty("current_year_distance") var currentYearDistance: Int? = null,
     @JsonProperty("current_month_distance") var currentMonthDistance: Int? = null,
 ) : MongoModel<Bike>()
@@ -55,5 +56,9 @@ data class SetupProfileUpdate(
     @JsonProperty("firstName") val firstName: String,
     @JsonProperty("lastName") val lastName: String,
     @JsonProperty("profilePhotoUrl") val profilePhotoUrl: String?,
+    @JsonProperty("synchronizedBikesIds") val synchronizedBikesIds: List<String>
+)
+
+data class SyncBikes(
     @JsonProperty("synchronizedBikesIds") val synchronizedBikesIds: List<String>
 )

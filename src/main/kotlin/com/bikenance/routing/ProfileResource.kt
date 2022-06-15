@@ -35,6 +35,8 @@ class ProfilePath() {
     @Resource("/setup")
     class Setup(val parent: ProfilePath = ProfilePath())
 
+
+
     @Serializable
     @Resource("/bikes")
     class Bikes(val parent: ProfilePath = ProfilePath(), val draft: Boolean = false) {
@@ -48,6 +50,10 @@ class ProfilePath() {
     @Serializable
     @Resource("/rides")
     class Rides(val parent: ProfilePath = ProfilePath())
+
+    @Serializable
+    @Resource("/sync")
+    class SyncBikes(val parent: ProfilePath = ProfilePath())
 
 }
 
@@ -186,6 +192,34 @@ fun Application.profileRoutes() {
                 }
             }
 
+            put<ProfilePath.SyncBikes> {
+                val syncBikes = call.receive<SyncBikes>()
+                println("ProfilePath.SyncBikes: ${syncBikes.synchronizedBikesIds.joinToString(",")}")
+                apiResult {
+                    val authUserId = authUserId()
+                    authUserId?.let { userId ->
+                        val user = dao.userDao.getById(authUserId) ?: throw Exception("User not found")
+                        val bikes = dao.bikeDao.getByUserId(userId)
+                        val sync = syncBikes.synchronizedBikesIds
+
+                        bikes.forEach {
+                            if (it.draft && sync.contains(it.oid())) {
+                                it.draft = false
+                                dao.bikeDao.update(it.oid(), it)
+                                stravaBikeSync.onBikeAdded(user, it)
+                            }
+                            // bike is being removed
+                            else if (!it.draft && !sync.contains(it.oid())) {
+                                it.draft = true
+                                dao.bikeDao.update(it.oid(), it)
+                                stravaBikeSync.onBikeRemoved(user, it)
+                            }
+                        }
+                        true
+                    } ?: false
+                }
+            }
+
             put<ProfilePath.Setup> {
                 val update = call.receive<SetupProfileUpdate>()
                 apiResult {
@@ -252,8 +286,6 @@ fun Application.profileRoutes() {
         }
     }
 }
-
-
 
 
 suspend fun syncBikeActivities(bike: Bike, user: User, strava: Strava, db: DB, dao: DAOS) {
