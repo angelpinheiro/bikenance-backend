@@ -2,10 +2,6 @@ package com.bikenance.model
 
 import com.bikenance.database.mongodb.MongoModel
 import com.fasterxml.jackson.annotation.JsonProperty
-import org.bson.codecs.pojo.annotations.BsonId
-import org.bson.types.ObjectId
-import org.litote.kmongo.Id
-import org.litote.kmongo.id.toId
 
 data class ExtendedProfile(
     val profile: Profile?,
@@ -22,7 +18,7 @@ data class Profile(
     @JsonProperty("sex") var sex: String? = null,
     @JsonProperty("weight") var weight: Int? = null,
     @JsonProperty("created_at") var createdAt: String? = null,
-): MongoModel<Profile>()
+) : MongoModel<Profile>()
 
 data class Bike(
     @JsonProperty("user_id") var userId: String? = null,
@@ -33,7 +29,7 @@ data class Bike(
     @JsonProperty("distance") var distance: Long? = null,
     @JsonProperty("photo_url") var photoUrl: String? = null,
     @JsonProperty("draft") var draft: Boolean = false,
-    @JsonProperty("type") var type: String = "mtb", // mtb | road | electric | gravel | ...
+    @JsonProperty("bike_type") var type: String = "MTB", // mtb | road | electric | gravel | ...
     @JsonProperty("current_year_distance") var currentYearDistance: Int? = null,
     @JsonProperty("current_month_distance") var currentMonthDistance: Int? = null,
 ) : MongoModel<Bike>()
@@ -49,7 +45,6 @@ data class BikeRide(
     @JsonProperty("total_elevation_gain") var totalElevationGain: Int? = null,
     @JsonProperty("date_time") var dateTime: String? = null
 ) : MongoModel<BikeRide>()
-
 
 
 data class SetupProfileUpdate(

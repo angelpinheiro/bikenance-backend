@@ -103,7 +103,8 @@ data class AuthData(
     var refreshToken: String?,
     var expiresIn: Long,
     var expiresAt: Long,
-    var scope: String = ""
+    var scope: String = "",
+    var lastRefresh: String = "",
 )
 
 fun PipelineContext<*, ApplicationCall>.getOAuthData(): AuthData? {

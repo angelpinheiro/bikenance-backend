@@ -39,7 +39,7 @@ suspend inline fun <reified T : Any> PipelineContext<Unit, ApplicationCall>.apiR
 }
 
 val dtf: DateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss'Z'")
-fun LocalDateTime.formatAsIsoDate(): String? {
+fun LocalDateTime.formatAsIsoDate(): String {
     return dtf.format(this)
 }
 
