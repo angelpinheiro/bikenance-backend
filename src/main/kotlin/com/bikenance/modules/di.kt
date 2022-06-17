@@ -7,6 +7,7 @@ import com.bikenance.features.login.config.AppConfig
 import com.bikenance.features.login.config.JwtConfig
 import com.bikenance.features.login.config.JwtMgr
 import com.bikenance.features.strava.api.Strava
+import com.bikenance.features.strava.usecase.ReceiveDataUseCase
 import com.bikenance.features.strava.usecase.StravaBikeSync
 import com.bikenance.features.strava.usecase.StravaOAuthCallbackHandler
 import com.bikenance.model.Profile
@@ -62,6 +63,8 @@ val appModule = module {
     }
 
     single { StravaOAuthCallbackHandler(get(), get(), get(), get()) }
+
+    single { ReceiveDataUseCase(get(), get(), get(), get()) }
 
     single {
         MessageSender(get(), get(), get())

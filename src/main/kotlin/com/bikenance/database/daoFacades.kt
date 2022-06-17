@@ -39,5 +39,7 @@ interface StravaAthleteDao : BasicDao<StravaAthlete> {
     suspend fun getByAthleteId(id: String): StravaAthlete?
 }
 
-interface StravaActivityDao : BasicDao<StravaActivity>
+interface StravaActivityDao : BasicDao<StravaActivity>  {
+    suspend fun getByStravaId(id: String): StravaActivity?
+}
 

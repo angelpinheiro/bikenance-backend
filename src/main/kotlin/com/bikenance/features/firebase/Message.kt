@@ -8,6 +8,7 @@ enum class MessageType(
     @JsonValue
     @JsonProperty("message_type") val type: String
 ) {
+    NEW_ACTIVITY("NEW_ACTIVITY"),
     RIDES_UPDATED("RIDES_UPDATED"),
     RIDES_DELETED("RIDES_DELETED")
 }

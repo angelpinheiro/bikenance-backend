@@ -53,4 +53,8 @@ class MongoStravaAthleteDao(private val db: DB) : BasicDaoImpl<StravaAthlete>(db
     }
 }
 
-class MongoStravaActivityDao(private val db: DB) : BasicDaoImpl<StravaActivity>(db.activities), StravaActivityDao
+class MongoStravaActivityDao(private val db: DB) : BasicDaoImpl<StravaActivity>(db.activities), StravaActivityDao {
+    override suspend fun getByStravaId(id: String): StravaActivity? {
+        return db.activities.findOne(StravaActivity::id eq id)
+    }
+}

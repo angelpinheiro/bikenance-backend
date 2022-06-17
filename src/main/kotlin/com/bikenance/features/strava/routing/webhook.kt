@@ -34,10 +34,8 @@ fun Application.stravaWebhookRouting() {
 
     val config: AppConfig by inject()
     val db: DB by inject()
-    val userRepository: UserRepository by inject()
     val strava: Strava by inject()
-
-    val receiveDataUseCase = ReceiveDataUseCase(userRepository)
+    val receiveDataUseCase: ReceiveDataUseCase by inject()
 
     routing {
 
@@ -61,7 +59,7 @@ fun Application.stravaWebhookRouting() {
             // launch a new coroutine for processing event data
             // and return Ok to avoid strava request cancellation
             application.launch {
-                receiveDataUseCase.handleEventData(db, strava, eventData)
+                receiveDataUseCase.handleEventData(eventData)
             }
             call.respond(HttpStatusCode.OK)
         }
