@@ -104,14 +104,14 @@ data class AuthData(
     var expiresIn: Long,
     var expiresAt: Long,
     var scope: String = "",
-    var lastRefresh: String = "",
+    var lastRefresh: String,
 )
 
 fun PipelineContext<*, ApplicationCall>.getOAuthData(): AuthData? {
     val principal: OAuthAccessTokenResponse.OAuth2? = call.principal()
     return principal?.let {
-        val expiration = Instant.now().plusSeconds(it.expiresIn - 10).toEpochMilli()
-        AuthData(it.accessToken, it.refreshToken, it.expiresIn, expiration)
+        val expiration = Instant.now().plusSeconds(it.expiresIn - 10).epochSecond
+        AuthData(it.accessToken, it.refreshToken, it.expiresIn, expiration, lastRefresh = "Pending")
     }
 }
 
