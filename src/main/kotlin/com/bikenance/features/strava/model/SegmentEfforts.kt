@@ -6,7 +6,7 @@ import com.fasterxml.jackson.annotation.JsonProperty
 data class SegmentEfforts(
 
     @JsonProperty("id")
-    var id: Int? = null,
+    var id: String? = null,
     @JsonProperty("resource_state")
     var resourceState: Int? = null,
     @JsonProperty("name")

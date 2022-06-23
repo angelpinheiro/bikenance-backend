@@ -11,6 +11,7 @@ import com.bikenance.features.strava.model.StravaActivity
 import com.bikenance.model.Bike
 import com.bikenance.model.BikeRide
 import com.bikenance.model.User
+import com.bikenance.model.toBikeRide
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -46,17 +47,7 @@ class StravaBikeSync(
                         db.activities.insertOne(stravaActivity)
                         // create a ride from the strava activity and save it
                         dao.bikeRideDao.create(
-                            BikeRide(
-                                userId = user.oid(),
-                                stravaId = stravaActivity.id,
-                                bikeId = bike.oid(),
-                                name = stravaActivity.name,
-                                distance = stravaActivity.distance,
-                                movingTime = stravaActivity.movingTime,
-                                elapsedTime = stravaActivity.elapsedTime,
-                                dateTime = stravaActivity.startDate,
-                                totalElevationGain = stravaActivity.totalElevationGain,
-                            )
+                            stravaActivity.toBikeRide(user, bike)
                         )
                     }
                 }

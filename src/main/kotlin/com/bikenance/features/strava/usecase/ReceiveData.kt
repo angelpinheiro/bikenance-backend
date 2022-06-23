@@ -11,6 +11,7 @@ import com.bikenance.features.strava.model.EventData
 import com.bikenance.features.strava.model.ObjectType
 import com.bikenance.model.BikeRide
 import com.bikenance.model.User
+import com.bikenance.model.toBikeRide
 import com.bikenance.repository.UserRepository
 
 
@@ -55,17 +56,7 @@ class ReceiveDataUseCase(
                     val bike = activity.gearId?.let { dao.bikeDao.getByStravaId(it) }
                     dao.stravaActivityDao.create(activity)
                     dao.bikeRideDao.create(
-                        BikeRide(
-                            userId = user.oid(),
-                            stravaId = activity.id,
-                            bikeId = bike?.oid(),
-                            name = activity.name,
-                            distance = activity.distance,
-                            movingTime = activity.movingTime,
-                            elapsedTime = activity.elapsedTime,
-                            dateTime = activity.startDate,
-                            totalElevationGain = activity.totalElevationGain,
-                        )
+                        activity.toBikeRide(user, bike)
                     )?.let {
                         messageSender.sendMessage(
                             user, MessageData(

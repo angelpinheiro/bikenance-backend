@@ -107,18 +107,10 @@ data class StravaActivity(
     var description: String? = null,
     @JsonProperty("calories")
     var calories: Double? = null,
-    @JsonProperty("segment_efforts")
-    var segmentEfforts: ArrayList<SegmentEfforts>? = null,
-    @JsonProperty("splits_metric")
-    var splitsMetric: ArrayList<SplitsMetric>? = null,
-    @JsonProperty("laps")
-    var laps: ArrayList<Laps>? = null,
     @JsonProperty("gear")
     var gear: Gear? = null,
     @JsonProperty("partner_brand_tag")
     var partnerBrandTag: String? = null,
-    @JsonProperty("highlighted_kudosers")
-    var highlightedKudosers: ArrayList<HighlightedKudosers>? = null,
     @JsonProperty("hide_from_home")
     var hideFromHome: Boolean? = null,
     @JsonProperty("device_name")
