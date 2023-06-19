@@ -19,73 +19,6 @@ import java.time.LocalDateTime
 
 class StravaOAuthCallbackHandler(val strava: Strava, val db: DB, val dao: DAOS, private val jwtMgr: JwtMgr) {
 
-
-    /**
-     * -> auth
-     * 1) Get user from auth
-     * 2) If user exist, do nothing
-     * 3) If not:
-     *  - Create user
-     *  - Create user profile (with data from strava)
-     *  - Get user bikes from strava
-     *  - Get last user activities from strava
-     *
-     */
-
-//    // TODO Refactor
-//    suspend fun handleOAuthCallback(auth: AuthData): String? {
-//
-//        val stravaClient = strava.withAuth(auth);
-//        val stravaAthlete = stravaClient.athlete() //TODO may be null
-//
-//        if (stravaAthlete != null) {
-//            when (val u = dao.userDao.getByAthleteId(stravaAthlete.id)) {
-//                null -> {
-//                    dao.userDao.create(
-//                        User(
-//                            stravaAthlete.username ?: stravaAthlete.firstname ?: "None",
-//                            ".",
-//                            stravaAthlete.id,
-//                            auth
-//                        )
-//                    )
-//
-//                }
-//                else -> {
-//                    dao.userDao.update(u.id(), u.copy(athleteId = stravaAthlete.id, authData = auth))
-//                }
-//            }
-//
-//            val ath = dao.stravaAthleteDao.getByAthleteId(stravaAthlete.id)
-//            // get detailed gear
-//            stravaAthlete.detailedGear = stravaAthlete.bikeRefs?.mapNotNull { ref ->
-//                stravaClient.bike(ref.id)?.apply {
-//                    this.name = ref.name
-//                }
-//
-//            }
-//            if (ath == null) {
-//                dao.stravaAthleteDao.create(stravaAthlete)
-//            } else {
-//                db.athletes.updateOneById(ath._id, stravaAthlete)
-//            }
-//
-//            // get activities from the last month
-//
-//            stravaClient.activities(LocalDateTime.now().minusMonths(1))?.forEach { activity ->
-//                if (db.activities.findOne(StravaActivity::id eq activity.id) == null)
-//                    db.activities.insertOne(activity)
-//            }
-//            // return a token
-//            val user = db.users.findOne(User::athleteId eq stravaAthlete.id)
-//            return user?.let { jwtMgr.generator.generateToken(it, stravaAthlete, auth) }
-//        } else {
-//            return null
-//        }
-//
-//    }
-
-
     suspend fun handleCallback(auth: AuthData): String {
 
         val stravaClient = strava.withAuth(auth);
@@ -93,10 +26,7 @@ class StravaOAuthCallbackHandler(val strava: Strava, val db: DB, val dao: DAOS, 
 
         val loggedUser: User = when (val user = dao.userDao.getByAthleteId(stravaAthlete.id)) {
             null -> {
-                val newUser = dao.userDao.create(User(null, null, stravaAthlete.id, auth))
-                if (newUser == null) {
-                    throw Exception("Could not create user")
-                }
+                val newUser = dao.userDao.create(User(null, null, stravaAthlete.id, auth)) ?: throw Exception("Could not create user")
                 createUserProfile(newUser, stravaAthlete, stravaClient)
                 newUser
             }
@@ -127,6 +57,7 @@ class StravaOAuthCallbackHandler(val strava: Strava, val db: DB, val dao: DAOS, 
         // get and create athlete bikes
         val bikes = stravaAthlete.bikeRefs?.mapNotNull { ref ->
             stravaClient.bike(ref.id)?.let { gear ->
+                println("Bike details for id ${ref.id}: ${gear.name}")
                 val bike = Bike(
                     name = ref.name,
                     brandName = gear.brandName,
@@ -140,25 +71,6 @@ class StravaOAuthCallbackHandler(val strava: Strava, val db: DB, val dao: DAOS, 
                 dao.bikeDao.create(bike)
             }
         }
-
-//        // get and create last strava activities
-//        stravaClient.activities(LocalDateTime.now().minusMonths(1))?.forEach { activity ->
-//            if (db.activities.findOne(StravaActivity::id eq activity.id) == null) {
-//                db.activities.insertOne(activity)
-//                val ride = BikeRide(
-//                    userId = newUser.oid(),
-//                    stravaId = activity.id,
-//                    bikeId = bikes?.firstOrNull { it.stravaId == activity.gearId }?.oid(),
-//                    name = activity.name,
-//                    distance = activity.distance,
-//                    movingTime = activity.movingTime,
-//                    elapsedTime = activity.elapsedTime,
-//                    dateTime = activity.startDate, //TODO Set
-//                    totalElevationGain = activity.totalElevationGain,
-//                )
-//                dao.bikeRideDao.create(ride)
-//            }
-//        }
     }
 }
 
