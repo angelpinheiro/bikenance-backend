@@ -2,15 +2,13 @@ package com.bikenance.modules
 
 import com.bikenance.database.UserDao
 import com.bikenance.database.mongodb.*
-import com.bikenance.features.firebase.MessageSender
-import com.bikenance.features.login.config.AppConfig
-import com.bikenance.features.login.config.JwtConfig
-import com.bikenance.features.login.config.JwtMgr
-import com.bikenance.features.strava.api.Strava
-import com.bikenance.features.strava.usecase.ReceiveDataUseCase
-import com.bikenance.features.strava.usecase.StravaBikeSync
-import com.bikenance.features.strava.usecase.StravaOAuthCallbackHandler
-import com.bikenance.model.Profile
+import com.bikenance.strava.usecase.ReceiveDataUseCase
+import com.bikenance.strava.usecase.StravaBikeSync
+import com.bikenance.strava.usecase.StravaOAuthCallbackHandler
+import com.bikenance.login.config.AppConfig
+import com.bikenance.login.config.JwtConfig
+import com.bikenance.login.config.JwtMgr
+import com.bikenance.push.MessageSender
 import com.bikenance.repository.UserRepository
 import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.databind.SerializationFeature
@@ -59,7 +57,7 @@ val appModule = module {
     }
 
     single {
-        Strava(get(), get(), get())
+        com.bikenance.strava.api.Strava(get(), get(), get())
     }
 
     single { StravaOAuthCallbackHandler(get(), get(), get(), get()) }

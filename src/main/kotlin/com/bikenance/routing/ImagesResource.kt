@@ -1,6 +1,6 @@
 package com.bikenance.routing
 
-import com.bikenance.features.login.config.AppConfig
+import com.bikenance.login.config.AppConfig
 import io.ktor.http.*
 import io.ktor.http.content.*
 import io.ktor.server.application.*

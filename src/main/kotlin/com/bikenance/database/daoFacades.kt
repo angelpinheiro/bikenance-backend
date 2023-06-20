@@ -1,8 +1,8 @@
 package com.bikenance.database
 
 import com.bikenance.database.mongodb.BasicDao
-import com.bikenance.features.strava.model.StravaActivity
-import com.bikenance.features.strava.model.StravaAthlete
+import com.bikenance.strava.model.StravaActivity
+import com.bikenance.strava.model.StravaAthlete
 import com.bikenance.model.*
 
 interface UserDao : BasicDao<User> {

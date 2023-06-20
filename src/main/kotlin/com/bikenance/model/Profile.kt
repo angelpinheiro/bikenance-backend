@@ -1,7 +1,6 @@
 package com.bikenance.model
 
 import com.bikenance.database.mongodb.MongoModel
-import com.bikenance.features.strava.model.StravaActivity
 import com.fasterxml.jackson.annotation.JsonProperty
 
 data class ExtendedProfile(

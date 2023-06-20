@@ -2,10 +2,8 @@ package com.bikenance.routing
 
 import com.bikenance.database.mongodb.DAOS
 import com.bikenance.database.mongodb.DB
-import com.bikenance.features.strava.api.Strava
-import com.bikenance.features.strava.api.supportedActivityTypes
-import com.bikenance.features.strava.model.StravaActivity
-import com.bikenance.features.strava.usecase.StravaBikeSync
+import com.bikenance.strava.model.StravaActivity
+import com.bikenance.strava.usecase.StravaBikeSync
 import com.bikenance.model.*
 import com.bikenance.repository.UserRepository
 import io.ktor.resources.*
@@ -73,7 +71,7 @@ suspend fun getUserProfile(dao: DAOS, userId: String, includeDraftBikes: Boolean
 
 fun Application.profileRoutes() {
 
-    val strava: Strava by inject()
+    val strava: com.bikenance.strava.api.Strava by inject()
     val dao: DAOS by inject()
     val db: DB by inject()
     val stravaBikeSync: StravaBikeSync by inject()
@@ -258,7 +256,7 @@ fun Application.profileRoutes() {
                                 if (db.activities.findOne(StravaActivity::id eq activity.id) == null) {
 
                                     val syncStravaBikeIds = bikes.filter { !it.draft }.map { it.stravaId }
-                                    val supported = supportedActivityTypes.contains(activity.type)
+                                    val supported = com.bikenance.strava.api.supportedActivityTypes.contains(activity.type)
                                     if (syncStravaBikeIds.contains(activity.gearId) && supported) {
                                         db.activities.insertOne(activity)
                                         val ride = BikeRide(
@@ -288,7 +286,7 @@ fun Application.profileRoutes() {
 }
 
 
-suspend fun syncBikeActivities(bike: Bike, user: User, strava: Strava, db: DB, dao: DAOS) {
+suspend fun syncBikeActivities(bike: Bike, user: User, strava: com.bikenance.strava.api.Strava, db: DB, dao: DAOS) {
 
 
     println("Synchronizing bike activities: ${bike.oid()}")
@@ -299,7 +297,7 @@ suspend fun syncBikeActivities(bike: Bike, user: User, strava: Strava, db: DB, d
     activities?.forEach { activity ->
 
         if (db.activities.findOne(StravaActivity::id eq activity.id) == null) {
-            val supported = supportedActivityTypes.contains(activity.type)
+            val supported = com.bikenance.strava.api.supportedActivityTypes.contains(activity.type)
             if (bike.stravaId == activity.gearId && supported) {
                 db.activities.insertOne(activity)
                 val ride = BikeRide(
@@ -320,7 +318,7 @@ suspend fun syncBikeActivities(bike: Bike, user: User, strava: Strava, db: DB, d
 }
 
 
-suspend fun removeBikeActivities(bike: Bike, user: User, strava: Strava, db: DB, dao: DAOS) {
+suspend fun removeBikeActivities(bike: Bike, user: User, strava: com.bikenance.strava.api.Strava, db: DB, dao: DAOS) {
     println("Deleting bike activities: ${bike.oid()}")
     db.activities.deleteMany(StravaActivity::gearId eq bike.stravaId)
     db.bikeRides.deleteMany(BikeRide::bikeId eq bike.oid())

@@ -1,7 +1,7 @@
 package com.bikenance.routing
 
 import com.bikenance.database.mongodb.DB
-import com.bikenance.features.strava.model.StravaAthlete
+import com.bikenance.strava.model.StravaAthlete
 import io.ktor.resources.*
 import io.ktor.server.application.*
 import io.ktor.server.auth.*

@@ -17,9 +17,6 @@ abstract class MongoModel<T>(
     fun oid(): String {
         return _id.toString()
     }
-    fun generateId() {
-//        _id = ObjectId().toId()
-    }
 }
 
 interface BasicDao<T> {

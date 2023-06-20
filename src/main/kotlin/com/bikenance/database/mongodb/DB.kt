@@ -3,14 +3,13 @@ package com.bikenance.database.mongodb
 import ch.qos.logback.classic.Level
 import ch.qos.logback.classic.LoggerContext
 import com.bikenance.database.*
-import com.bikenance.features.login.config.AppConfig
-import com.bikenance.features.strava.model.StravaActivity
-import com.bikenance.features.strava.model.StravaAthlete
+import com.bikenance.strava.model.StravaActivity
+import com.bikenance.strava.model.StravaAthlete
+import com.bikenance.login.config.AppConfig
 import com.bikenance.model.Bike
 import com.bikenance.model.BikeRide
 import com.bikenance.model.Profile
 import com.bikenance.model.User
-import com.mongodb.MongoClientSettings
 import com.mongodb.client.MongoDatabase
 import io.ktor.server.application.*
 import org.koin.ktor.ext.inject
@@ -25,7 +24,7 @@ fun createDatabase(config: AppConfig): MongoDatabase {
     rootLogger.level = Level.OFF
 
     val client = KMongo.createClient("mongodb://" + config.db.host)
-    return client.getDatabase("stravadb")
+    return client.getDatabase(config.db.name)
 }
 
 

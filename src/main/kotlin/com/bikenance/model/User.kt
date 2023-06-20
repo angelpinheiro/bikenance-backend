@@ -1,12 +1,7 @@
 package com.bikenance.model
 
 import com.bikenance.database.mongodb.MongoModel
-import com.bikenance.features.strava.AuthData
-import org.bson.codecs.pojo.annotations.BsonId
-import org.bson.types.ObjectId
-import org.litote.kmongo.Id
-import org.litote.kmongo.id.toId
-import org.litote.kmongo.json
+import com.bikenance.strava.AuthData
 
 data class User(
     val username: String?,
