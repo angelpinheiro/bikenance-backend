@@ -12,13 +12,6 @@ enum class MessageType(
     RIDES_UPDATED("RIDES_UPDATED"),
     RIDES_DELETED("RIDES_DELETED")
 }
-//
-//data class Message(
-//    @JsonProperty("data")
-//    val data: MessageData,
-//    @JsonProperty("registration_ids")
-//    val registrationIds: List<String>
-//)
 
 data class MessageData(
     val appMessageType: MessageType,
