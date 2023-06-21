@@ -1,15 +1,26 @@
 services:
-  backend:
-    build: .
-    ports:
-      - "8080:8080"
-    environment:
-      - DB_HOST=bkn-mongo
-  mongo:
+  db:
     image: mongo
     container_name: bkn-mongo
     ports:
       - "27017:27017"
     healthcheck:
-        test: echo 'db.stats().ok' | mongo localhost:27017 --quiet
-        start_period: 10s
+      test: echo 'db.stats().ok' | mongo localhost:27017 --quiet
+      start_period: 10s
+  backend:
+    depends_on:
+      - db
+    build: .
+    ports:
+      - "8080:8080"
+    environment:
+      - DB_HOST=bkn-mongo
+      - DB_NAME=strava-docker-db
+
+  # Start LocalTunnel for obtaining a public address bound to the backend host
+  localtunnel:
+    image: efrecon/localtunnel
+    links:
+      - backend
+    command:
+      --local-host backend --port 8080 --subdomain bikenanceapp
