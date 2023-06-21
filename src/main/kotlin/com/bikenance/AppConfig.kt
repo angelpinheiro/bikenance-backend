@@ -3,16 +3,16 @@ package com.bikenance
 import io.ktor.server.application.*
 import org.koin.ktor.ext.inject
 
-class ApiConfig(
+data class ApiConfig(
     val url: String
 )
 
-class DBConfig(
+data class DBConfig(
     val host: String,
     val name: String
 )
 
-class StravaConfig(
+data class StravaConfig(
     val clientId: String,
     val clientSecret: String,
     val subscribeUrl: String,
@@ -20,11 +20,11 @@ class StravaConfig(
     val forceSubscribe : Boolean = false
 )
 
-class StorageConfig(
+data class StorageConfig(
     val imageUploadFolder: String
 )
 
-class FirebaseConfig(
+data class FirebaseConfig(
     val serviceAccountFile: String
 )
 
@@ -64,4 +64,17 @@ fun Application.loadConfig() {
     config.firebase = FirebaseConfig(
         environment.config.property("firebase.service_account_file").getString()
     )
+
+
+
+
+    log.info("==== App Config ====")
+    log.info("==== API ====")
+    log.info(config.api.toString())
+    log.info("==== DB ====")
+    log.info(config.db.toString())
+    log.info("==== STORAGE ====")
+    log.info(config.storage.toString())
+    log.info("==== FIREBASE ====")
+    log.info(config.firebase.toString())
 }
