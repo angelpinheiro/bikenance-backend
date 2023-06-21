@@ -1,6 +1,6 @@
 package com.bikenance.push
 
-import com.bikenance.login.config.AppConfig
+import com.bikenance.AppConfig
 import com.bikenance.model.User
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.google.auth.oauth2.GoogleCredentials

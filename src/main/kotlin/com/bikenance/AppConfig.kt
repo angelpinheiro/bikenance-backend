@@ -1,4 +1,4 @@
-package com.bikenance.login.config
+package com.bikenance
 
 import io.ktor.server.application.*
 import org.koin.ktor.ext.inject
@@ -25,7 +25,6 @@ class StorageConfig(
 )
 
 class FirebaseConfig(
-    val serverKey: String,
     val serviceAccountFile: String
 )
 
@@ -63,7 +62,6 @@ fun Application.loadConfig() {
     )
 
     config.firebase = FirebaseConfig(
-        environment.config.property("firebase.server_key").getString(),
         environment.config.property("firebase.service_account_file").getString()
     )
 }

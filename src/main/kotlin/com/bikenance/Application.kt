@@ -1,7 +1,6 @@
 package com.bikenance
 
 import com.bikenance.database.mongodb.configureMongoDB
-import com.bikenance.login.config.loadConfig
 import com.bikenance.login.configureLogin
 import com.bikenance.modules.appModule
 import com.bikenance.modules.configurePlugins

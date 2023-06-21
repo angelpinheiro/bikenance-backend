@@ -5,7 +5,7 @@ import com.bikenance.database.mongodb.*
 import com.bikenance.strava.usecase.ReceiveDataUseCase
 import com.bikenance.strava.usecase.StravaBikeSync
 import com.bikenance.strava.usecase.StravaOAuthCallbackHandler
-import com.bikenance.login.config.AppConfig
+import com.bikenance.AppConfig
 import com.bikenance.login.config.JwtConfig
 import com.bikenance.login.config.JwtMgr
 import com.bikenance.push.MessageSender

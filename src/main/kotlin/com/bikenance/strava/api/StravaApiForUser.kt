@@ -5,7 +5,7 @@ import com.bikenance.strava.model.StravaActivity
 import com.bikenance.strava.model.StravaAthlete
 import com.bikenance.strava.model.StravaDetailedGear
 import com.bikenance.strava.usecase.StravaTokenRefresh
-import com.bikenance.login.config.AppConfig
+import com.bikenance.AppConfig
 import com.bikenance.repository.UserRepository
 import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.databind.ObjectMapper

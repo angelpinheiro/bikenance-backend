@@ -5,7 +5,7 @@ import ch.qos.logback.classic.LoggerContext
 import com.bikenance.database.*
 import com.bikenance.strava.model.StravaActivity
 import com.bikenance.strava.model.StravaAthlete
-import com.bikenance.login.config.AppConfig
+import com.bikenance.AppConfig
 import com.bikenance.model.Bike
 import com.bikenance.model.BikeRide
 import com.bikenance.model.Profile

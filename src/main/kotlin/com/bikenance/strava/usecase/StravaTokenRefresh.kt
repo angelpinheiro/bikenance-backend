@@ -3,7 +3,7 @@ package com.bikenance.strava.usecase
 import com.bikenance.strava.AuthData
 import com.bikenance.strava.StravaOAuthEndpoints
 import com.bikenance.strava.model.StravaRequestParams
-import com.bikenance.login.config.StravaConfig
+import com.bikenance.StravaConfig
 import com.bikenance.model.User
 import com.bikenance.repository.UserRepository
 import com.bikenance.routing.formatAsIsoDate
