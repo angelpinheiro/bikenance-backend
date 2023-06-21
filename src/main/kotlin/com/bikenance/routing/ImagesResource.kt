@@ -29,16 +29,10 @@ fun Application.imageRoutes() {
             try {
                 multipart.forEachPart { partData ->
                     when (partData) {
-                        is PartData.FormItem -> {
-//                            //to read additional parameters that we sent with the image
-//                            if (partData.name == "text") {
-//                                text = partData.value
-//                            }
-                        }
                         is PartData.FileItem -> {
                             fileName = partData.save(config.storage.imageUploadFolder)
                         }
-                        is PartData.BinaryItem -> Unit
+                        else -> Unit
                     }
                 }
 

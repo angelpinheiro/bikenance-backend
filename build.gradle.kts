@@ -5,12 +5,13 @@ val exposed_version: String by project
 val h2_version: String by project
 val koin_version: String by project
 val kmongo_version: String by project
+val firebase_version: String by project
 
 
 plugins {
     application
-    kotlin("jvm") version "1.6.21"
-    kotlin("plugin.serialization") version "1.6.21"
+    kotlin("jvm") version "1.8.10"
+    kotlin("plugin.serialization") version "1.8.10"
     id("com.github.johnrengelman.shadow") version "7.1.2"
 }
 
@@ -50,7 +51,7 @@ dependencies {
     implementation("org.jetbrains.exposed:exposed-core:$exposed_version")
     implementation("org.jetbrains.exposed:exposed-dao:$exposed_version")
     implementation("org.jetbrains.exposed:exposed-jdbc:$exposed_version")
-    implementation("com.h2database:h2:$h2_version")
+//    implementation("com.h2database:h2:$h2_version")
 
     // Koin for Ktor
     implementation("io.insert-koin:koin-ktor:$koin_version")
@@ -60,7 +61,7 @@ dependencies {
     implementation("org.litote.kmongo:kmongo-id:$kmongo_version")
     implementation("org.litote.kmongo:kmongo-id-jackson:$kmongo_version")
 
-    implementation("com.google.firebase:firebase-admin:8.2.0")
+    implementation("com.google.firebase:firebase-admin:$firebase_version")
 
 
     testImplementation("io.ktor:ktor-server-tests-jvm:$ktor_version")
