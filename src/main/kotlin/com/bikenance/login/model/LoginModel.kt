@@ -1,4 +1,4 @@
-package com.bikenance.login.data
+package com.bikenance.login.model
 
 import io.ktor.server.auth.*
 

@@ -1,7 +1,7 @@
 package com.bikenance.login.usecase
 
 import com.bikenance.login.config.JwtMgr
-import com.bikenance.login.data.LoginData
+import com.bikenance.login.model.LoginData
 import com.bikenance.repository.UserRepository
 
 data class LoginResult(

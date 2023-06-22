@@ -1,8 +1,8 @@
-package com.bikenance.login.routing
+package com.bikenance.routing.login
 
 import com.bikenance.login.config.JwtMgr
-import com.bikenance.login.data.AuthData
-import com.bikenance.login.data.LoginData
+import com.bikenance.login.model.AuthData
+import com.bikenance.login.model.LoginData
 import com.bikenance.login.usecase.LoginUseCase
 import com.bikenance.repository.UserRepository
 import io.ktor.http.*

@@ -1,7 +1,7 @@
 package com.bikenance.login
 
-import com.bikenance.login.routing.login
-import com.bikenance.login.routing.loginAuthentication
+import com.bikenance.routing.login.login
+import com.bikenance.routing.login.loginAuthentication
 import io.ktor.server.application.*
 import io.ktor.server.routing.*
 
