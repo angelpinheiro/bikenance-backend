@@ -9,7 +9,6 @@ import com.google.firebase.FirebaseOptions
 import com.google.firebase.messaging.FirebaseMessaging
 import com.google.firebase.messaging.Message
 import io.ktor.client.*
-import io.ktor.server.application.*
 import io.ktor.util.logging.*
 import java.io.File
 import java.io.FileInputStream

@@ -4,13 +4,12 @@ package com.bikenance.database.mongodb
 import com.bikenance.database.StravaActivityDao
 import com.bikenance.database.StravaAthleteDao
 import com.bikenance.database.UserDao
+import com.bikenance.model.User
+import com.bikenance.model.UserUpdate
 import com.bikenance.strava.AuthData
 import com.bikenance.strava.model.StravaActivity
 import com.bikenance.strava.model.StravaAthlete
-import com.bikenance.model.User
-import com.bikenance.model.UserUpdate
 import org.bson.types.ObjectId
-
 import org.litote.kmongo.*
 
 class MongoUserDao(private val db: DB) : BasicDaoImpl<User>(db.users), UserDao {

@@ -1,12 +1,12 @@
 package com.bikenance.strava.usecase
 
-import com.bikenance.strava.AuthData
-import com.bikenance.strava.StravaOAuthEndpoints
-import com.bikenance.strava.model.StravaRequestParams
 import com.bikenance.StravaConfig
 import com.bikenance.model.User
 import com.bikenance.repository.UserRepository
 import com.bikenance.routing.formatAsIsoDate
+import com.bikenance.strava.AuthData
+import com.bikenance.strava.StravaOAuthEndpoints
+import com.bikenance.strava.model.StravaRequestParams
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.module.kotlin.readValue
 import io.ktor.client.*

@@ -2,12 +2,12 @@ package com.bikenance.strava.usecase
 
 import com.bikenance.database.mongodb.DAOS
 import com.bikenance.database.mongodb.DB
-import com.bikenance.strava.AuthData
-import com.bikenance.strava.model.StravaAthlete
 import com.bikenance.login.config.JwtMgr
 import com.bikenance.model.Bike
 import com.bikenance.model.Profile
 import com.bikenance.model.User
+import com.bikenance.strava.AuthData
+import com.bikenance.strava.model.StravaAthlete
 
 
 class StravaOAuthCallbackHandler(val strava: com.bikenance.strava.api.Strava, val db: DB, val dao: DAOS, private val jwtMgr: JwtMgr) {

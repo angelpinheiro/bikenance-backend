@@ -1,12 +1,12 @@
 package com.bikenance.strava.api
 
+import com.bikenance.AppConfig
+import com.bikenance.repository.UserRepository
 import com.bikenance.strava.AuthData
 import com.bikenance.strava.model.StravaActivity
 import com.bikenance.strava.model.StravaAthlete
 import com.bikenance.strava.model.StravaDetailedGear
 import com.bikenance.strava.usecase.StravaTokenRefresh
-import com.bikenance.AppConfig
-import com.bikenance.repository.UserRepository
 import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper

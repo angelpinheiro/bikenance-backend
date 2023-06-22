@@ -2,14 +2,14 @@ package com.bikenance.database.mongodb
 
 import ch.qos.logback.classic.Level
 import ch.qos.logback.classic.LoggerContext
-import com.bikenance.database.*
-import com.bikenance.strava.model.StravaActivity
-import com.bikenance.strava.model.StravaAthlete
 import com.bikenance.AppConfig
+import com.bikenance.database.*
 import com.bikenance.model.Bike
 import com.bikenance.model.BikeRide
 import com.bikenance.model.Profile
 import com.bikenance.model.User
+import com.bikenance.strava.model.StravaActivity
+import com.bikenance.strava.model.StravaAthlete
 import com.mongodb.client.MongoDatabase
 import io.ktor.server.application.*
 import org.koin.ktor.ext.inject

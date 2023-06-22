@@ -2,10 +2,10 @@ package com.bikenance.routing
 
 import com.bikenance.database.mongodb.DAOS
 import com.bikenance.database.mongodb.DB
-import com.bikenance.strava.model.StravaActivity
-import com.bikenance.strava.usecase.StravaBikeSync
 import com.bikenance.model.*
 import com.bikenance.repository.UserRepository
+import com.bikenance.strava.model.StravaActivity
+import com.bikenance.strava.usecase.StravaBikeSync
 import io.ktor.resources.*
 import io.ktor.server.application.*
 import io.ktor.server.auth.*

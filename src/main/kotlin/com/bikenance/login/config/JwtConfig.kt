@@ -3,9 +3,9 @@ package com.bikenance.login.config
 import com.auth0.jwt.JWT
 import com.auth0.jwt.JWTVerifier
 import com.auth0.jwt.algorithms.Algorithm
+import com.bikenance.model.User
 import com.bikenance.strava.AuthData
 import com.bikenance.strava.model.StravaAthlete
-import com.bikenance.model.User
 import java.util.*
 
 

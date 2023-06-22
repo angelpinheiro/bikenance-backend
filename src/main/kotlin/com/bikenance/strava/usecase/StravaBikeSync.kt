@@ -2,7 +2,6 @@ package com.bikenance.strava.usecase
 
 import com.bikenance.database.mongodb.DAOS
 import com.bikenance.database.mongodb.DB
-import com.bikenance.strava.model.StravaActivity
 import com.bikenance.model.Bike
 import com.bikenance.model.BikeRide
 import com.bikenance.model.User
@@ -10,6 +9,7 @@ import com.bikenance.model.toBikeRide
 import com.bikenance.push.MessageData
 import com.bikenance.push.MessageSender
 import com.bikenance.push.MessageType
+import com.bikenance.strava.model.StravaActivity
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job

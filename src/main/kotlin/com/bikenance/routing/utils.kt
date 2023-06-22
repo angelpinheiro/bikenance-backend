@@ -1,12 +1,10 @@
 package com.bikenance.routing
 
-import com.bikenance.model.User
 import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.auth.*
 import io.ktor.server.auth.jwt.*
 import io.ktor.server.response.*
-import io.ktor.server.routing.*
 import io.ktor.util.pipeline.*
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter

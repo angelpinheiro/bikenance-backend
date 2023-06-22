@@ -1,15 +1,15 @@
 package com.bikenance.strava.usecase
 
 import com.bikenance.database.mongodb.DAOS
-import com.bikenance.strava.model.AspectType
-import com.bikenance.strava.model.EventData
-import com.bikenance.strava.model.ObjectType
 import com.bikenance.model.User
 import com.bikenance.model.toBikeRide
 import com.bikenance.push.MessageData
 import com.bikenance.push.MessageSender
 import com.bikenance.push.MessageType
 import com.bikenance.repository.UserRepository
+import com.bikenance.strava.model.AspectType
+import com.bikenance.strava.model.EventData
+import com.bikenance.strava.model.ObjectType
 
 
 class ReceiveDataUseCase(

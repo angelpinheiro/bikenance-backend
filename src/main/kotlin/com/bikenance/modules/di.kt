@@ -16,9 +16,7 @@ import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import io.ktor.client.*
 import io.ktor.client.engine.cio.*
 import io.ktor.client.plugins.logging.*
-import io.ktor.util.logging.*
 import org.koin.dsl.module
-
 
 
 val appModule = module {

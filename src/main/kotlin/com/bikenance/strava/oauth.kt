@@ -1,11 +1,11 @@
 package com.bikenance.strava
 
-import com.bikenance.database.mongodb.DB
-import com.bikenance.strava.model.StravaAthlete
-import com.bikenance.strava.usecase.StravaOAuthCallbackHandler
 import com.bikenance.AppConfig
+import com.bikenance.database.mongodb.DB
 import com.bikenance.repository.UserRepository
 import com.bikenance.routing.apiResult
+import com.bikenance.strava.model.StravaAthlete
+import com.bikenance.strava.usecase.StravaOAuthCallbackHandler
 import com.fasterxml.jackson.module.kotlin.readValue
 import io.ktor.client.*
 import io.ktor.client.engine.cio.*

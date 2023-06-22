@@ -1,9 +1,9 @@
 package com.bikenance.database
 
 import com.bikenance.database.mongodb.BasicDao
+import com.bikenance.model.*
 import com.bikenance.strava.model.StravaActivity
 import com.bikenance.strava.model.StravaAthlete
-import com.bikenance.model.*
 
 interface UserDao : BasicDao<User> {
     suspend fun getByUsername(username: String): User?
