@@ -36,7 +36,7 @@ out/
 .vscode/
 
 
-src/main/resources/application.conf
+src/main/resources/application.local.conf
 src/main/resources/firebase.json
 
 *.jar
