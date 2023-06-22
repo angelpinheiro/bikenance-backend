@@ -47,21 +47,3 @@ fun PipelineContext<*, ApplicationCall>.authUserId(): String? {
     val principal: JWTPrincipal? = call.principal()
     return principal?.subject
 }
-
-fun Application.test() {
-    routing {
-        get("/test1") {
-            apiResult { null }
-        }
-        get("/test2") {
-            apiResult {
-                throw Exception("Exception!!!!!")
-            }
-        }
-        get("/test3") {
-            apiResult {
-                User("hola", "que tal")
-            }
-        }
-    }
-}

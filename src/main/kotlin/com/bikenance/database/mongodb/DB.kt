@@ -53,6 +53,8 @@ fun Application.configureMongoDB() {
 
     val db: DB by inject()
 
+    log.info("Initializing mongo database...")
+
     if (db.users.countDocuments() == 0L) {
         db.users.insertOne(
             User(
@@ -60,5 +62,7 @@ fun Application.configureMongoDB() {
             )
         )
     }
+
+    log.info("MongoDB ready.")
 
 }

@@ -17,6 +17,7 @@ import io.ktor.server.application.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
+import io.ktor.util.logging.*
 import kotlinx.coroutines.*
 import org.koin.ktor.ext.inject
 import kotlin.time.Duration.Companion.seconds
@@ -104,7 +105,7 @@ fun Application.subscribeToStravaWebhooks(config: AppConfig) {
     scope.launch {
 
         //  wait for app engine to deploy routes (refactor)
-        delay(1.seconds)
+        delay(0.seconds)
 
         val existResponse = client.get(config.strava.subscribeUrl) {
             parameter(StravaRequestParams.CLIENT_ID, config.strava.clientId)
@@ -116,7 +117,7 @@ fun Application.subscribeToStravaWebhooks(config: AppConfig) {
 
         subsList.forEach { sub ->
             if (sub.callbackUrl != "${config.api.url}/webhook" || config.strava.forceSubscribe) {
-                println("Deleting subscription with id ${sub.id}")
+                log.info("Deleting subscription with id ${sub.id}")
                 client.delete(config.strava.subscribeUrl + "/" + sub.id) {
                     parameter("id", sub.id)
                     parameter(StravaRequestParams.CLIENT_ID, config.strava.clientId)
@@ -127,7 +128,7 @@ fun Application.subscribeToStravaWebhooks(config: AppConfig) {
         }
 
         if (subsList.isEmpty() || deleted) {
-            println("Creating new subscription...")
+            log.info("Creating new subscription...")
 
             val response = client.post(config.strava.subscribeUrl) {
                 parameter(StravaRequestParams.CLIENT_ID, config.strava.clientId)
@@ -138,9 +139,9 @@ fun Application.subscribeToStravaWebhooks(config: AppConfig) {
 
             println(response.bodyAsText())
             if (response.status == HttpStatusCode.Created) {
-                println("SUCCESS: Webhook subscription created.")
+                log.info("SUCCESS: Webhook subscription created.")
             } else {
-                println("WARNING: Could not create webhook subscription. ${response.status}")
+                log.error("ERROR: Could not create webhook subscription. ${response.status}")
             }
         }
     }

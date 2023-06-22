@@ -1,22 +1,24 @@
 package com.bikenance.modules
 
+import com.bikenance.AppConfig
 import com.bikenance.database.UserDao
 import com.bikenance.database.mongodb.*
-import com.bikenance.strava.usecase.ReceiveDataUseCase
-import com.bikenance.strava.usecase.StravaBikeSync
-import com.bikenance.strava.usecase.StravaOAuthCallbackHandler
-import com.bikenance.AppConfig
 import com.bikenance.login.config.JwtConfig
 import com.bikenance.login.config.JwtMgr
 import com.bikenance.push.MessageSender
 import com.bikenance.repository.UserRepository
+import com.bikenance.strava.usecase.ReceiveDataUseCase
+import com.bikenance.strava.usecase.StravaBikeSync
+import com.bikenance.strava.usecase.StravaOAuthCallbackHandler
 import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.databind.SerializationFeature
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import io.ktor.client.*
 import io.ktor.client.engine.cio.*
 import io.ktor.client.plugins.logging.*
+import io.ktor.util.logging.*
 import org.koin.dsl.module
+
 
 
 val appModule = module {

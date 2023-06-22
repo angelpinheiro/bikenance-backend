@@ -39,28 +39,13 @@ fun Application.module() {
 
     configureLogin()
 
-    configureStrava()
-
     configureMongoDB()
 
-    // routes
-
-    routing {
-        get("/") {
-            call.respond("Bikenance Server running!")
-        }
-        get("/wh") {
-            call.respond("Bikenance Server WH!")
-        }
-    }
-
+    mainRoutes()
     userRoutes()
     athleteRoutes()
     profileRoutes()
     imageRoutes()
-    test()
 
-    messageSender.test()
-
-
+    configureStrava()
 }

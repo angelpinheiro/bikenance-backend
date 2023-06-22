@@ -9,6 +9,8 @@ import com.google.firebase.FirebaseOptions
 import com.google.firebase.messaging.FirebaseMessaging
 import com.google.firebase.messaging.Message
 import io.ktor.client.*
+import io.ktor.server.application.*
+import io.ktor.util.logging.*
 import java.io.File
 import java.io.FileInputStream
 import java.io.FileNotFoundException
@@ -17,22 +19,21 @@ import java.io.FileNotFoundException
 class MessageSender(
     private val client: HttpClient,
     private val appConfig: AppConfig,
-    private val mapper: ObjectMapper
+    private val mapper: ObjectMapper,
 ) {
 
-    fun test() {
-        println("Firebase app ${FirebaseApp.getInstance().name}")
-    }
+    private val log = KtorSimpleLogger(javaClass.simpleName)
 
     init {
-        val resource = loadConFirebaseConfigFile(appConfig)
+        val configFile = loadConFirebaseConfigFile(appConfig)
+        log.info("Config file loaded from ${configFile.absolutePath}")
         val options = FirebaseOptions.builder()
-            .setCredentials(GoogleCredentials.fromStream(FileInputStream(resource)))
+            .setCredentials(GoogleCredentials.fromStream(FileInputStream(configFile)))
             .build()
 
         FirebaseApp.initializeApp(options)
 
-        println("Initialized firebase app ${FirebaseApp.getInstance().name}")
+        log.info("Initialized firebase app ${FirebaseApp.getInstance().name}")
     }
 
     fun sendMessage(user: User, data: MessageData) {
@@ -52,22 +53,34 @@ class MessageSender(
 
 
     private fun loadConFirebaseConfigFile(appConfig: AppConfig): File {
-        return try {
-            val resourcesPath = "src/main/resources/" + appConfig.firebase.serviceAccountFile
-            println("(1/2) Trying to load firebase config from $resourcesPath")
-            val configFile = File(resourcesPath)
-            if(configFile.exists() && configFile.isFile)
-                configFile
-            else
-                throw FileNotFoundException("File not found: $resourcesPath")
-        } catch (e: FileNotFoundException) {
-            val absolutePath = appConfig.firebase.serviceAccountFile
-            println("(2/2) Failed. Trying to load firebase config from $absolutePath")
-            val configFile = File(absolutePath)
-            if(configFile.exists() && configFile.isFile)
-                configFile
-            else
-                throw FileNotFoundException("File not found: $absolutePath")
+
+        try {
+            val url = {}.javaClass.classLoader.getResource(appConfig.firebase.serviceAccountFile)
+            url?.let {
+                return File(it.path)
+            }
+        } catch (e: Exception) {
+            log.info("(1/3) Could not load ${appConfig.firebase.serviceAccountFile} from resources")
         }
+
+        try {
+            val configFile = File("src/main/resources/" + appConfig.firebase.serviceAccountFile)
+            if (configFile.exists() && configFile.isFile)
+                return configFile
+        } catch (e: Exception) {
+            log.info("(1/3) Could not load ${"src/main/resources/" + appConfig.firebase.serviceAccountFile}")
+        }
+
+        try {
+            val configFile = File(appConfig.firebase.serviceAccountFile)
+            if (configFile.exists() && configFile.isFile) {
+                return configFile
+            }
+
+        } catch (e: Exception) {
+            log.info("(3/3) Could not load ${appConfig.firebase.serviceAccountFile}")
+        }
+
+        throw FileNotFoundException("File not found: ${appConfig.firebase.serviceAccountFile}")
     }
 }
