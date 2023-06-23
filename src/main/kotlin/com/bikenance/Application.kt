@@ -5,6 +5,7 @@ import com.bikenance.login.configureLogin
 import com.bikenance.modules.appModule
 import com.bikenance.modules.configurePlugins
 import com.bikenance.push.MessageSender
+import com.bikenance.push.configureFirebase
 import com.bikenance.routing.*
 import com.bikenance.strava.configureStrava
 import io.ktor.server.application.*
@@ -23,9 +24,6 @@ fun main(args: Array<String>) = EngineMain.main(args)
 @Suppress("unused")
 fun Application.module() {
 
-    val messageSender: MessageSender by inject()
-
-
     install(Koin) {
         slf4jLogger()
         modules(appModule)
@@ -34,9 +32,7 @@ fun Application.module() {
     loadConfig()
 
     configurePlugins()
-
     configureLogin()
-
     configureMongoDB()
 
     mainRoutes()
@@ -45,5 +41,6 @@ fun Application.module() {
     profileRoutes()
     imageRoutes()
 
+    configureFirebase()
     configureStrava()
 }

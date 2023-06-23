@@ -12,7 +12,7 @@ import io.ktor.client.*
 import io.ktor.util.logging.*
 import java.io.File
 import java.io.FileInputStream
-import java.io.FileNotFoundException
+import java.io.InputStream
 
 
 class MessageSender(
@@ -21,19 +21,6 @@ class MessageSender(
     private val mapper: ObjectMapper,
 ) {
 
-    private val log = KtorSimpleLogger(javaClass.simpleName)
-
-    init {
-        val configFile = loadConFirebaseConfigFile(appConfig)
-        log.info("Config file loaded from ${configFile.absolutePath}")
-        val options = FirebaseOptions.builder()
-            .setCredentials(GoogleCredentials.fromStream(FileInputStream(configFile)))
-            .build()
-
-        FirebaseApp.initializeApp(options)
-
-        log.info("Initialized firebase app ${FirebaseApp.getInstance().name}")
-    }
 
     fun sendMessage(user: User, data: MessageData) {
 
@@ -51,35 +38,4 @@ class MessageSender(
     }
 
 
-    private fun loadConFirebaseConfigFile(appConfig: AppConfig): File {
-
-        try {
-            val url = {}.javaClass.classLoader.getResource(appConfig.firebase.serviceAccountFile)
-            url?.let {
-                return File(it.path)
-            }
-        } catch (e: Exception) {
-            log.info("(1/3) Could not load ${appConfig.firebase.serviceAccountFile} from resources")
-        }
-
-        try {
-            val configFile = File("src/main/resources/" + appConfig.firebase.serviceAccountFile)
-            if (configFile.exists() && configFile.isFile)
-                return configFile
-        } catch (e: Exception) {
-            log.info("(1/3) Could not load ${"src/main/resources/" + appConfig.firebase.serviceAccountFile}")
-        }
-
-        try {
-            val configFile = File(appConfig.firebase.serviceAccountFile)
-            if (configFile.exists() && configFile.isFile) {
-                return configFile
-            }
-
-        } catch (e: Exception) {
-            log.info("(3/3) Could not load ${appConfig.firebase.serviceAccountFile}")
-        }
-
-        throw FileNotFoundException("File not found: ${appConfig.firebase.serviceAccountFile}")
-    }
 }

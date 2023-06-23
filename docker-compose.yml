@@ -13,9 +13,12 @@ services:
     build: .
     ports:
       - "8080:8080"
+    volumes:
+      - /media/angel/ssdata/bikenance/uploads:/app/uploads
     environment:
       - DB_HOST=bkn-mongo
       - DB_NAME=strava-docker-db
+      - UPLOADS_PATH=/app/uploads
 
   # Start LocalTunnel for obtaining a public address bound to the backend host
   localtunnel:

@@ -63,6 +63,10 @@ fun Application.stravaWebhookRouting() {
             call.respond(HttpStatusCode.OK)
         }
 
+        get("/webhook_check") {
+            call.respondText("Webhook available", ContentType.parse("text/plain"), HttpStatusCode.OK)
+        }
+
         /**
          * Validate subscription endpoint
          */

@@ -66,15 +66,9 @@ fun Application.loadConfig() {
     )
 
 
-
-
-    log.info("==== App Config ====")
-    log.info("==== API ====")
-    log.info(config.api.toString())
-    log.info("==== DB ====")
-    log.info(config.db.toString())
-    log.info("==== STORAGE ====")
-    log.info(config.storage.toString())
-    log.info("==== FIREBASE ====")
-    log.info(config.firebase.toString())
+    log.info("App Config")
+    log.info("\t\t${config.api}")
+    log.info("\t\t${config.db}")
+    log.info("\t\t${config.storage}")
+    log.info("\t\t${config.firebase}")
 }

@@ -48,15 +48,13 @@ The flow of information involves the app, the Bikenance server, and Strava:
     - The app receives the notification and displays it to the user, indicating that the new activity has been synchronized.
 
 
-## Deployment 
+## Deployment
+
+The repository includes a Dockerfile and a docker-compose file. Before deployment, it's important 
+to obtain the necessary files and credentials from Strava and Firebase and customize configuration.
 
 * To use the Strava API you need to register an application on the Strava Developers website. This registration will provide you with the necessary parameters to make requests: `strava.client_id` and `strava.client_secret`.
-
-* This server also uses Firebase for push notifications, so you need to create a Firebase project and configure it:
-  - Create a new project in the [Firebase Console](https://console.firebase.google.com), and enable Firebase Cloud Messaging (FCM) to send push notifications from the server to the Bikenance app.
-  - Replace the existing `firebase-adminsdk.json` file with the one generated from your Firebase project.
-
-Then update the `application.conf` file with appropriate URLs, database host, server port, and Strava API client credentials for your deployment.
+* This server also uses Firebase for push notifications, so you need to create a Firebase project and configure it. Then replace the existing `firebase-adminsdk.json` file with the one generated from your Firebase project.
 
 ## License
 
