@@ -7,6 +7,7 @@ services:
     healthcheck:
       test: echo 'db.stats().ok' | mongo localhost:27017 --quiet
       start_period: 10s
+    profiles: ["dev", "full"]
   backend:
     depends_on:
       - db
@@ -15,6 +16,7 @@ services:
       - "8080:8080"
     volumes:
       - /media/angel/ssdata/bikenance/uploads:/app/uploads
+    profiles: ["dev", "full"]
     environment:
       - DB_HOST=bkn-mongo
       - DB_NAME=strava-docker-db
@@ -27,3 +29,4 @@ services:
       - backend
     command:
       --local-host backend --port 8080 --subdomain bikenanceapp
+    profiles: ["full"]
