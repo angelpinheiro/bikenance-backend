@@ -34,7 +34,6 @@ class ProfilePath() {
     class Setup(val parent: ProfilePath = ProfilePath())
 
 
-
     @Serializable
     @Resource("/bikes")
     class Bikes(val parent: ProfilePath = ProfilePath(), val draft: Boolean = false) {
@@ -175,7 +174,20 @@ fun Application.profileRoutes() {
 
             delete<ProfilePath.Bikes.Bike> { r ->
                 apiResult {
-                    dao.bikeDao.delete(r.bikeId)
+
+                    val authUserId = authUserId()
+                    authUserId?.let { userId ->
+
+                        val user = dao.userDao.getById(userId) ?: throw Exception("User not found")
+
+                        dao.bikeDao.getById(r.bikeId)?.let { bike ->
+                            if (bike.stravaId != null) {
+                                bike.draft = true
+                                dao.bikeDao.update(bike.oid(), bike)
+                                stravaBikeSync.onBikeRemoved(user, bike)
+                            }
+                        }
+                    }
                 }
             }
 
@@ -256,7 +268,8 @@ fun Application.profileRoutes() {
                                 if (db.activities.findOne(StravaActivity::id eq activity.id) == null) {
 
                                     val syncStravaBikeIds = bikes.filter { !it.draft }.map { it.stravaId }
-                                    val supported = com.bikenance.strava.api.supportedActivityTypes.contains(activity.type)
+                                    val supported =
+                                        com.bikenance.strava.api.supportedActivityTypes.contains(activity.type)
                                     if (syncStravaBikeIds.contains(activity.gearId) && supported) {
                                         db.activities.insertOne(activity)
                                         val ride = BikeRide(
