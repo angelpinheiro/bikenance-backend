@@ -3,8 +3,10 @@ package com.bikenance.routing.login
 import com.bikenance.login.config.JwtMgr
 import com.bikenance.login.model.AuthData
 import com.bikenance.login.model.LoginData
+import com.bikenance.login.model.RefreshData
 import com.bikenance.login.usecase.LoginUseCase
 import com.bikenance.repository.UserRepository
+import com.bikenance.routing.apiResult
 import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.auth.*
@@ -42,6 +44,13 @@ fun Route.login() {
             call.respond(HttpStatusCode.OK, registerResult)
         } else {
             call.respond(HttpStatusCode.Unauthorized, registerResult.message ?: "Registration failed")
+        }
+    }
+
+    post("/refresh") {
+        val refreshData = call.receive<RefreshData>()
+        apiResult {
+            loginUseCase.refreshUserTokens(refreshData)
         }
     }
 

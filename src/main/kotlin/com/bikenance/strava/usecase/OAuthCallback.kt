@@ -3,16 +3,18 @@ package com.bikenance.strava.usecase
 import com.bikenance.database.mongodb.DAOS
 import com.bikenance.database.mongodb.DB
 import com.bikenance.login.config.JwtMgr
+import com.bikenance.login.model.TokenPair
 import com.bikenance.model.Bike
 import com.bikenance.model.Profile
 import com.bikenance.model.User
+import com.bikenance.repository.UserRepository
 import com.bikenance.strava.AuthData
 import com.bikenance.strava.model.StravaAthlete
 
 
-class StravaOAuthCallbackHandler(val strava: com.bikenance.strava.api.Strava, val db: DB, val dao: DAOS, private val jwtMgr: JwtMgr) {
+class StravaOAuthCallbackHandler(val strava: com.bikenance.strava.api.Strava, val db: DB, val dao: DAOS, val userRepository: UserRepository, private val jwtMgr: JwtMgr) {
 
-    suspend fun handleCallback(auth: AuthData): String {
+    suspend fun handleCallback(auth: AuthData): TokenPair {
 
         val stravaClient = strava.withAuth(auth);
         val stravaAthlete: StravaAthlete = stravaClient.athlete() ?: throw Exception("Athlete not found")
@@ -28,7 +30,11 @@ class StravaOAuthCallbackHandler(val strava: com.bikenance.strava.api.Strava, va
                 user
             }
         }
-        return jwtMgr.generator.generateToken(loggedUser, stravaAthlete, auth)
+
+        val tokens = jwtMgr.generator.generateTokenPair(loggedUser)
+        loggedUser.refreshToken = tokens.refreshToken
+        userRepository.update(loggedUser.oid(),loggedUser)
+        return tokens
     }
 
     private suspend fun createUserProfile(newUser: User, stravaAthlete: StravaAthlete, stravaClient: com.bikenance.strava.api.StravaApiForUser) {

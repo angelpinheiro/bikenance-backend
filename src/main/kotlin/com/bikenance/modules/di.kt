@@ -60,7 +60,7 @@ val appModule = module {
         com.bikenance.strava.api.Strava(get(), get(), get())
     }
 
-    single { StravaOAuthCallbackHandler(get(), get(), get(), get()) }
+    single { StravaOAuthCallbackHandler(get(), get(), get(), get(), get()) }
 
     single { ReceiveDataUseCase(get(), get(), get(), get()) }
 

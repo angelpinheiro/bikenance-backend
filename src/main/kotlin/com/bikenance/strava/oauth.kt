@@ -2,6 +2,7 @@ package com.bikenance.strava
 
 import com.bikenance.AppConfig
 import com.bikenance.database.mongodb.DB
+import com.bikenance.login.model.TokenPair
 import com.bikenance.repository.UserRepository
 import com.bikenance.routing.apiResult
 import com.bikenance.strava.model.StravaAthlete
@@ -55,22 +56,6 @@ fun Application.configureOAuth() {
 
     routing {
 
-        // TEST STRAVA OAUTH REFRESH TOKENS
-        get("/athlete/{token}") {
-            apiResult{
-                call.parameters["token"]?.let {
-                    userRepository.getByToken(it)?.stravaAuthData?.let { auth ->
-                        // auth.expiresAt = 0 // Force token refresh
-                        strava.withAuth(auth).athlete();
-                    }
-                }
-            }
-        }
-
-        /**
-         * Route for testing purposes. Authorizes a user using the strava OAuth API,
-         * and stores the token in the user with id '1'
-         */
         authenticate("auth-oauth-strava") {
 
             get("/strava") {
@@ -79,18 +64,13 @@ fun Application.configureOAuth() {
 
             get("/callback") {
                 val authData = getOAuthData()
-                val isApp = call.request.headers["user-agent"]?.let { isMobileUserAgentRegex(it) } ?: false
-                var appToken: String? = null
-
                 if (authData != null) {
+                    val tokenPair: TokenPair = oAuthCallbackHandler.handleCallback(authData)
                     call.parameters["scope"]?.let { authData.scope = it }
-                    appToken = oAuthCallbackHandler.handleCallback(authData)
+                    call.respondRedirect("bikenance://redirect?code=${tokenPair.token}&refresh=${tokenPair.refreshToken}")
+                } else {
+                    call.respond("Auth failed")
                 }
-
-                if (isApp)
-                    call.respondRedirect("bikenance://redirect?code=$appToken")
-                else
-                    call.respond(appToken ?: "Auth failed")
 
             }
         }
