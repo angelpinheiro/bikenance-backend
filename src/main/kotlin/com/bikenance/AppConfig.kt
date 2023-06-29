@@ -20,10 +20,6 @@ data class StravaConfig(
     val forceSubscribe : Boolean = false
 )
 
-data class StorageConfig(
-    val imageUploadFolder: String
-)
-
 data class FirebaseConfig(
     val serviceAccountFile: String
 )
