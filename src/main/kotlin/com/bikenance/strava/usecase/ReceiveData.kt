@@ -46,7 +46,7 @@ class ReceiveDataUseCase(
 
     private suspend fun handleActivityCreate(user: User, eventData: EventData) {
         println("handleActivityCreate")
-        user.authData?.let { authData ->
+        user.stravaAuthData?.let { authData ->
             strava.withAuth(authData).activity(eventData.objectId)?.let { activity ->
                 val supported = com.bikenance.strava.api.supportedActivityTypes.contains(activity.type)
                 if (supported) {
@@ -70,7 +70,7 @@ class ReceiveDataUseCase(
 
     private suspend fun handleActivityUpdate(user: User, eventData: EventData) {
         println("handleActivityUpdate")
-        user.authData?.let {
+        user.stravaAuthData?.let {
             strava.withAuth(it).activity(eventData.objectId)?.let { new ->
                 when (val current = dao.stravaActivityDao.getByStravaId(eventData.objectId)) {
                     null -> dao.stravaActivityDao.create(new)

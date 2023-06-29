@@ -55,7 +55,7 @@ class StravaTokenRefresh(
     }
 
     private suspend fun updateUserAuthInDB(user: User, auth: AuthData): User? {
-        user.authData = auth
+        user.stravaAuthData = auth
         return userRepository.update(user.oid(), user)
     }
 

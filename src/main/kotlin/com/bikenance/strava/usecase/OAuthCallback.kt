@@ -24,7 +24,7 @@ class StravaOAuthCallbackHandler(val strava: com.bikenance.strava.api.Strava, va
                 newUser
             }
             else -> {
-                dao.userDao.update(user.oid(), user.copy(athleteId = stravaAthlete.id, authData = auth))
+                dao.userDao.update(user.oid(), user.copy(athleteId = stravaAthlete.id, stravaAuthData = auth))
                 user
             }
         }

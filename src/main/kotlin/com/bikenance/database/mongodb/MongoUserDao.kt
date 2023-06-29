@@ -42,7 +42,7 @@ class MongoUserDao(private val db: DB) : BasicDaoImpl<User>(db.users), UserDao {
 
 
     override suspend fun getByAccessToken(token: String): User? {
-        return db.users.findOne(User::authData / AuthData::accessToken eq token)
+        return db.users.findOne(User::stravaAuthData / AuthData::accessToken eq token)
     }
 }
 

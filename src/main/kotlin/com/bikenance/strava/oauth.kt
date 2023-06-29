@@ -59,7 +59,7 @@ fun Application.configureOAuth() {
         get("/athlete/{token}") {
             apiResult{
                 call.parameters["token"]?.let {
-                    userRepository.getByToken(it)?.authData?.let { auth ->
+                    userRepository.getByToken(it)?.stravaAuthData?.let { auth ->
                         // auth.expiresAt = 0 // Force token refresh
                         strava.withAuth(auth).athlete();
                     }

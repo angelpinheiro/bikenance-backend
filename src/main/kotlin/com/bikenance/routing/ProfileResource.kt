@@ -259,7 +259,7 @@ fun Application.profileRoutes() {
 
                         val bikes = dao.bikeDao.getByUserId(userId)
 
-                        user?.authData?.let { authData ->
+                        user?.stravaAuthData?.let { authData ->
                             val stravaClient = strava.withAuth(authData);
                             val activities = stravaClient.activities(LocalDateTime.now().minusMonths(6))
 
@@ -304,7 +304,7 @@ suspend fun syncBikeActivities(bike: Bike, user: User, strava: com.bikenance.str
 
     println("Synchronizing bike activities: ${bike.oid()}")
 
-    val stravaClient = strava.withAuth(user.authData ?: throw Exception("User auth not found"));
+    val stravaClient = strava.withAuth(user.stravaAuthData ?: throw Exception("User auth not found"));
     val activities = stravaClient.activities(LocalDateTime.now().minusMonths(6))
 
     activities?.forEach { activity ->

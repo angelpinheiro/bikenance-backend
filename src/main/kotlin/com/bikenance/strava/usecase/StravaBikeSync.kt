@@ -33,7 +33,7 @@ class StravaBikeSync(
 
             var modifiedCount = 0
 
-            val stravaClient = strava.withAuth(user.authData ?: throw Exception("User auth not found"));
+            val stravaClient = strava.withAuth(user.stravaAuthData ?: throw Exception("User auth not found"));
             // find activities in the previous six months
             stravaClient.activities(LocalDateTime.now().minusMonths(6))?.forEach { stravaActivity ->
                 // ensure they are not already on db
