@@ -32,7 +32,6 @@ class AppConfig {
     lateinit var api: ApiConfig
     lateinit var db: DBConfig
     lateinit var strava: StravaConfig
-    lateinit var storage: StorageConfig
     lateinit var firebase: FirebaseConfig
 }
 
@@ -47,10 +46,6 @@ fun Application.loadConfig() {
     config.db = DBConfig(
         environment.config.property("db.host").getString(),
         environment.config.property("db.name").getString()
-    )
-
-    config.storage = StorageConfig(
-        environment.config.property("storage.image_upload_folder").getString()
     )
 
     config.strava = StravaConfig(
@@ -69,6 +64,5 @@ fun Application.loadConfig() {
     log.info("App Config")
     log.info("\t\t${config.api}")
     log.info("\t\t${config.db}")
-    log.info("\t\t${config.storage}")
     log.info("\t\t${config.firebase}")
 }
