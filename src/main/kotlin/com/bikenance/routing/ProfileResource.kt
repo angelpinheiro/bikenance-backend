@@ -46,7 +46,11 @@ class ProfilePath() {
 
     @Serializable
     @Resource("/rides")
-    class Rides(val parent: ProfilePath = ProfilePath())
+    class Rides(val parent: ProfilePath = ProfilePath(), val page: Int = 0, val pageSize: Int = 10)
+
+    @Serializable
+    @Resource("/pagedRides")
+    class PagedByKeyRides(val parent: ProfilePath = ProfilePath(), val pageSize: Int = 10, val key: String? = null)
 
     @Serializable
     @Resource("/sync")
@@ -125,7 +129,23 @@ fun Application.profileRoutes() {
                 apiResult {
                     val authUserId = authUserId()
                     authUserId?.let { userId ->
-                        dao.bikeRideDao.getByUserId(userId)
+                        dao.bikeRideDao.getByUserIdPaginated(userId, r.page, r.pageSize)
+                    }
+                }
+            }
+
+            get<ProfilePath.PagedByKeyRides> { r ->
+                apiResult {
+                    val authUserId = authUserId()
+                    authUserId?.let { userId ->
+                        try {
+                            val result = dao.bikeRideDao.getByUserIdPaginatedByKey(userId, r.key, r.pageSize)
+
+                            result
+                        }catch (e: Exception) {
+                            e.printStackTrace()
+                            listOf<BikeRide>()
+                        }
                     }
                 }
             }

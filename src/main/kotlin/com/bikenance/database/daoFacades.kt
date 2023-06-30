@@ -32,6 +32,8 @@ interface BikeRideDao : BasicDao<BikeRide> {
     suspend fun getByStravaId(id: String): BikeRide?
     suspend fun getByBikeId(id: String): BikeRide?
     suspend fun getByUserId(id: String): List<BikeRide>
+    suspend fun getByUserIdPaginated(id: String, page: Int, pageSize: Int): List<BikeRide>
+    suspend fun getByUserIdPaginatedByKey(id: String, key: String?, pageSize: Int): List<BikeRide>
 
 }
 
