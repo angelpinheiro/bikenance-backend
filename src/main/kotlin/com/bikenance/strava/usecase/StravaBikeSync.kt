@@ -10,6 +10,7 @@ import com.bikenance.push.MessageData
 import com.bikenance.push.MessageSender
 import com.bikenance.push.MessageType
 import com.bikenance.strava.model.StravaActivity
+import io.ktor.util.logging.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -26,14 +27,16 @@ class StravaBikeSync(
     private val messageSender: MessageSender
 ) {
 
+    private val log = KtorSimpleLogger("StravaBikeSync")
     private val scope = CoroutineScope(Job() + Dispatchers.IO)
 
-    fun onBikeAdded(user: User, bike: Bike) {
+    fun onBikeAddedOld(user: User, bike: Bike) {
         scope.launch {
 
             var modifiedCount = 0
 
             val stravaClient = strava.withAuth(user.stravaAuthData ?: throw Exception("User auth not found"));
+
             // find activities in the previous six months
             stravaClient.activities(LocalDateTime.now().minusMonths(6))?.forEach { stravaActivity ->
                 // ensure they are not already on db
@@ -65,6 +68,36 @@ class StravaBikeSync(
         }
     }
 
+    fun onBikeAdded(user: User, bike: Bike) {
+        scope.launch {
+
+            val stravaClient = strava.withAuth(user.stravaAuthData ?: throw Exception("User auth not found"));
+
+            var page = 1
+            var keepGoing = true
+            var createdCount = 0
+
+            // iterate over paginated strava activities until an empty page is returned
+            // this is the recommended approach from strava api docs
+            while (keepGoing) {
+                val activities = stravaClient.activitiesPaginated(page)
+                if (activities?.isNotEmpty() == true) {
+                    createdCount += activities.sumOf { activity ->
+                        createRideIfNotExist(user, bike, activity)
+                    }
+                    page +=1
+                } else {
+                    keepGoing = false
+                }
+            }
+
+            if (createdCount > 0) {
+                // notify client
+                sendCreatedRidesMessage(user, createdCount)
+            }
+        }
+    }
+
     fun onBikeRemoved(user: User, bike: Bike) {
         scope.launch {
             // delete rides from the bike being removed
@@ -81,5 +114,32 @@ class StravaBikeSync(
             )
         }
 
+    }
+
+
+    private suspend fun createRideIfNotExist(user: User, bike: Bike, stravaActivity: StravaActivity): Int {
+        if (db.activities.findOne(StravaActivity::id eq stravaActivity.id) == null) {
+            val supported = com.bikenance.strava.api.supportedActivityTypes.contains(stravaActivity.type)
+            if (bike.stravaId == stravaActivity.gearId && supported) {
+                // save strava activity on db
+                db.activities.insertOne(stravaActivity)
+                // create a ride from the strava activity and save it
+                dao.bikeRideDao.create(
+                    stravaActivity.toBikeRide(user, bike)
+                )
+                return 1
+            }
+        }
+        return 0
+    }
+
+    private suspend fun sendCreatedRidesMessage(user: User, count: Int) {
+        messageSender.sendMessage(
+            user, MessageData(
+                MessageType.RIDES_UPDATED, mapOf(
+                    "count" to count.toString()
+                )
+            )
+        )
     }
 }
