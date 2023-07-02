@@ -18,6 +18,7 @@ import kotlinx.serialization.Serializable
 import org.koin.ktor.ext.inject
 import org.litote.kmongo.eq
 import org.litote.kmongo.findOne
+import org.litote.kmongo.push
 import java.time.LocalDateTime
 
 
@@ -40,7 +41,11 @@ class ProfilePath() {
 
         @Serializable
         @Resource("{bikeId}")
-        class Bike(val parent: Bikes = Bikes(), val bikeId: String)
+        class BikeById(val parent: Bikes = Bikes(), val bikeId: String) {
+            @Serializable
+            @Resource("components")
+            class Components(val parent: BikeById)
+        }
 
     }
 
@@ -159,13 +164,29 @@ fun Application.profileRoutes() {
                 }
             }
 
-            get<ProfilePath.Bikes.Bike> { r ->
+            get<ProfilePath.Bikes.BikeById> { r ->
                 apiResult {
                     dao.bikeDao.getById(r.bikeId)
                 }
             }
 
-            put<ProfilePath.Bikes.Bike> { r ->
+            get<ProfilePath.Bikes.BikeById.Components> { r ->
+                apiResult {
+                    dao.componentDao.getByBikeId(r.parent.bikeId)
+                }
+            }
+
+            post<ProfilePath.Bikes.BikeById.Components> { r ->
+
+                val bikeId = r.parent.bikeId
+                val component = call.receive<Component>()
+
+                apiResult {
+                    dao.componentDao.create(component.copy(bikeId = bikeId))
+                }
+            }
+
+            put<ProfilePath.Bikes.BikeById> { r ->
                 val bike = call.receive<Bike>()
                 val authUserId = authUserId()
 
@@ -192,7 +213,7 @@ fun Application.profileRoutes() {
                 }
             }
 
-            delete<ProfilePath.Bikes.Bike> { r ->
+            delete<ProfilePath.Bikes.BikeById> { r ->
                 apiResult {
 
                     val authUserId = authUserId()
