@@ -57,6 +57,4 @@ to obtain the necessary files and credentials from Strava and Firebase and custo
 * This server also uses Firebase for push notifications, so you need to create a Firebase project and configure it. Then replace the existing `firebase-adminsdk.json` file with the one generated from your Firebase project.
 
 ## License
-
-The Bikenance Server is released under the [MIT License](LICENSE.md). Please review the license file for more information.
-
+Bikenance is [licensed](LICENSE.md) under the [CC BY-NC-SA 4.0 License](https://creativecommons.org/licenses/by-nc-sa/4.0/)
