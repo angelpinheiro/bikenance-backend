@@ -8,7 +8,9 @@ import java.util.concurrent.TimeUnit
  * Represents the types of components for a bike.
  */
 data class ComponentType(
-    val id: String,
+    @JsonProperty("type")
+    val type: String,
+    @JsonProperty("name")
     val name: String
 )
 
@@ -21,6 +23,7 @@ data class ComponentType(
  * @property usage The component's usage information.
  */
 data class Component(
+    @JsonProperty("bikeId")
     val bikeId: String?,
     @JsonProperty("type")
     val type: ComponentType,
