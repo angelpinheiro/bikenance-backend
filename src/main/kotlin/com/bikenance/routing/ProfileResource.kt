@@ -3,6 +3,7 @@ package com.bikenance.routing
 import com.bikenance.database.mongodb.DAOS
 import com.bikenance.database.mongodb.DB
 import com.bikenance.model.*
+import com.bikenance.model.components.BikeComponent
 import com.bikenance.repository.UserRepository
 import com.bikenance.strava.model.StravaActivity
 import com.bikenance.strava.usecase.StravaBikeSync
@@ -18,7 +19,6 @@ import kotlinx.serialization.Serializable
 import org.koin.ktor.ext.inject
 import org.litote.kmongo.eq
 import org.litote.kmongo.findOne
-import org.litote.kmongo.push
 import java.time.LocalDateTime
 
 
@@ -179,7 +179,7 @@ fun Application.profileRoutes() {
             post<ProfilePath.Bikes.BikeById.Components> { r ->
 
                 val bikeId = r.parent.bikeId
-                val component = call.receive<Component>()
+                val component = call.receive<BikeComponent>()
 
                 apiResult {
                     dao.componentDao.create(component.copy(bikeId = bikeId))

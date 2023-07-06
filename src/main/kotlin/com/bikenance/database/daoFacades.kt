@@ -2,6 +2,7 @@ package com.bikenance.database
 
 import com.bikenance.database.mongodb.BasicDao
 import com.bikenance.model.*
+import com.bikenance.model.components.BikeComponent
 import com.bikenance.strava.model.StravaActivity
 import com.bikenance.strava.model.StravaAthlete
 
@@ -36,8 +37,8 @@ interface BikeRideDao : BasicDao<BikeRide> {
     suspend fun getByUserIdPaginatedByKey(id: String, key: String?, pageSize: Int): List<BikeRide>
 }
 
-interface ComponentDao : BasicDao<Component> {
-    suspend fun getByBikeId(id: String): List<Component>
+interface ComponentDao : BasicDao<BikeComponent> {
+    suspend fun getByBikeId(id: String): List<BikeComponent>
 }
 
 

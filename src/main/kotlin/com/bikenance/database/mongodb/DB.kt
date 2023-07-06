@@ -5,6 +5,7 @@ import ch.qos.logback.classic.LoggerContext
 import com.bikenance.AppConfig
 import com.bikenance.database.*
 import com.bikenance.model.*
+import com.bikenance.model.components.BikeComponent
 import com.bikenance.strava.model.StravaActivity
 import com.bikenance.strava.model.StravaAthlete
 import com.mongodb.client.MongoDatabase
@@ -33,7 +34,7 @@ class DB(mongoDatabase: MongoDatabase) {
     val profiles = mongoDatabase.getCollection<Profile>()
     val bikes = mongoDatabase.getCollection<Bike>()
     val bikeRides = mongoDatabase.getCollection<BikeRide>()
-    val components = mongoDatabase.getCollection<Component>()
+    val components = mongoDatabase.getCollection<BikeComponent>()
 }
 
 class DAOS(db: DB) {
