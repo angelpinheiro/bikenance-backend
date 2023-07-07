@@ -6,8 +6,8 @@ import io.ktor.server.routing.*
 
 fun Application.mainRoutes() {
     routing {
-        get("/") {
-            call.respond("Bikenance Server running!")
+        get("/ping") {
+            call.respond("pong")
         }
     }
 }

@@ -31,6 +31,8 @@ data class StravaActivity(
     var totalElevationGain: Int? = null,
     @JsonProperty("type")
     var type: String? = null,
+    @JsonProperty("sport_type")
+    var sportType: String? = null,
     @JsonProperty("start_date")
     var startDate: String? = null,
     @JsonProperty("start_date_local")
