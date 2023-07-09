@@ -137,7 +137,7 @@ fun Application.subscribeToStravaWebhooks(config: AppConfig) {
             val response = client.post(config.strava.subscribeUrl) {
                 parameter(StravaRequestParams.CLIENT_ID, config.strava.clientId)
                 parameter(StravaRequestParams.CLIENT_SECRET, config.strava.clientSecret)
-                parameter(StravaRequestParams.CALLBACK_URL, "${config.api.url}/webhook")
+                parameter(StravaRequestParams.CALLBACK_URL, "${config.api.url}/${config.api.rootPath}/webhook")
                 parameter(StravaRequestParams.VERIFY_TOKEN, VERIFY_TOKEN)
             }
 

@@ -4,7 +4,8 @@ import io.ktor.server.application.*
 import org.koin.ktor.ext.inject
 
 data class ApiConfig(
-    val url: String
+    val url: String,
+    val rootPath: String
 )
 
 data class DBConfig(
@@ -36,7 +37,8 @@ fun Application.loadConfig() {
     val config: AppConfig by inject()
 
     config.api = ApiConfig(
-        environment.config.property("api.url").getString()
+        environment.config.property("api.url").getString(),
+        environment.config.property("ktor.deployment.rootPath").getString()
     )
 
     config.db = DBConfig(
