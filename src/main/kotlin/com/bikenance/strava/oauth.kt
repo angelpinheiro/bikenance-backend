@@ -35,7 +35,7 @@ fun Application.configureOAuth() {
 
     authentication {
         oauth("auth-oauth-strava") {
-            urlProvider = { "${config.api.url}/callback" }
+            urlProvider = { "${config.api.url}/${config.api.rootPath}/callback" }
             providerLookup = {
                 OAuthServerSettings.OAuth2ServerSettings(
                     name = "strava",

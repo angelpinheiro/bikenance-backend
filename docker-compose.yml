@@ -8,25 +8,9 @@ services:
       test: echo 'db.stats().ok' | mongo localhost:27017 --quiet
       start_period: 10s
   backend:
-    profiles:
-      - full
     depends_on:
       - db
-    build:
-      context: .
-      dockerfile: full.Dockerfile
-    ports:
-      - "8080:8080"
-    environment:
-      - DB_HOST=bkn-mongo
-  backend-local:
-    profiles:
-      - local
-    depends_on:
-      - db
-    build:
-      context: .
-      dockerfile: local.Dockerfile
+    build: .
     ports:
       - "8080:8080"
     environment:
