@@ -3,6 +3,7 @@ package com.bikenance.strava.api
 import com.bikenance.AppConfig
 import com.bikenance.repository.UserRepository
 import com.bikenance.strava.AuthData
+import com.bikenance.strava.model.AthleteStats
 import com.bikenance.strava.model.StravaActivity
 import com.bikenance.strava.model.StravaAthlete
 import com.bikenance.strava.model.StravaDetailedGear
@@ -27,6 +28,7 @@ object StravaApiEndpoints {
     const val activitiesPaginatedEndpoint = "https://www.strava.com/api/v3/activities"
     fun activityEndpoint(activityId: String) = "https://www.strava.com/api/v3/activities/$activityId"
     fun bikeEndpoint(id: String) = "https://www.strava.com/api/v3/gear/$id"
+    fun athleteStatsEndpoint(id: String) = "https://www.strava.com/api/v3/athletes/$id/stats"
 }
 
 class Strava(private val client: HttpClient, val config: AppConfig, private val userRepository: UserRepository) {
@@ -39,6 +41,10 @@ class Strava(private val client: HttpClient, val config: AppConfig, private val 
 
     suspend fun athlete(auth: AuthData): StravaAthlete? {
         return authorizedGet(StravaApiEndpoints.athleteEndpoint, auth)
+    }
+
+    suspend fun athleteStats(auth: AuthData, athleteId: String): AthleteStats? {
+        return authorizedGet(StravaApiEndpoints.athleteStatsEndpoint(athleteId), auth)
     }
 
     suspend fun activity(auth: AuthData, activityId: String): StravaActivity? {
@@ -86,6 +92,8 @@ val mapper: ObjectMapper = jacksonObjectMapper()
 
 class StravaApiForUser(private val auth: AuthData, private val strava: Strava) {
     suspend fun athlete(): StravaAthlete? = strava.athlete(auth)
+
+    suspend fun athleteStats(athleteId: String): AthleteStats? = strava.athleteStats(auth, athleteId)
     suspend fun activity(activityId: String): StravaActivity? = strava.activity(auth, activityId)
     suspend fun activities(from: LocalDateTime): List<StravaActivity>? = strava.activities(auth, from)
 

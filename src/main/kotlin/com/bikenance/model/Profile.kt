@@ -1,6 +1,7 @@
 package com.bikenance.model
 
 import com.bikenance.database.mongodb.MongoModel
+import com.bikenance.strava.model.AthleteStats
 import com.fasterxml.jackson.annotation.JsonProperty
 
 data class ExtendedProfile(
@@ -18,7 +19,8 @@ data class Profile(
     @JsonProperty("sex") var sex: String? = null,
     @JsonProperty("weight") var weight: Int? = null,
     @JsonProperty("created_at") var createdAt: String? = null,
-) : MongoModel<Profile>()
+    @JsonProperty("stats") val athleteStats: AthleteStats? = null
+    ) : MongoModel<Profile>()
 
 
 data class SetupProfileUpdate(
