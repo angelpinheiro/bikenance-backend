@@ -10,7 +10,9 @@ data class ApiConfig(
 
 data class DBConfig(
     val host: String,
-    val name: String
+    val name: String,
+    val user: String,
+    val password: String
 )
 
 data class StravaConfig(
@@ -43,7 +45,9 @@ fun Application.loadConfig() {
 
     config.db = DBConfig(
         environment.config.property("db.host").getString(),
-        environment.config.property("db.name").getString()
+        environment.config.property("db.name").getString(),
+        environment.config.property("db.user").getString(),
+        environment.config.property("db.password").getString()
     )
 
     config.strava = StravaConfig(

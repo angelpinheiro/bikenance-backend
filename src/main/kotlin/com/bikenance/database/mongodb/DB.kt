@@ -4,7 +4,10 @@ import ch.qos.logback.classic.Level
 import ch.qos.logback.classic.LoggerContext
 import com.bikenance.AppConfig
 import com.bikenance.database.*
-import com.bikenance.model.*
+import com.bikenance.model.Bike
+import com.bikenance.model.BikeRide
+import com.bikenance.model.Profile
+import com.bikenance.model.User
 import com.bikenance.model.components.BikeComponent
 import com.bikenance.strava.model.StravaActivity
 import com.bikenance.strava.model.StravaAthlete
@@ -21,7 +24,15 @@ fun createDatabase(config: AppConfig): MongoDatabase {
     val rootLogger = loggerContext.getLogger("org.mongodb.driver")
     rootLogger.level = Level.OFF
 
-    val client = KMongo.createClient("mongodb://" + config.db.host)
+    val hasAuth = config.db.name.isNotBlank() && config.db.password.isNotBlank()
+
+    val connectionString = if (hasAuth) {
+        "mongodb://${config.db.user}:${config.db.password}@${config.db.host}"
+    } else {
+        "mongodb://${config.db.host}"
+    }
+
+    val client = KMongo.createClient(connectionString)
     return client.getDatabase(config.db.name)
 }
 
@@ -38,9 +49,9 @@ class DB(mongoDatabase: MongoDatabase) {
 }
 
 class DAOS(db: DB) {
-    val userDao : UserDao = MongoUserDao(db)
-    val profileDao : ProfileDao = MongoProfileDao(db)
-    val bikeDao : BikeDao = MongoBikeDao(db)
+    val userDao: UserDao = MongoUserDao(db)
+    val profileDao: ProfileDao = MongoProfileDao(db)
+    val bikeDao: BikeDao = MongoBikeDao(db)
     val bikeRideDao: BikeRideDao = MongoBikeRideDao(db)
     val componentDao: MongoComponentDao = MongoComponentDao(db)
 

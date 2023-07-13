@@ -179,10 +179,12 @@ fun Application.profileRoutes() {
             post<ProfilePath.Bikes.BikeById.Components> { r ->
 
                 val bikeId = r.parent.bikeId
-                val component = call.receive<BikeComponent>()
+                val components = call.receive<List<BikeComponent>>()
 
                 apiResult {
-                    dao.componentDao.create(component.copy(bikeId = bikeId))
+                    components.mapNotNull { component ->
+                        dao.componentDao.create(component.copy(bikeId = bikeId))
+                    }
                 }
             }
 

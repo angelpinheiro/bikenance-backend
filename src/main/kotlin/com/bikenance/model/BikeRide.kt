@@ -33,6 +33,7 @@ fun StravaActivity.toBikeRide(user: User, bike: Bike?): BikeRide {
         elapsedTime = elapsedTime,
         dateTime = startDate,
         totalElevationGain = totalElevationGain,
-        mapSummaryPolyline = map?.summaryPolyline
+        mapSummaryPolyline = map?.summaryPolyline,
+
     )
 }

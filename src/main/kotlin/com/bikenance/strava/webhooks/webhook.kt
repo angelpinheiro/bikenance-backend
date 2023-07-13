@@ -10,6 +10,7 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
 import io.ktor.client.*
 import io.ktor.client.engine.cio.*
+import io.ktor.client.plugins.*
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
@@ -26,7 +27,9 @@ import kotlin.time.Duration.Companion.seconds
 const val VERIFY_TOKEN = "BIKENANCE_VERIFY_TOKEN"
 
 val client = HttpClient(CIO) {
-//    install(Logging)
+    install(HttpTimeout) {
+        requestTimeoutMillis = 20000
+    }
 }
 
 fun Application.stravaWebhookRouting() {
@@ -98,6 +101,8 @@ fun Application.stravaWebhookRouting() {
 
 fun Application.subscribeToStravaWebhooks(config: AppConfig) {
 
+    val log = KtorSimpleLogger("StravaWebhooks")
+
     val mapper: ObjectMapper by inject()
 
     // Flow:
@@ -111,16 +116,22 @@ fun Application.subscribeToStravaWebhooks(config: AppConfig) {
         //  wait for app engine to deploy routes (refactor)
         delay(0.seconds)
 
+        log.info("Calling strava subscribeUrl...")
+
         val existResponse = client.get(config.strava.subscribeUrl) {
             parameter(StravaRequestParams.CLIENT_ID, config.strava.clientId)
             parameter(StravaRequestParams.CLIENT_SECRET, config.strava.clientSecret)
         }
 
+        log.info("Calling strava subscribeUrl -> Status ${existResponse.status}")
+
+
+
         val subsList = mapper.readValue<List<StravaSubscription>>(existResponse.bodyAsText())
         var deleted = false
 
         subsList.forEach { sub ->
-            if (sub.callbackUrl != "${config.api.url}/webhook" || config.strava.forceSubscribe) {
+            if (sub.callbackUrl != "${config.api.url}/api/webhook" || config.strava.forceSubscribe) {
                 log.info("Deleting subscription with id ${sub.id}")
                 client.delete(config.strava.subscribeUrl + "/" + sub.id) {
                     parameter("id", sub.id)

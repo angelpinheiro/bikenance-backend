@@ -16,6 +16,7 @@ import io.ktor.server.application.*
 import io.ktor.server.auth.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
+import io.ktor.util.logging.*
 import io.ktor.util.pipeline.*
 import org.koin.ktor.ext.inject
 import java.time.Instant
@@ -26,7 +27,7 @@ object StravaOAuthEndpoints {
 }
 
 fun Application.configureOAuth() {
-
+    val log = KtorSimpleLogger("StravaAuth")
     val config: AppConfig by inject()
     val strava: com.bikenance.strava.api.Strava by inject()
     val oAuthCallbackHandler: StravaOAuthCallbackHandler by inject()
@@ -63,6 +64,9 @@ fun Application.configureOAuth() {
             }
 
             get("/callback") {
+
+                log.debug("Received auth callback")
+
                 val authData = getOAuthData()
                 if (authData != null) {
                     val tokenPair: TokenPair = oAuthCallbackHandler.handleCallback(authData)

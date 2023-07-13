@@ -2,6 +2,7 @@ package com.bikenance.model.components
 
 import com.bikenance.database.mongodb.MongoModel
 import com.fasterxml.jackson.annotation.JsonProperty
+import kotlinx.serialization.SerialName
 
 
 data class ComponentInfo(
@@ -28,13 +29,16 @@ data class BikeComponent(
     val bikeId: String?,
     @JsonProperty("alias")
     val alias: String? = null,
-    @JsonProperty("info")
-    val info: ComponentInfo,
+    @JsonProperty("type")
+    val type: ComponentTypes,
     @JsonProperty("maintenances")
     val maintenance: List<Maintenance>? = null,
+    @JsonProperty("modifier")
+    val modifier: ComponentModifier? = null,
     @JsonProperty("usage")
     var usageSinceLastReplace: Usage = Usage(0.0, 0.0)
 ) : MongoModel<BikeComponent>()
+
 
 enum class ComponentTypes {
     BRAKE_LEVER,
@@ -53,6 +57,8 @@ enum class ComponentTypes {
     THRU_AXLE,
     TIRE,
     WHEELSET,
+    FRAME_BEARINGS,
+    HANDLEBAR_TAPE,
     CUSTOM,
     UNKNOWN
 }
@@ -72,6 +78,11 @@ enum class MaintenanceTypes {
     WHEELSET_TUBELESS_MAINTENANCE,
     WHEELSET_WHEELS_AND_SPOKES_MAINTENANCE,
     WHEELSET_TREAD_WEAR_MAINTENANCE
+}
+
+enum class ComponentModifier {
+    REAR,
+    FRONT
 }
 
 enum class RevisionUnit {
