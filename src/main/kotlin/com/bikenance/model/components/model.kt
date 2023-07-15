@@ -2,7 +2,6 @@ package com.bikenance.model.components
 
 import com.bikenance.database.mongodb.MongoModel
 import com.fasterxml.jackson.annotation.JsonProperty
-import kotlinx.serialization.SerialName
 import java.time.LocalDateTime
 
 
@@ -37,7 +36,7 @@ data class BikeComponent(
     @JsonProperty("modifier")
     val modifier: ComponentModifier? = null,
     @JsonProperty("usage")
-    var usageSinceLastReplace: Usage = Usage(0.0, 0.0),
+    var usage: Usage = Usage(0.0, 0.0),
     @JsonProperty("from")
     var from: LocalDateTime? = null
 ) : MongoModel<BikeComponent>()

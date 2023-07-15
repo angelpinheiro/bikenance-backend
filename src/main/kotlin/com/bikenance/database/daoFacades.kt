@@ -5,6 +5,7 @@ import com.bikenance.model.*
 import com.bikenance.model.components.BikeComponent
 import com.bikenance.strava.model.StravaActivity
 import com.bikenance.strava.model.StravaAthlete
+import java.time.LocalDateTime
 
 interface UserDao : BasicDao<User> {
     suspend fun getByUsername(username: String): User?
@@ -32,6 +33,7 @@ interface BikeDao : BasicDao<Bike> {
 interface BikeRideDao : BasicDao<BikeRide> {
     suspend fun getByStravaId(id: String): BikeRide?
     suspend fun getByBikeId(id: String): BikeRide?
+    suspend fun getByBikeIdAfter(id: String, date: LocalDateTime): List<BikeRide>
     suspend fun getByUserId(id: String): List<BikeRide>
     suspend fun getByUserIdPaginated(id: String, page: Int, pageSize: Int): List<BikeRide>
     suspend fun getByUserIdPaginatedByKey(id: String, key: String?, pageSize: Int): List<BikeRide>
@@ -46,7 +48,7 @@ interface StravaAthleteDao : BasicDao<StravaAthlete> {
     suspend fun getByAthleteId(id: String): StravaAthlete?
 }
 
-interface StravaActivityDao : BasicDao<StravaActivity>  {
+interface StravaActivityDao : BasicDao<StravaActivity> {
     suspend fun getByStravaId(id: String): StravaActivity?
 }
 

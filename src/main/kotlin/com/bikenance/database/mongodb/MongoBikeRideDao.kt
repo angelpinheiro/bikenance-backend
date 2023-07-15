@@ -2,9 +2,9 @@ package com.bikenance.database.mongodb
 
 import com.bikenance.database.BikeRideDao
 import com.bikenance.model.BikeRide
-import org.bson.types.ObjectId
+import com.bikenance.model.serializer.formatAsIso8061
 import org.litote.kmongo.*
-import org.litote.kmongo.id.toId
+import java.time.LocalDateTime
 
 class MongoBikeRideDao(db: DB) : BasicDaoImpl<BikeRide>(db.bikeRides), BikeRideDao {
 
@@ -14,6 +14,11 @@ class MongoBikeRideDao(db: DB) : BasicDaoImpl<BikeRide>(db.bikeRides), BikeRideD
 
     override suspend fun getByBikeId(id: String): BikeRide? {
         return collection.findOne(BikeRide::bikeId eq id)
+    }
+
+    override suspend fun getByBikeIdAfter(id: String, date: LocalDateTime): List<BikeRide> {
+        val q = and(BikeRide::userId eq id, BikeRide::dateTime gt date.formatAsIso8061())
+        return collection.find(q).toList()
     }
 
     override suspend fun getByUserId(id: String): List<BikeRide> {

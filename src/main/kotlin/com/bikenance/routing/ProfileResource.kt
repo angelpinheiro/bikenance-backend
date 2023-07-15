@@ -7,6 +7,7 @@ import com.bikenance.model.components.BikeComponent
 import com.bikenance.repository.UserRepository
 import com.bikenance.strava.model.StravaActivity
 import com.bikenance.strava.usecase.StravaBikeSync
+import com.bikenance.usecase.SetupBikeUseCase
 import io.ktor.resources.*
 import io.ktor.server.application.*
 import io.ktor.server.auth.*
@@ -60,6 +61,10 @@ class ProfilePath() {
     @Serializable
     @Resource("/pagedRides")
     class PagedByKeyRides(val parent: ProfilePath = ProfilePath(), val pageSize: Int = 10, val key: String? = null)
+
+    @Serializable
+    @Resource("/synchronizeRides")
+    class SyncRides(val parent: ProfilePath = ProfilePath())
 
     @Serializable
     @Resource("/sync")
@@ -199,9 +204,10 @@ fun Application.profileRoutes() {
                     val bikeId = r.parent.bikeId
                     val bike = call.receive<Bike>()
 
+                    log.debug("Setup bike $bikeId")
+
                     apiResult {
-                        dao.bikeDao.update(bikeId, bike)
-                        dao.bikeDao.getById(bikeId) ?: throw Exception("Bike not found")
+                        SetupBikeUseCase(dao.bikeDao, dao.bikeRideDao).setupBike(bikeId, bike)
                     }
                 } catch (e: Exception) {
                     log.error("Error", e)
@@ -223,7 +229,7 @@ fun Application.profileRoutes() {
 
                     // bike is being synchronized
                     if (old.draft && !bike.draft) {
-                        stravaBikeSync.onBikeAdded(user, updated)
+                        stravaBikeSync.syncRides(user, updated)
                     }
                     // bike is being removed
                     else if (bike.draft && !old.draft) {
@@ -267,6 +273,15 @@ fun Application.profileRoutes() {
 
             }
 
+//            post<ProfilePath.SyncRides> { r ->
+//
+//                val authUserId = authUserId()
+//                apiResult {
+//
+//                }
+//
+//            }
+
             put<ProfilePath.SyncBikes> {
                 val syncBikes = call.receive<SyncBikes>()
                 println("ProfilePath.SyncBikes: ${syncBikes.synchronizedBikesIds.joinToString(",")}")
@@ -281,7 +296,7 @@ fun Application.profileRoutes() {
                             if (it.draft && sync.contains(it.oid())) {
                                 it.draft = false
                                 dao.bikeDao.update(it.oid(), it)
-                                stravaBikeSync.onBikeAdded(user, it)
+                                stravaBikeSync.syncRides(user, it)
                             }
                             // bike is being removed
                             else if (!it.draft && !sync.contains(it.oid())) {

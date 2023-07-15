@@ -9,6 +9,7 @@ import com.fasterxml.jackson.databind.SerializerProvider
 import com.fasterxml.jackson.databind.module.SimpleModule
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
+import java.time.temporal.TemporalAccessor
 
 val iso8061DateFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss'Z'")
 
@@ -16,7 +17,7 @@ fun String.iso8061ToLocalDateTime(): LocalDateTime {
     return LocalDateTime.parse(this, iso8061DateFormatter)
 }
 
-fun LocalDateTime.formatAsIso8061(): String {
+fun TemporalAccessor.formatAsIso8061(): String {
     return iso8061DateFormatter.format(this)
 }
 
