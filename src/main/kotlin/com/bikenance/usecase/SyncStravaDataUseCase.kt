@@ -1,16 +1,17 @@
 package com.bikenance.usecase
 
-import com.bikenance.database.mongodb.DAOS
-import com.bikenance.database.mongodb.DB
-import com.bikenance.model.Bike
-import com.bikenance.model.User
-import com.bikenance.model.toBikeRide
-import com.bikenance.push.MessageData
-import com.bikenance.push.MessageSender
-import com.bikenance.push.MessageType
-import com.bikenance.repository.UserRepository
-import com.bikenance.strava.api.StravaApiForUser
-import com.bikenance.strava.model.StravaAthlete
+import com.bikenance.data.database.mongodb.DAOS
+import com.bikenance.data.database.mongodb.DB
+import com.bikenance.data.model.Bike
+import com.bikenance.data.model.User
+import com.bikenance.data.model.toBikeRide
+import com.bikenance.data.network.push.MessageData
+import com.bikenance.data.network.push.MessageSender
+import com.bikenance.data.network.push.MessageType
+import com.bikenance.data.repository.UserRepository
+import com.bikenance.data.network.stravaApi.StravaApiForUser
+import com.bikenance.data.model.strava.StravaAthlete
+import com.bikenance.data.network.stravaApi.Strava
 import io.ktor.util.logging.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -18,7 +19,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 
 class SyncStravaDataUseCase(
-    val strava: com.bikenance.strava.api.Strava,
+    val strava: Strava,
     val db: DB,
     val dao: DAOS,
     val userRepository: UserRepository,

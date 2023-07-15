@@ -1,15 +1,15 @@
 package com.bikenance
 
-import com.bikenance.database.mongodb.configureMongoDB
-import com.bikenance.login.configureLogin
-import com.bikenance.modules.appModule
-import com.bikenance.modules.configurePlugins
-import com.bikenance.push.configureFirebase
-import com.bikenance.routing.athleteRoutes
-import com.bikenance.routing.mainRoutes
-import com.bikenance.routing.profileRoutes
-import com.bikenance.routing.userRoutes
-import com.bikenance.strava.configureStrava
+import com.bikenance.extensions.configureFirebase
+import com.bikenance.data.network.routing.athleteRoutes
+import com.bikenance.data.network.routing.mainRoutes
+import com.bikenance.data.network.routing.profileRoutes
+import com.bikenance.data.network.routing.userRoutes
+import com.bikenance.di.appModule
+import com.bikenance.extensions.configureMongoDB
+import com.bikenance.extensions.configurePlugins
+import com.bikenance.extensions.configureStrava
+import com.bikenance.extensions.configureLogin
 import io.ktor.server.application.*
 import io.ktor.server.netty.*
 import org.koin.ktor.plugin.Koin

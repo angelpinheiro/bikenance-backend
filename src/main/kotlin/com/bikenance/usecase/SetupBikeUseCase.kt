@@ -1,9 +1,9 @@
 package com.bikenance.usecase
 
-import com.bikenance.database.BikeDao
-import com.bikenance.database.BikeRideDao
-import com.bikenance.model.Bike
-import com.bikenance.model.components.Usage
+import com.bikenance.data.database.BikeDao
+import com.bikenance.data.database.BikeRideDao
+import com.bikenance.data.model.Bike
+import com.bikenance.data.model.components.Usage
 import io.ktor.util.logging.*
 
 class SetupBikeUseCase(private val bikeDao: BikeDao, private val rideDao: BikeRideDao) {
