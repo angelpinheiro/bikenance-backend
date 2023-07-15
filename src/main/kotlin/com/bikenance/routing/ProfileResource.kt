@@ -15,6 +15,7 @@ import io.ktor.server.resources.*
 import io.ktor.server.resources.post
 import io.ktor.server.resources.put
 import io.ktor.server.routing.*
+import io.ktor.util.logging.*
 import kotlinx.serialization.Serializable
 import org.koin.ktor.ext.inject
 import org.litote.kmongo.eq
@@ -45,8 +46,11 @@ class ProfilePath() {
             @Serializable
             @Resource("components")
             class Components(val parent: BikeById)
-        }
 
+            @Serializable
+            @Resource("setup")
+            class Setup(val parent: BikeById)
+        }
     }
 
     @Serializable
@@ -83,6 +87,8 @@ fun Application.profileRoutes() {
     val dao: DAOS by inject()
     val db: DB by inject()
     val stravaBikeSync: StravaBikeSync by inject()
+
+    val log = KtorSimpleLogger("ProfileRoutes")
 
     routing {
 
@@ -147,7 +153,7 @@ fun Application.profileRoutes() {
                             val result = dao.bikeRideDao.getByUserIdPaginatedByKey(userId, r.key, r.pageSize)
 
                             result
-                        }catch (e: Exception) {
+                        } catch (e: Exception) {
                             e.printStackTrace()
                             listOf<BikeRide>()
                         }
@@ -185,6 +191,20 @@ fun Application.profileRoutes() {
                     components.mapNotNull { component ->
                         dao.componentDao.create(component.copy(bikeId = bikeId))
                     }
+                }
+            }
+
+            put<ProfilePath.Bikes.BikeById.Setup> { r ->
+                try {
+                    val bikeId = r.parent.bikeId
+                    val bike = call.receive<Bike>()
+
+                    apiResult {
+                        dao.bikeDao.update(bikeId, bike)
+                        dao.bikeDao.getById(bikeId) ?: throw Exception("Bike not found")
+                    }
+                } catch (e: Exception) {
+                    log.error("Error", e)
                 }
             }
 
@@ -235,6 +255,7 @@ fun Application.profileRoutes() {
             }
 
             post<ProfilePath.Bikes> { r ->
+
                 val bike = call.receive<Bike>()
                 val authUserId = authUserId()
                 apiResult {
@@ -243,6 +264,7 @@ fun Application.profileRoutes() {
                         dao.bikeDao.create(bike)
                     }
                 }
+
             }
 
             put<ProfilePath.SyncBikes> {

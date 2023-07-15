@@ -70,6 +70,9 @@ dependencies {
 
     implementation("com.google.firebase:firebase-admin:$firebase_version")
 
+    // https://mvnrepository.com/artifact/com.fasterxml.jackson.datatype/jackson-datatype-jsr310
+    implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.15.2")
+
 
     testImplementation("io.ktor:ktor-server-tests-jvm:$ktor_version")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit:$kotlin_version")

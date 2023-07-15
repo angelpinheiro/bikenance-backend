@@ -1,7 +1,27 @@
 package com.bikenance.model
 
 import com.bikenance.database.mongodb.MongoModel
+import com.bikenance.model.components.BikeComponent
 import com.fasterxml.jackson.annotation.JsonProperty
+import kotlinx.serialization.KSerializer
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.Serializer
+import kotlinx.serialization.encoding.Decoder
+import kotlinx.serialization.encoding.Encoder
+
+
+enum class BikeType(
+    val type: String,
+    val extendedType: String
+) {
+    MTB("MTB", "MTB Hardtail"),
+    FULL_MTB("Full MTB", "MTB Full Suspension" ),
+    ROAD("Road", "Road Bike"),
+    E_BIKE("E-Bike", "Electric Bike"),
+    GRAVEL("Gravel", "Gravel Bike"),
+    STATIONARY("Stationary", "Stationary Bike")
+}
 
 data class Bike(
     @JsonProperty("user_id") var userId: String? = null,
@@ -12,9 +32,11 @@ data class Bike(
     @JsonProperty("distance") var distance: Long? = null,
     @JsonProperty("photo_url") var photoUrl: String? = null,
     @JsonProperty("draft") var draft: Boolean = false,
-    @JsonProperty("bike_type") var type: String = "MTB", // mtb | road | electric | gravel | ...
-    @JsonProperty("current_year_distance") var currentYearDistance: Int? = null,
-    @JsonProperty("current_month_distance") var currentMonthDistance: Int? = null,
+    @JsonProperty("electric") val electric: Boolean = false,
+    @JsonProperty("configDone") val configDone: Boolean = false,
+    @JsonProperty("bike_type") var type: BikeType = BikeType.MTB,
+
+    val components: List<BikeComponent>? = emptyList()
 ) : MongoModel<Bike>()
 
 

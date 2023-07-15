@@ -1,5 +1,6 @@
 package com.bikenance.modules
 
+import com.bikenance.model.serializer.DateTimeModule
 import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.databind.SerializationFeature
 import io.ktor.serialization.jackson.*
@@ -25,6 +26,7 @@ fun Application.configurePlugins() {
             enable(SerializationFeature.WRITE_SELF_REFERENCES_AS_NULL)
             disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
             registerModule(IdJacksonModule())
+            registerModule(DateTimeModule())
         }
     }
 
