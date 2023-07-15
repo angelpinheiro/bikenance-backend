@@ -3,6 +3,7 @@ package com.bikenance.modules
 import com.bikenance.model.serializer.DateTimeModule
 import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.databind.SerializationFeature
+import io.ktor.client.plugins.*
 import io.ktor.serialization.jackson.*
 import io.ktor.server.application.*
 import io.ktor.server.auth.*
@@ -33,8 +34,15 @@ fun Application.configurePlugins() {
     install(Resources)
 
     install(CallLogging) {
-        level = Level.INFO
-        filter { call -> call.request.path().startsWith("/") }
+        level = Level.TRACE
+        filter { call ->
+            call.request.path().startsWith("/api/profile")
+        }
+        format { call ->
+            val status = call.response.status()
+            val httpMethod = call.request.httpMethod.value
+            "Status: $status, HTTP method: $httpMethod"
+        }
     }
 
     install(Authentication)

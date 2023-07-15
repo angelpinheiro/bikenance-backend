@@ -10,11 +10,13 @@ import com.bikenance.repository.UserRepository
 import com.bikenance.strava.usecase.ReceiveDataUseCase
 import com.bikenance.strava.usecase.StravaBikeSync
 import com.bikenance.strava.usecase.StravaOAuthCallbackHandler
+import com.bikenance.usecase.SyncStravaDataUseCase
 import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.databind.SerializationFeature
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import io.ktor.client.*
 import io.ktor.client.engine.cio.*
+import io.ktor.client.plugins.*
 import io.ktor.client.plugins.logging.*
 import org.koin.dsl.module
 
@@ -52,7 +54,15 @@ val appModule = module {
 
     single {
         HttpClient(CIO) {
-            install(Logging)
+            engine {
+                requestTimeout = 0
+            }
+
+            install(Logging) {
+                logger = Logger.DEFAULT
+                level = LogLevel.INFO
+
+            }
         }
     }
 
@@ -60,9 +70,14 @@ val appModule = module {
         com.bikenance.strava.api.Strava(get(), get(), get())
     }
 
-    single { StravaOAuthCallbackHandler(get(), get(), get(), get(), get()) }
+    single { StravaOAuthCallbackHandler(get(), get(), get(), get(), get(), get()) }
 
     single { ReceiveDataUseCase(get(), get(), get(), get()) }
+
+    single { SyncStravaDataUseCase(get(), get(), get(), get(), get()) }
+
+
+
 
     single {
         MessageSender(get(), get(), get())

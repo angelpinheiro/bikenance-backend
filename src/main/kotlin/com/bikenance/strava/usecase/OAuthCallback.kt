@@ -11,6 +11,7 @@ import com.bikenance.repository.UserRepository
 import com.bikenance.strava.AuthData
 import com.bikenance.strava.model.AthleteStats
 import com.bikenance.strava.model.StravaAthlete
+import com.bikenance.usecase.SyncStravaDataUseCase
 
 
 class StravaOAuthCallbackHandler(
@@ -18,7 +19,8 @@ class StravaOAuthCallbackHandler(
     val db: DB,
     val dao: DAOS,
     val userRepository: UserRepository,
-    private val jwtMgr: JwtMgr
+    val syncStravaDataUseCase: SyncStravaDataUseCase,
+    private val jwtMgr: JwtMgr,
 ) {
 
     suspend fun handleCallback(auth: AuthData): TokenPair {
@@ -68,6 +70,10 @@ class StravaOAuthCallbackHandler(
                 athleteStats = stats
             )
         )
+
+
+        // TODO: Use this
+        // syncStravaDataUseCase.syncBikesAndRides(newUser.oid(), stravaClient)
 
         // get and create athlete bikes
         val bikes = stravaAthlete.bikeRefs?.mapNotNull { ref ->

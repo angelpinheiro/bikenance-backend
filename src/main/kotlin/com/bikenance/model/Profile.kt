@@ -19,7 +19,8 @@ data class Profile(
     @JsonProperty("sex") var sex: String? = null,
     @JsonProperty("weight") var weight: Int? = null,
     @JsonProperty("created_at") var createdAt: String? = null,
-    @JsonProperty("stats") val athleteStats: AthleteStats? = null
+    @JsonProperty("stats") val athleteStats: AthleteStats? = null,
+    @JsonProperty("sync") val sync: Boolean = false
     ) : MongoModel<Profile>()
 
 

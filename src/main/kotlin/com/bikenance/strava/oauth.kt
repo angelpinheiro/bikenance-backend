@@ -33,6 +33,7 @@ fun Application.configureOAuth() {
     val oAuthCallbackHandler: StravaOAuthCallbackHandler by inject()
     val db: DB by inject()
     val userRepository: UserRepository by inject()
+    val httpClient: HttpClient by inject()
 
     authentication {
         oauth("auth-oauth-strava") {
@@ -48,9 +49,7 @@ fun Application.configureOAuth() {
                     defaultScopes = listOf("read_all,activity:read_all,profile:read_all"),
                 )
             }
-            client = HttpClient(CIO) {
-                install(Logging)
-            }
+            client = httpClient
         }
     }
 

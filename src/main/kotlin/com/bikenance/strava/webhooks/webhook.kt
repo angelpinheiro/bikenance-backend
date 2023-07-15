@@ -26,11 +26,11 @@ import kotlin.time.Duration.Companion.seconds
 
 const val VERIFY_TOKEN = "BIKENANCE_VERIFY_TOKEN"
 
-val client = HttpClient(CIO) {
-    install(HttpTimeout) {
-        requestTimeoutMillis = 20000
-    }
-}
+//val client = HttpClient(CIO) {
+//    install(HttpTimeout) {
+//        requestTimeoutMillis = 20000
+//    }
+//}
 
 fun Application.stravaWebhookRouting() {
 
@@ -38,6 +38,7 @@ fun Application.stravaWebhookRouting() {
     val db: DB by inject()
     val strava: com.bikenance.strava.api.Strava by inject()
     val receiveDataUseCase: ReceiveDataUseCase by inject()
+    val client: HttpClient by inject()
 
     routing {
 
@@ -101,9 +102,10 @@ fun Application.stravaWebhookRouting() {
 
 fun Application.subscribeToStravaWebhooks(config: AppConfig) {
 
-    val log = KtorSimpleLogger("StravaWebhooks")
+    val log = KtorSimpleLogger("Application - StravaWebhooks")
 
     val mapper: ObjectMapper by inject()
+    val client: HttpClient by inject()
 
     // Flow:
     // 1) check subscriptions (* not implemented)
@@ -124,8 +126,6 @@ fun Application.subscribeToStravaWebhooks(config: AppConfig) {
         }
 
         log.info("Calling strava subscribeUrl -> Status ${existResponse.status}")
-
-
 
         val subsList = mapper.readValue<List<StravaSubscription>>(existResponse.bodyAsText())
         var deleted = false
@@ -161,15 +161,6 @@ fun Application.subscribeToStravaWebhooks(config: AppConfig) {
         }
     }
 }
-
-data class WebhookEvent(
-    val aspect_type: String,
-    val event_time: Long,
-    val object_id: Long,
-    val object_type: String,
-    val owner_id: Long,
-    val subscription_id: Long
-)
 
 data class StravaSubscription(
     @JsonProperty("id") var id: Int? = null,
