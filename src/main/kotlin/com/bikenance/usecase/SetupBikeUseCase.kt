@@ -6,10 +6,13 @@ import com.bikenance.data.model.Bike
 import com.bikenance.data.model.components.Usage
 import io.ktor.util.logging.*
 
-class SetupBikeUseCase(private val bikeDao: BikeDao, private val rideDao: BikeRideDao) {
+class SetupBikeUseCase(
+    private val bikeDao: BikeDao, private val rideDao: BikeRideDao
+) {
 
     val log = KtorSimpleLogger("SetupBikeUseCase")
-    suspend fun setupBike(bikeId: String, bike: Bike): Bike {
+
+    suspend operator fun invoke(bikeId: String, bike: Bike): Bike {
 
         val updatedComponents = bike.components?.map { bikeComponent ->
             val lastMaintenance = bikeComponent.from
@@ -28,13 +31,11 @@ class SetupBikeUseCase(private val bikeDao: BikeDao, private val rideDao: BikeRi
         }
 
         val updatedBike = bike.copy(
-            configDone = true,
-            components = updatedComponents
+            configDone = true, components = updatedComponents
         )
 
         bikeDao.update(bikeId, updatedBike)
         return bikeDao.getById(bikeId) ?: throw Exception("Bike not found")
     }
-
 
 }

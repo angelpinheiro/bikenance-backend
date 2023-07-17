@@ -33,7 +33,6 @@ data class Bike(
     val components: List<BikeComponent>? = emptyList()
 ) : MongoModel<Bike>()
 
-
-data class SyncBikes(
-    @JsonProperty("synchronizedBikesIds") val synchronizedBikesIds: List<String>
+data class SyncBikesData(
+    @JsonProperty("syncData") val syncData: Map<String, Boolean>
 )

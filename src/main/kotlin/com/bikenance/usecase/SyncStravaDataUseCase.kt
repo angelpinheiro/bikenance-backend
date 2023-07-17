@@ -29,7 +29,7 @@ class SyncStravaDataUseCase(
     val log = KtorSimpleLogger("UpdateRidesUseCase")
     private val scope = CoroutineScope(Job() + Dispatchers.IO)
 
-    suspend fun syncBikesAndRides(userId: String, stravaClient: StravaApiForUser) = scope.launch {
+    suspend operator fun invoke(userId: String, stravaClient: StravaApiForUser) = scope.launch {
         val user = dao.userDao.getById(userId) ?: throw Exception("User not found")
         val profile = dao.profileDao.getByUserId(userId) ?: throw Exception("User profile not found")
 

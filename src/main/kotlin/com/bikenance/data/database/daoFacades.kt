@@ -27,7 +27,7 @@ interface ProfileDao : BasicDao<Profile> {
 interface BikeDao : BasicDao<Bike> {
     suspend fun getByStravaId(id: String): Bike?
     suspend fun getByUserId(id: String): List<Bike>
-    suspend fun getByUserIdAndBikeId(userId: String, bikeId: String): Bike?
+    suspend fun updateSyncStatus(bikeId: String, sync: Boolean): Boolean
 }
 
 interface BikeRideDao : BasicDao<BikeRide> {

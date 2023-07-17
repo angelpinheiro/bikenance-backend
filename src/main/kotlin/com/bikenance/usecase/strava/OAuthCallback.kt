@@ -76,24 +76,25 @@ class StravaOAuthCallbackHandler(
 
         // TODO: Use this
         // syncStravaDataUseCase.syncBikesAndRides(newUser.oid(), stravaClient)
+        syncStravaDataUseCase.invoke(newUser.oid(), stravaClient)
 
         // get and create athlete bikes
-        val bikes = stravaAthlete.bikeRefs?.mapNotNull { ref ->
-            stravaClient.bike(ref.id)?.let { gear ->
-                println("Bike details for id ${ref.id}: ${gear.name}")
-                val bike = Bike(
-                    name = ref.name,
-                    brandName = gear.brandName,
-                    modelName = gear.modelName,
-                    distance = gear.distance,
-                    userId = newUser.oid(),
-                    stravaId = ref.id,
-                    draft = true
-
-                )
-                dao.bikeDao.create(bike)
-            }
-        }
+//        val bikes = stravaAthlete.bikeRefs?.mapNotNull { ref ->
+//            stravaClient.bike(ref.id)?.let { gear ->
+//                println("Bike details for id ${ref.id}: ${gear.name}")
+//                val bike = Bike(
+//                    name = ref.name,
+//                    brandName = gear.brandName,
+//                    modelName = gear.modelName,
+//                    distance = gear.distance,
+//                    userId = newUser.oid(),
+//                    stravaId = ref.id,
+//                    draft = true
+//
+//                )
+//                dao.bikeDao.create(bike)
+//            }
+//        }
     }
 }
 
