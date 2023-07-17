@@ -65,21 +65,21 @@ enum class ComponentTypes {
     UNKNOWN
 }
 
-enum class MaintenanceTypes {
-    BRAKE_MAINTENANCE,
-    CABLES_AND_HOUSING_MAINTENANCE,
-    CASSETTE_MAINTENANCE,
-    CHAIN_MAINTENANCE,
-    DISC_BRAKE_MAINTENANCE,
-    DROPPER_POST_MAINTENANCE,
-    FORK_MAINTENANCE,
-    FRONT_HUB_MAINTENANCE,
-    REAR_SUSPENSION_MAINTENANCE,
-    THRU_AXLE_MAINTENANCE,
-    TIRE_MAINTENANCE,
-    WHEELSET_TUBELESS_MAINTENANCE,
-    WHEELSET_WHEELS_AND_SPOKES_MAINTENANCE,
-    WHEELSET_TREAD_WEAR_MAINTENANCE
+enum class MaintenanceTypes(val componentType: ComponentTypes) {
+    BRAKE_MAINTENANCE(ComponentTypes.BRAKE_LEVER),
+    DISC_PAD_MAINTENANCE(ComponentTypes.DISC_PAD),
+    CABLES_AND_HOUSING_MAINTENANCE(ComponentTypes.CABLE_HOUSING),
+    CASSETTE_MAINTENANCE(ComponentTypes.CASSETTE),
+    CHAIN_MAINTENANCE(ComponentTypes.CHAIN),
+    DISC_BRAKE_MAINTENANCE(ComponentTypes.DISC_BRAKE),
+    DROPPER_POST_MAINTENANCE(ComponentTypes.DROPER_POST),
+    FORK_MAINTENANCE(ComponentTypes.FORK),
+    FRONT_HUB_MAINTENANCE(ComponentTypes.FRONT_HUB),
+    REAR_SUSPENSION_MAINTENANCE(ComponentTypes.REAR_SUSPENSION),
+    THRU_AXLE_MAINTENANCE(ComponentTypes.THRU_AXLE),
+    TIRE_MAINTENANCE(ComponentTypes.TIRE),
+    WHEELSET_TUBELESS_MAINTENANCE(ComponentTypes.WHEELSET),
+    WHEELSET_WHEELS_AND_SPOKES_MAINTENANCE(ComponentTypes.WHEELSET),
 }
 
 enum class ComponentModifier {
@@ -89,6 +89,7 @@ enum class ComponentModifier {
 
 enum class RevisionUnit {
     KILOMETERS,
+    HOURS,
     WEEKS,
     MONTHS,
     YEARS
@@ -110,33 +111,29 @@ data class Usage(
 
 data class MaintenanceInfo(
     @JsonProperty("type")
-    val type: String,
-    @JsonProperty("description")
-    val description: String,
-    @JsonProperty("longDescription")
-    val longDescription: String,
+    val type: MaintenanceTypes,
     @JsonProperty("defaultFrequency")
-    val defaultFrequency: RevisionFrequency,
-    @JsonProperty("componentType")
-    val componentType: ComponentTypes
-) {
-    fun maintenanceType(): MaintenanceTypes {
-        return try {
-            MaintenanceTypes.valueOf(type)
-        } catch (e: Exception) {
-            throw e
-            // TODO: return ComponentTypes.CUSTOM
-        }
-    }
-}
+    val defaultFrequency: RevisionFrequency
+)
 
 data class Maintenance(
     @JsonProperty("type")
-    val type: MaintenanceInfo,
-    @JsonProperty("usage")
-    var usageSinceLastMaintenance: Usage = Usage(0.0, 0.0),
-    @JsonProperty("dueDate")
-    var dateTime: String? = null,
+    val type: MaintenanceTypes,
+    @JsonProperty("description")
+    val description: String,
+    @JsonProperty("defaultFrequency")
+    val defaultFrequency: RevisionFrequency,
+    @JsonProperty("componentType")
+    val componentType: ComponentTypes,
+    @JsonProperty("usageSinceLast")
+    var usageSinceLast: Usage?,
+    @JsonProperty("status")
+    var status: Double = 0.0,
+    @JsonProperty("lastDate")
+    var lastMaintenanceDate: LocalDateTime? = null,
+    @JsonProperty("estimatedDate")
+    var estimatedDate: LocalDateTime? = null,
 )
+
 
 

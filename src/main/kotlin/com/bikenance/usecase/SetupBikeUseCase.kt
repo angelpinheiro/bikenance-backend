@@ -3,9 +3,11 @@ package com.bikenance.usecase
 import com.bikenance.data.database.BikeDao
 import com.bikenance.data.database.BikeRideDao
 import com.bikenance.data.model.Bike
-import com.bikenance.data.model.components.Usage
+import com.bikenance.data.model.components.*
 import com.bikenance.util.bknLogger
 import com.bikenance.util.formatAsIsoDate
+import java.time.LocalDateTime
+import java.time.Period
 import java.time.ZoneOffset
 
 class SetupBikeUseCase(
@@ -47,7 +49,12 @@ class SetupBikeUseCase(
             }
 
             bikeComponent.copy(
-                usage = usage
+                usage = usage,
+                maintenance = maintenances(
+                    bikeComponent.copy(
+                        usage = usage
+                    )
+                )
             )
         }
 
@@ -57,6 +64,57 @@ class SetupBikeUseCase(
 
         bikeDao.update(bikeId, updatedBike)
         return bikeDao.getById(bikeId) ?: throw Exception("Bike not found")
+    }
+
+    private fun maintenances(bikeComponent: BikeComponent): List<Maintenance> {
+
+        val usage = bikeComponent.usage
+
+        return defaultMaintenances.filter { it.type.componentType == bikeComponent.type }.map { info ->
+
+            val freq = info.defaultFrequency
+            val status = determineCurrentStatus(freq, usage)
+            val estimatedDate = bikeComponent.from?.let {
+                estimateNextMaintenanceDate(it, status, LocalDateTime.now())
+            }
+
+            Maintenance(
+                type = info.type,
+                description = "",
+                componentType = info.type.componentType,
+                defaultFrequency = info.defaultFrequency,
+                usageSinceLast = usage,
+                lastMaintenanceDate = bikeComponent.from,
+                estimatedDate = estimatedDate,
+                status = status
+            )
+        }
+
+    }
+
+    private fun estimateNextMaintenanceDate(from: LocalDateTime, status: Double, until: LocalDateTime): LocalDateTime {
+        val daysBetween = Period.between(from.toLocalDate(), until.toLocalDate()).days
+        val expectedDurationInDays = (daysBetween / status).toLong()
+        return from.plusDays(expectedDurationInDays)
+    }
+
+    private fun determineCurrentStatus(
+        freq: RevisionFrequency, usage: Usage
+    ): Double {
+        return when (freq.unit) {
+            RevisionUnit.KILOMETERS -> {
+                val maxKm = freq.every
+                if (usage.distance > 0) {
+                    (usage.distance / 1000) / maxKm
+                } else {
+                    0.0
+                }
+            }
+
+            else -> {
+                0.0
+            }
+        }
     }
 
 }
