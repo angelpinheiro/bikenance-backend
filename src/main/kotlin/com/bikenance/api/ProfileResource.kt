@@ -28,11 +28,7 @@ import java.time.LocalDateTime
 
 @Serializable
 @Resource("/profile")
-class ProfilePath() {
-
-    @Serializable
-    @Resource("/extended")
-    class Extended(val parent: ProfilePath = ProfilePath(), val draft: Boolean = false)
+class ProfilePath {
 
     @Serializable
     @Resource("/setup")
@@ -160,15 +156,6 @@ fun Application.profileRoutes() {
                             e.printStackTrace()
                             listOf<BikeRide>()
                         }
-                    }
-                }
-            }
-
-            get<ProfilePath.Extended> { r ->
-                apiResult {
-                    val authUserId = authUserId()
-                    authUserId?.let { userId ->
-                        getUserProfile(dao, userId, r.draft)
                     }
                 }
             }
@@ -338,43 +325,4 @@ fun Application.profileRoutes() {
 
         }
     }
-}
-
-
-suspend fun syncBikeActivities(bike: Bike, user: User, strava: Strava, db: DB, dao: DAOS) {
-
-
-    println("Synchronizing bike activities: ${bike.oid()}")
-
-    val stravaClient = strava.withAuth(user.stravaAuthData ?: throw Exception("User auth not found"));
-    val activities = stravaClient.activities(LocalDateTime.now().minusMonths(6))
-
-    activities?.forEach { activity ->
-
-        if (db.activities.findOne(StravaActivity::id eq activity.id) == null) {
-            val supported = supportedActivityTypes.contains(activity.type)
-            if (bike.stravaId == activity.gearId && supported) {
-                db.activities.insertOne(activity)
-                val ride = BikeRide(
-                    userId = user.oid(),
-                    stravaId = activity.id,
-                    bikeId = bike.oid(),
-                    name = activity.name,
-                    distance = activity.distance,
-                    movingTime = activity.movingTime,
-                    elapsedTime = activity.elapsedTime,
-                    dateTime = activity.startDate,
-                    totalElevationGain = activity.totalElevationGain,
-                )
-                dao.bikeRideDao.create(ride)
-            }
-        }
-    }
-}
-
-
-suspend fun removeBikeActivities(bike: Bike, user: User, strava: Strava, db: DB, dao: DAOS) {
-    println("Deleting bike activities: ${bike.oid()}")
-    db.activities.deleteMany(StravaActivity::gearId eq bike.stravaId)
-    db.bikeRides.deleteMany(BikeRide::bikeId eq bike.oid())
 }
