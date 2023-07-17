@@ -1,4 +1,4 @@
-package com.bikenance.data.network.routing.login
+package com.bikenance.data.network
 
 import com.bikenance.data.network.jwt.JwtMgr
 import com.bikenance.data.repository.UserRepository

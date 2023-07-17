@@ -1,7 +1,7 @@
 package com.bikenance.data.model
 
 import com.bikenance.data.database.mongodb.MongoModel
-import com.bikenance.data.network.routing.strava.AuthData
+import com.bikenance.api.strava.AuthData
 
 
 data class User(

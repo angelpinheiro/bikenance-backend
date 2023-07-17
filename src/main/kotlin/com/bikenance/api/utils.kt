@@ -1,4 +1,4 @@
-package com.bikenance.data.network.routing
+package com.bikenance.api
 
 import io.ktor.http.*
 import io.ktor.server.application.*

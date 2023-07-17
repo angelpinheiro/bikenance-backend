@@ -4,11 +4,10 @@ import com.bikenance.data.database.mongodb.DAOS
 import com.bikenance.data.database.mongodb.DB
 import com.bikenance.data.network.jwt.JwtMgr
 import com.bikenance.data.model.login.TokenPair
-import com.bikenance.data.model.Bike
 import com.bikenance.data.model.Profile
 import com.bikenance.data.model.User
 import com.bikenance.data.repository.UserRepository
-import com.bikenance.data.network.routing.strava.AuthData
+import com.bikenance.api.strava.AuthData
 import com.bikenance.data.model.strava.AthleteStats
 import com.bikenance.data.model.strava.StravaAthlete
 import com.bikenance.data.network.stravaApi.Strava

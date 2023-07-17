@@ -3,9 +3,9 @@ package com.bikenance.usecase.strava
 import com.bikenance.StravaConfig
 import com.bikenance.data.model.User
 import com.bikenance.data.repository.UserRepository
-import com.bikenance.data.network.routing.formatAsIsoDate
-import com.bikenance.data.network.routing.strava.AuthData
-import com.bikenance.data.network.routing.strava.StravaOAuthEndpoints
+import com.bikenance.api.formatAsIsoDate
+import com.bikenance.api.strava.AuthData
+import com.bikenance.api.strava.StravaOAuthEndpoints
 import com.bikenance.data.model.strava.StravaRequestParams
 import com.bikenance.data.network.stravaApi.mapper
 import com.fasterxml.jackson.annotation.JsonProperty

@@ -2,7 +2,7 @@ package com.bikenance.data.network.stravaApi
 
 import com.bikenance.AppConfig
 import com.bikenance.data.repository.UserRepository
-import com.bikenance.data.network.routing.strava.AuthData
+import com.bikenance.api.strava.AuthData
 import com.bikenance.data.model.strava.AthleteStats
 import com.bikenance.data.model.strava.StravaActivity
 import com.bikenance.data.model.strava.StravaAthlete

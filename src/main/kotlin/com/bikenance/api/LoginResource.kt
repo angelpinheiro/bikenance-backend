@@ -1,4 +1,4 @@
-package com.bikenance.data.network.routing.login
+package com.bikenance.api
 
 import com.bikenance.data.network.jwt.JwtMgr
 import com.bikenance.data.model.login.AuthData
@@ -6,7 +6,6 @@ import com.bikenance.data.model.login.LoginData
 import com.bikenance.data.model.login.RefreshData
 import com.bikenance.usecase.LoginUseCase
 import com.bikenance.data.repository.UserRepository
-import com.bikenance.data.network.routing.apiResult
 import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.auth.*

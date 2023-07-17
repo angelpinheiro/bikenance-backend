@@ -1,7 +1,7 @@
 package com.bikenance.extensions
 
-import com.bikenance.data.network.routing.login.login
-import com.bikenance.data.network.routing.login.loginAuthentication
+import com.bikenance.api.login
+import com.bikenance.data.network.loginAuthentication
 import io.ktor.server.application.*
 import io.ktor.server.routing.*
 

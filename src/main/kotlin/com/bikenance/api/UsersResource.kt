@@ -1,4 +1,4 @@
-package com.bikenance.data.network.routing
+package com.bikenance.api
 
 import com.bikenance.data.database.mongodb.DB
 import com.bikenance.data.model.UserUpdate

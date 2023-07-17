@@ -1,4 +1,4 @@
-package com.bikenance.data.network.routing.strava
+package com.bikenance.api.strava
 
 import com.bikenance.AppConfig
 import com.bikenance.data.database.mongodb.DB

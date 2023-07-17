@@ -1,10 +1,10 @@
 package com.bikenance
 
 import com.bikenance.extensions.configureFirebase
-import com.bikenance.data.network.routing.athleteRoutes
-import com.bikenance.data.network.routing.mainRoutes
-import com.bikenance.data.network.routing.profileRoutes
-import com.bikenance.data.network.routing.userRoutes
+import com.bikenance.api.athleteRoutes
+import com.bikenance.api.mainRoutes
+import com.bikenance.api.profileRoutes
+import com.bikenance.api.userRoutes
 import com.bikenance.di.appModule
 import com.bikenance.extensions.configureMongoDB
 import com.bikenance.extensions.configurePlugins

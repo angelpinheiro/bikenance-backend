@@ -6,7 +6,7 @@ import com.bikenance.data.database.StravaAthleteDao
 import com.bikenance.data.database.UserDao
 import com.bikenance.data.model.User
 import com.bikenance.data.model.UserUpdate
-import com.bikenance.data.network.routing.strava.AuthData
+import com.bikenance.api.strava.AuthData
 import com.bikenance.data.model.strava.StravaActivity
 import com.bikenance.data.model.strava.StravaAthlete
 import org.bson.types.ObjectId
