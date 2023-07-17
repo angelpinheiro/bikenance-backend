@@ -14,7 +14,7 @@ import com.bikenance.data.network.strava.Strava
 import com.bikenance.data.network.strava.supportedActivityTypes
 
 
-class ReceiveDataUseCase(
+class StravaEventReceivedUseCase(
     private val userRepository: UserRepository,
     private val dao: DAOS,
     private val strava: Strava,

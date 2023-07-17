@@ -20,7 +20,7 @@ fun Route.profileBikeRoutes() {
     val log = KtorSimpleLogger("ProfileRoutes")
 
     val dao: DAOS by inject()
-    val stravaBikeSync: StravaBikeSync by inject()
+//    val stravaBikeSync: StravaBikeSync by inject()
 
 
     get<ProfilePath.Bikes> {
@@ -91,7 +91,7 @@ fun Route.profileBikeRoutes() {
                 if (bike.stravaId != null) {
                     bike.draft = true
                     dao.bikeDao.update(bike.oid(), bike)
-                    stravaBikeSync.onBikeRemoved(user, bike)
+//                    stravaBikeSync.onBikeRemoved(user, bike)
                 }
             }
         }

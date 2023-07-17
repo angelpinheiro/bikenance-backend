@@ -2,7 +2,7 @@ package com.bikenance.api.strava
 
 import com.bikenance.data.model.login.TokenPair
 import com.bikenance.data.network.strava.stravaAuthConfigName
-import com.bikenance.usecase.strava.StravaOAuthCallbackHandler
+import com.bikenance.usecase.strava.StravaAuthCallbackHandler
 import com.bikenance.util.bknLogger
 import io.ktor.server.application.*
 import io.ktor.server.auth.*
@@ -29,7 +29,7 @@ data class AuthData(
 fun Route.stravaLoginRoutes() {
 
     val log = bknLogger("StravaAuth")
-    val oAuthCallbackHandler: StravaOAuthCallbackHandler by inject()
+    val oAuthCallbackHandler: StravaAuthCallbackHandler by inject()
 
     authenticate(stravaAuthConfigName) {
 

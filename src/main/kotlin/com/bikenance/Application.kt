@@ -2,6 +2,8 @@ package com.bikenance
 
 import com.bikenance.api.exposeApi
 import com.bikenance.di.appModule
+import com.bikenance.di.dataModule
+import com.bikenance.di.stravaModule
 import com.bikenance.extensions.*
 import io.ktor.server.application.*
 import io.ktor.server.netty.*
@@ -21,7 +23,7 @@ fun Application.module() {
     // Setup dependency injection
     install(Koin) {
         slf4jLogger()
-        modules(appModule)
+        modules(appModule, dataModule, stravaModule)
     }
 
     // Load app config

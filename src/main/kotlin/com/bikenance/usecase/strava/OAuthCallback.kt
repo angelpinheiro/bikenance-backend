@@ -15,7 +15,7 @@ import com.bikenance.data.network.strava.StravaApiForUser
 import com.bikenance.usecase.SyncStravaDataUseCase
 
 
-class StravaOAuthCallbackHandler(
+class StravaAuthCallbackHandler(
     val strava: Strava,
     val db: DB,
     val dao: DAOS,

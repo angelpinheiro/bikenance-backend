@@ -32,37 +32,6 @@ class StravaBikeSync(
     private val scope = CoroutineScope(Job() + Dispatchers.IO)
 
 
-
-    fun syncRides(user: User, bike: Bike) {
-        scope.launch {
-
-            val stravaClient = strava.withAuth(user.stravaAuthData ?: throw Exception("User auth not found"));
-
-            var page = 1
-            var keepGoing = true
-            var createdCount = 0
-
-            // iterate over paginated strava activities until an empty page is returned
-            // this is the recommended approach from strava api docs
-            while (keepGoing) {
-                val activities = stravaClient.activitiesPaginated(page)
-                if (activities?.isNotEmpty() == true) {
-                    createdCount += activities.sumOf { activity ->
-                        createRideIfNotExist(user, bike, activity)
-                    }
-                    page +=1
-                } else {
-                    keepGoing = false
-                }
-            }
-
-            if (createdCount > 0) {
-                // notify client
-                sendCreatedRidesMessage(user, createdCount)
-            }
-        }
-    }
-
     fun onBikeRemoved(user: User, bike: Bike) {
         scope.launch {
             // delete rides from the bike being removed

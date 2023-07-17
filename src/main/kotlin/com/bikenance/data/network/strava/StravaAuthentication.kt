@@ -2,16 +2,10 @@ package com.bikenance.data.network.strava
 
 import com.bikenance.AppConfig
 import com.bikenance.api.strava.StravaOAuthEndpoints
-import com.bikenance.data.network.jwt.JwtMgr
-import com.bikenance.data.repository.UserRepository
-import com.bikenance.usecase.strava.StravaOAuthCallbackHandler
-import com.bikenance.util.bknLogger
 import io.ktor.client.*
 import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.auth.*
-import io.ktor.server.auth.jwt.*
-import io.ktor.server.response.*
 import org.koin.ktor.ext.inject
 
 const val stravaAuthConfigName = "strava-oauth"

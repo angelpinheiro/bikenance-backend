@@ -3,7 +3,7 @@ package com.bikenance.api.strava
 import com.bikenance.AppConfig
 import com.bikenance.data.model.strava.EventData
 import com.bikenance.data.model.strava.StravaRequestParams
-import com.bikenance.usecase.strava.ReceiveDataUseCase
+import com.bikenance.usecase.strava.StravaEventReceivedUseCase
 import io.ktor.client.*
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
@@ -22,7 +22,7 @@ const val VERIFY_TOKEN = "BIKENANCE_VERIFY_TOKEN"
 fun Route.stravaWebhookRoutes() {
 
     val config: AppConfig by inject()
-    val receiveDataUseCase: ReceiveDataUseCase by inject()
+    val receiveDataUseCase: StravaEventReceivedUseCase by inject()
     val client: HttpClient by inject()
 
     /**

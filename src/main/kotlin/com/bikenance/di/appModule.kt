@@ -1,19 +1,11 @@
 package com.bikenance.di
 
 import com.bikenance.AppConfig
-import com.bikenance.data.database.UserDao
-import com.bikenance.data.database.mongodb.*
 import com.bikenance.data.network.jwt.JwtConfig
 import com.bikenance.data.network.jwt.JwtMgr
 import com.bikenance.data.network.push.MessageSender
-import com.bikenance.data.network.strava.Strava
-import com.bikenance.data.network.strava.StravaWebhook
-import com.bikenance.data.repository.UserRepository
-import com.bikenance.usecase.SyncStravaDataUseCase
-import com.bikenance.usecase.strava.ReceiveDataUseCase
-import com.bikenance.usecase.strava.StravaBikeSync
-import com.bikenance.usecase.strava.StravaOAuthCallbackHandler
 import com.fasterxml.jackson.databind.DeserializationFeature
+import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.SerializationFeature
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import io.ktor.client.*
@@ -23,37 +15,15 @@ import org.koin.dsl.module
 
 val appModule = module {
 
-    single {
+    single<AppConfig> {
         AppConfig()
     }
 
-    single {
-        DB(createDatabase(get()))
+    single<JwtMgr> {
+        JwtMgr(JwtConfig())
     }
 
-    single { DAOS(get()) }
-
-
-    single<UserDao> {
-        MongoUserDao(get())
-    }
-    single {
-        MongoProfileDao(get())
-    }
-
-    single {
-        MongoBikeDao(get())
-    }
-
-    single {
-        MongoBikeRideDao(get())
-    }
-
-    single {
-        UserRepository(get())
-    }
-
-    single {
+    single<HttpClient> {
         HttpClient(CIO) {
             engine {
                 requestTimeout = 0
@@ -67,34 +37,11 @@ val appModule = module {
         }
     }
 
-    single {
-        Strava(get(), get(), get())
-    }
-
-    single { StravaWebhook(get(), get(), get()) }
-
-    single { StravaOAuthCallbackHandler(get(), get(), get(), get(), get(), get()) }
-
-    single { ReceiveDataUseCase(get(), get(), get(), get()) }
-
-    single { SyncStravaDataUseCase(get(), get(), get(), get(), get()) }
-
-
-
-
-    single {
+    single<MessageSender> {
         MessageSender(get(), get(), get())
     }
 
-    single {
-        StravaBikeSync(get(), get(), get(), get())
-    }
-
-    single {
-        JwtMgr(JwtConfig())
-    }
-
-    single {
+    single<ObjectMapper> {
         jacksonObjectMapper()
             .enable(SerializationFeature.INDENT_OUTPUT)
             .enable(SerializationFeature.WRITE_SELF_REFERENCES_AS_NULL)
