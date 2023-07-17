@@ -3,12 +3,9 @@ package com.bikenance.api.strava
 import com.bikenance.AppConfig
 import com.bikenance.data.database.mongodb.DB
 import com.bikenance.data.model.login.TokenPair
-import com.bikenance.data.repository.UserRepository
-import com.bikenance.data.model.strava.StravaAthlete
 import com.bikenance.data.network.stravaApi.Strava
-import com.bikenance.util.mapper
+import com.bikenance.data.repository.UserRepository
 import com.bikenance.usecase.strava.StravaOAuthCallbackHandler
-import com.fasterxml.jackson.module.kotlin.readValue
 import io.ktor.client.*
 import io.ktor.http.*
 import io.ktor.server.application.*
@@ -93,14 +90,6 @@ fun PipelineContext<*, ApplicationCall>.getOAuthData(): AuthData? {
     return principal?.let {
         val expiration = Instant.now().plusSeconds(it.expiresIn - 10).epochSecond
         AuthData(it.accessToken, it.refreshToken, it.expiresIn, expiration, lastRefresh = "Pending")
-    }
-}
-
-fun PipelineContext<*, ApplicationCall>.getAthleteParameter(): StravaAthlete? {
-    val principal: OAuthAccessTokenResponse.OAuth2? = call.principal()
-
-    return principal?.extraParameters?.get("athlete")?.let {
-        return@let mapper.readValue<StravaAthlete>(it)
     }
 }
 

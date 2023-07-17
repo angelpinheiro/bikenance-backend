@@ -31,11 +31,6 @@ suspend inline fun <reified T : Any> PipelineContext<Unit, ApplicationCall>.apiR
     }
 }
 
-val dtf: DateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss'Z'")
-fun LocalDateTime.formatAsIsoDate(): String {
-    return dtf.format(this)
-}
-
 /**
  * Extension function for obtaining the userId from a JWT authenticated request
  */

@@ -16,7 +16,7 @@ import org.koin.ktor.ext.inject
 
 val ApplicationCall.authData get() = authentication.principal<LoginData>()?.let { AuthData(it.username)  }
 
-fun Route.login() {
+fun Route.loginRoutes() {
 
     val userRepository: UserRepository by inject()
     val jwtMgr: JwtMgr by inject()

@@ -1,13 +1,13 @@
 package com.bikenance.usecase.strava
 
 import com.bikenance.StravaConfig
-import com.bikenance.data.model.User
-import com.bikenance.data.repository.UserRepository
-import com.bikenance.api.formatAsIsoDate
 import com.bikenance.api.strava.AuthData
 import com.bikenance.api.strava.StravaOAuthEndpoints
+import com.bikenance.data.model.User
 import com.bikenance.data.model.strava.StravaRequestParams
 import com.bikenance.data.network.stravaApi.mapper
+import com.bikenance.data.repository.UserRepository
+import com.bikenance.util.formatAsIsoDate
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.module.kotlin.readValue
 import io.ktor.client.*
@@ -45,12 +45,12 @@ class StravaTokenRefresh(
         return auth
     }
 
-        @OptIn(InternalAPI::class)
+    @OptIn(InternalAPI::class)
     private fun needsTokenRefresh(auth: AuthData): Boolean {
         val expirationSeconds = auth.expiresAt
         val nowSeconds = Instant.now().epochSecond
-        val expiration = Date(expirationSeconds*1000).toLocalDateTime().formatAsIsoDate()
-        val now = Date(nowSeconds*1000).toLocalDateTime().formatAsIsoDate()
+        val expiration = Date(expirationSeconds * 1000).toLocalDateTime().formatAsIsoDate()
+        val now = Date(nowSeconds * 1000).toLocalDateTime().formatAsIsoDate()
         println("Token expires at $expiration ($expirationSeconds) | $now ($nowSeconds)")
         return expirationSeconds <= nowSeconds
     }

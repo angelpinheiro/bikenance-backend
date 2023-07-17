@@ -1,15 +1,9 @@
 package com.bikenance
 
-import com.bikenance.extensions.configureFirebase
-import com.bikenance.api.athleteRoutes
-import com.bikenance.api.mainRoutes
-import com.bikenance.api.profileRoutes
-import com.bikenance.api.userRoutes
+import com.bikenance.api.api
 import com.bikenance.di.appModule
-import com.bikenance.extensions.configureMongoDB
-import com.bikenance.extensions.configurePlugins
-import com.bikenance.extensions.configureStrava
-import com.bikenance.extensions.configureLogin
+import com.bikenance.extensions.*
+import com.bikenance.util.listAllRoutes
 import io.ktor.server.application.*
 import io.ktor.server.netty.*
 import org.koin.ktor.plugin.Koin
@@ -36,11 +30,12 @@ fun Application.module() {
     configureLogin()
     configureMongoDB()
 
-    mainRoutes()
-    userRoutes()
-    athleteRoutes()
-    profileRoutes()
+    api()
 
     configureFirebase()
     configureStrava()
+
+    listAllRoutes()
+
+
 }

@@ -32,17 +32,7 @@ fun Application.configurePlugins() {
 
     install(Resources)
 
-    install(CallLogging) {
-        level = Level.TRACE
-        filter { call ->
-            call.request.path().startsWith("/api/profile")
-        }
-        format { call ->
-            val status = call.response.status()
-            val httpMethod = call.request.httpMethod.value
-            "Status: $status, HTTP method: $httpMethod"
-        }
-    }
+    install(CallLogging)
 
     install(Authentication)
 }

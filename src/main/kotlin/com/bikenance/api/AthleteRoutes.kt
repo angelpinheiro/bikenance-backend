@@ -3,8 +3,6 @@ package com.bikenance.api
 import com.bikenance.data.database.mongodb.DB
 import com.bikenance.data.model.strava.StravaAthlete
 import io.ktor.resources.*
-import io.ktor.server.application.*
-import io.ktor.server.auth.*
 import io.ktor.server.resources.*
 import io.ktor.server.routing.*
 import kotlinx.serialization.Serializable
@@ -25,19 +23,16 @@ class Athletes(val filter: String? = null) {
 }
 
 
-fun Application.athleteRoutes() {
+fun Route.athleteRoutes() {
 
     val db: DB by inject()
 
-    routing {
-        authenticate {
-            get<Athletes> {
-                apiResult { db.athletes.find().toList() }
-            }
-
-            get<Athletes.Id> { r ->
-                apiResult { db.athletes.findOne(StravaAthlete::id eq r.id) }
-            }
-        }
+    get<Athletes> {
+        apiResult { db.athletes.find().toList() }
     }
+
+    get<Athletes.Id> { r ->
+        apiResult { db.athletes.findOne(StravaAthlete::id eq r.id) }
+    }
+
 }
