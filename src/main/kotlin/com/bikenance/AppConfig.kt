@@ -61,10 +61,4 @@ fun Application.loadConfig() {
     config.firebase = FirebaseConfig(
         environment.config.property("firebase.service_account_file").getString()
     )
-
-
-    log.info("App Config")
-    log.info("\t\t${config.api}")
-    log.info("\t\t${config.db}")
-    log.info("\t\t${config.firebase}")
 }
