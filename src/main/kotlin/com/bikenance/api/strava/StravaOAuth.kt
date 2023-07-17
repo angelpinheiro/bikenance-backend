@@ -17,6 +17,15 @@ object StravaOAuthEndpoints {
     const val accessTokenUrl = "https://www.strava.com/api/v3/oauth/token"
 }
 
+data class AuthData(
+    var accessToken: String,
+    var refreshToken: String?,
+    var expiresIn: Long,
+    var expiresAt: Long,
+    var scope: String = "",
+    var lastRefresh: String,
+)
+
 fun Route.stravaLoginRoutes() {
 
     val log = bknLogger("StravaAuth")
@@ -29,38 +38,24 @@ fun Route.stravaLoginRoutes() {
         }
 
         get("/callback") {
-
-            log.debug("Received auth callback")
-
-            val authData = getOAuthData()
-            if (authData != null) {
-                val tokenPair: TokenPair = oAuthCallbackHandler.handleCallback(authData)
-                call.parameters["scope"]?.let { authData.scope = it }
-                call.respondRedirect("bikenance://redirect?code=${tokenPair.token}&refresh=${tokenPair.refreshToken}")
-            } else {
-                call.respond("Auth failed")
-            }
-
+            val authData = getOAuthData(this)
+            val tokenPair: TokenPair = oAuthCallbackHandler.handleCallback(authData)
+            call.parameters["scope"]?.let { authData.scope = it }
+            call.respondRedirect("bikenance://redirect?code=${tokenPair.token}&refresh=${tokenPair.refreshToken}")
         }
     }
 }
 
-data class AuthData(
-    var accessToken: String,
-    var refreshToken: String?,
-    var expiresIn: Long,
-    var expiresAt: Long,
-    var scope: String = "",
-    var lastRefresh: String,
-)
+fun getOAuthData(pipelineContext: PipelineContext<*, ApplicationCall>): AuthData {
+    val principal: OAuthAccessTokenResponse.OAuth2? = pipelineContext.call.principal()
 
-fun PipelineContext<*, ApplicationCall>.getOAuthData(): AuthData? {
-    val principal: OAuthAccessTokenResponse.OAuth2? = call.principal()
-    return principal?.let {
-        val expiration = Instant.now().plusSeconds(it.expiresIn - 10).epochSecond
-        AuthData(it.accessToken, it.refreshToken, it.expiresIn, expiration, lastRefresh = "Pending")
+    return if (principal != null) {
+        val expiration = Instant.now().plusSeconds(principal.expiresIn - 10).epochSecond
+        AuthData(
+            principal.accessToken, principal.refreshToken, principal.expiresIn, expiration, lastRefresh = "Pending"
+        )
+    } else {
+        throw Exception("Could not get auth principal")
     }
-}
 
-fun isMobileUserAgentRegex(userAgent: String) =
-    listOf("Mobile", "Android", "iPhone", "iPad", "IEMobile").any { userAgent.contains(it) }
+}

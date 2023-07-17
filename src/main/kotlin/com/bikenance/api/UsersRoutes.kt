@@ -1,6 +1,5 @@
 package com.bikenance.api
 
-import com.bikenance.data.database.mongodb.DB
 import com.bikenance.data.model.UserUpdate
 import com.bikenance.data.repository.UserRepository
 import io.ktor.resources.*
@@ -32,7 +31,6 @@ class Users(val filter: String? = null) {
 fun Route.userRoutes() {
 
     val userRepository: UserRepository by inject()
-    val db: DB by inject()
 
     get<Users> { r ->
         apiResult {
@@ -60,23 +58,15 @@ fun Route.userRoutes() {
 
     put<Users.MessagingToken> { r ->
         val tokenWrapper = call.receive<TokenWrapper>()
-
-        println("ReceivedToken [${tokenWrapper.token}]")
-
-        val userId = authUserId()
-        apiResult {
-            userId?.let {
-                userRepository.getById(userId)?.let {
-                    it.firebaseToken = tokenWrapper.token
-                    userRepository.update(userId, it)
-                    true
-                }
-            } ?: false
+        authApiResult { userId ->
+            userRepository.getById(userId)?.let {
+                it.firebaseToken = tokenWrapper.token
+                userRepository.update(userId, it)
+                true
+            }
         }
     }
-
 }
-
 
 data class TokenWrapper(
     val token: String

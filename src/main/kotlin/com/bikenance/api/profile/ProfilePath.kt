@@ -9,10 +9,6 @@ import kotlinx.serialization.Serializable
 class ProfilePath {
 
     @Serializable
-    @Resource("/setup")
-    class Setup(val parent: ProfilePath = ProfilePath())
-
-    @Serializable
     @Resource("/rides")
     class Rides(val parent: ProfilePath = ProfilePath(), val page: Int = 0, val pageSize: Int = 10)
 

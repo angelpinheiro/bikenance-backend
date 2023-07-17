@@ -1,13 +1,10 @@
 package com.bikenance.api
 
+import com.bikenance.util.authUserIdOrFail
 import io.ktor.http.*
 import io.ktor.server.application.*
-import io.ktor.server.auth.*
-import io.ktor.server.auth.jwt.*
 import io.ktor.server.response.*
 import io.ktor.util.pipeline.*
-import java.time.LocalDateTime
-import java.time.format.DateTimeFormatter
 import java.util.concurrent.CancellationException
 
 
@@ -32,9 +29,11 @@ suspend inline fun <reified T : Any> PipelineContext<Unit, ApplicationCall>.apiR
 }
 
 /**
- * Extension function for obtaining the userId from a JWT authenticated request
+ * Handles the API results and generates the appropriate HTTP responses in the context of a Ktor route, passing
+ * authorization data to the code block to be executed
  */
-fun PipelineContext<*, ApplicationCall>.authUserId(): String? {
-    val principal: JWTPrincipal? = call.principal()
-    return principal?.subject
+suspend inline fun <reified T : Any> PipelineContext<Unit, ApplicationCall>.authApiResult(block: PipelineContext<Unit, ApplicationCall>.(userId: String) -> T?) {
+    val userId = authUserIdOrFail()
+    apiResult(block = { block(userId) })
 }
+
