@@ -2,7 +2,6 @@ package com.bikenance.data.database.mongodb
 
 import com.bikenance.data.database.BikeRideDao
 import com.bikenance.data.model.BikeRide
-import com.bikenance.data.model.serializer.formatAsIso8061
 import org.litote.kmongo.*
 import java.time.LocalDateTime
 
@@ -17,7 +16,7 @@ class MongoBikeRideDao(db: DB) : BasicDaoImpl<BikeRide>(db.bikeRides), BikeRideD
     }
 
     override suspend fun getByBikeIdAfter(id: String, date: LocalDateTime): List<BikeRide> {
-        val q = and(BikeRide::userId eq id, BikeRide::dateTime gt date.formatAsIso8061())
+        val q = and(BikeRide::bikeId eq id, BikeRide::dateTime gt date)
         return collection.find(q).toList()
     }
 
@@ -26,16 +25,17 @@ class MongoBikeRideDao(db: DB) : BasicDaoImpl<BikeRide>(db.bikeRides), BikeRideD
     }
 
     override suspend fun getByUserIdPaginated(id: String, page: Int, pageSize: Int): List<BikeRide> {
-        return collection.find(BikeRide::userId eq id).sort(descending(BikeRide::dateTime)).skip(page*pageSize).limit(pageSize).toList()
+        return collection.find(BikeRide::userId eq id).sort(descending(BikeRide::dateTime)).skip(page * pageSize)
+            .limit(pageSize).toList()
     }
 
-    override suspend fun getByUserIdPaginatedByKey(id: String, key: String?, pageSize: Int): List<BikeRide> {
+    override suspend fun getByUserIdPaginatedByKey(id: String, before: LocalDateTime?, pageSize: Int): List<BikeRide> {
 
 
-        val query = if(key == null) {
+        val query = if (before == null) {
             BikeRide::userId eq id
         } else {
-            and(BikeRide::userId eq id, BikeRide::dateTime lt key )
+            and(BikeRide::userId eq id, BikeRide::dateTime lt before)
         }
         return collection.find(query).sort(descending(BikeRide::dateTime)).limit(pageSize).toList()
     }

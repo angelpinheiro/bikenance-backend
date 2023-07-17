@@ -96,7 +96,6 @@ class StravaApiForUser(private val auth: AuthData, private val strava: Strava) {
     suspend fun athleteStats(athleteId: String): AthleteStats? = strava.athleteStats(auth, athleteId)
     suspend fun activity(activityId: String): StravaActivity? = strava.activity(auth, activityId)
     suspend fun activities(from: LocalDateTime): List<StravaActivity>? = strava.activities(auth, from)
-
-    suspend fun activitiesPaginated(page: Int, perPage: Int = 30): List<StravaActivity>? = strava.activitiesPaginated(auth, page, perPage)
+    suspend fun activitiesPaginated(page: Int, perPage: Int = 100): List<StravaActivity>? = strava.activitiesPaginated(auth, page, perPage)
     suspend fun bike(id: String): StravaDetailedGear? = strava.bike(auth, id)
 }

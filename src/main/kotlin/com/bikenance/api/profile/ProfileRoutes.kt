@@ -4,6 +4,7 @@ import com.bikenance.api.authApiResult
 import com.bikenance.data.database.mongodb.DAOS
 import com.bikenance.data.model.ExtendedProfile
 import com.bikenance.data.model.Profile
+import com.bikenance.data.model.serializer.iso8061ToLocalDateTime
 import com.bikenance.util.bknLogger
 import com.bikenance.util.formatAsIsoDate
 import io.ktor.server.application.*
@@ -66,7 +67,7 @@ fun Route.profileRoutes() {
 
     get<ProfilePath.PagedByKeyRides> { r ->
         authApiResult { userId ->
-            dao.bikeRideDao.getByUserIdPaginatedByKey(userId, r.key, r.pageSize)
+            dao.bikeRideDao.getByUserIdPaginatedByKey(userId, r.key?.iso8061ToLocalDateTime(), r.pageSize)
         }
     }
 

@@ -42,36 +42,57 @@ class StravaWebhook(val config: AppConfig, val client: HttpClient, private val m
 
             log.info("Calling strava subscribeUrl -> Status ${existResponse.status}")
 
-            val subsList = mapper.readValue<List<StravaSubscription>>(existResponse.bodyAsText())
-            var deleted = false
+            if (existResponse.status == HttpStatusCode.OK) {
 
-            subsList.forEach { sub ->
-                if (sub.callbackUrl != "${config.api.url}/api/webhook" || config.strava.forceSubscribe) {
-                    log.info("Deleting subscription with id ${sub.id}")
-                    client.delete(config.strava.subscribeUrl + "/" + sub.id) {
-                        parameter("id", sub.id)
+                val subsList = mapper.readValue<List<StravaSubscription>>(existResponse.bodyAsText())
+                var deleted = false
+
+                subsList.forEach { sub ->
+                    if (sub.callbackUrl != "${config.api.url}/api/webhook" || config.strava.forceSubscribe) {
+                        log.info("Deleting subscription with id ${sub.id}")
+                        client.delete(config.strava.subscribeUrl + "/" + sub.id) {
+                            parameter("id", sub.id)
+                            parameter(StravaRequestParams.CLIENT_ID, config.strava.clientId)
+                            parameter(StravaRequestParams.CLIENT_SECRET, config.strava.clientSecret)
+                        }
+                        deleted = true
+                    }
+                }
+
+                if (subsList.isEmpty() || deleted) {
+                    log.info("Creating new subscription...")
+
+                    val response = client.post(config.strava.subscribeUrl) {
                         parameter(StravaRequestParams.CLIENT_ID, config.strava.clientId)
                         parameter(StravaRequestParams.CLIENT_SECRET, config.strava.clientSecret)
+                        parameter(StravaRequestParams.CALLBACK_URL, "${config.api.url}/${config.api.rootPath}/webhook")
+                        parameter(StravaRequestParams.VERIFY_TOKEN, VERIFY_TOKEN)
                     }
-                    deleted = true
+
+                    when (response.status) {
+                        HttpStatusCode.Created -> {
+                            log.info("Strava subscription created.")
+                        }
+
+                        HttpStatusCode.ServiceUnavailable -> {
+                            log.info("Strava service is temporary unavailable.")
+                        }
+
+                        else -> {
+                            log.error("Could not create Strava webhook subscription. ${response.status}")
+                        }
+                    }
                 }
-            }
+            } else {
+                when (existResponse.status) {
 
-            if (subsList.isEmpty() || deleted) {
-                log.info("Creating new subscription...")
+                    HttpStatusCode.ServiceUnavailable -> {
+                        log.info("Strava service is temporary unavailable.")
+                    }
 
-                val response = client.post(config.strava.subscribeUrl) {
-                    parameter(StravaRequestParams.CLIENT_ID, config.strava.clientId)
-                    parameter(StravaRequestParams.CLIENT_SECRET, config.strava.clientSecret)
-                    parameter(StravaRequestParams.CALLBACK_URL, "${config.api.url}/${config.api.rootPath}/webhook")
-                    parameter(StravaRequestParams.VERIFY_TOKEN, VERIFY_TOKEN)
-                }
-
-                println(response.bodyAsText())
-                if (response.status == HttpStatusCode.Created) {
-                    log.info("SUCCESS: Webhook subscription created.")
-                } else {
-                    log.error("ERROR: Could not create webhook subscription. ${response.status}")
+                    else -> {
+                        log.error("Could not check strava subscription endpoint (${existResponse.status})")
+                    }
                 }
             }
         }

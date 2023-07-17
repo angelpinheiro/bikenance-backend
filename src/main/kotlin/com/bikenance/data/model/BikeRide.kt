@@ -1,8 +1,10 @@
 package com.bikenance.data.model
 
 import com.bikenance.data.database.mongodb.MongoModel
+import com.bikenance.data.model.serializer.iso8061ToLocalDateTime
 import com.bikenance.data.model.strava.StravaActivity
 import com.fasterxml.jackson.annotation.JsonProperty
+import java.time.LocalDateTime
 
 data class BikeRide(
     @JsonProperty("user_id") var userId: String? = null,
@@ -15,7 +17,7 @@ data class BikeRide(
     @JsonProperty("moving_time") var movingTime: Int? = null,
     @JsonProperty("elapsed_time") var elapsedTime: Int? = null,
     @JsonProperty("total_elevation_gain") var totalElevationGain: Int? = null,
-    @JsonProperty("date_time") var dateTime: String? = null,
+    @JsonProperty("date_time") var dateTime: LocalDateTime,
     @JsonProperty("map_summary_polyline") var mapSummaryPolyline: String? = null,
 ) : MongoModel<BikeRide>()
 
@@ -31,7 +33,7 @@ fun StravaActivity.toBikeRide(user: User, bike: Bike?): BikeRide {
         sportType = sportType,
         movingTime = movingTime,
         elapsedTime = elapsedTime,
-        dateTime = startDate,
+        dateTime = startDate.iso8061ToLocalDateTime(),
         totalElevationGain = totalElevationGain,
         mapSummaryPolyline = map?.summaryPolyline,
 

@@ -34,7 +34,7 @@ data class StravaActivity(
     @JsonProperty("sport_type")
     var sportType: String? = null,
     @JsonProperty("start_date")
-    var startDate: String? = null,
+    var startDate: String,
     @JsonProperty("start_date_local")
     var startDateLocal: String? = null,
     @JsonProperty("timezone")
