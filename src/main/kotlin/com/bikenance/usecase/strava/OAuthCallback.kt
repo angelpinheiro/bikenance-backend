@@ -10,8 +10,8 @@ import com.bikenance.data.repository.UserRepository
 import com.bikenance.api.strava.AuthData
 import com.bikenance.data.model.strava.AthleteStats
 import com.bikenance.data.model.strava.StravaAthlete
-import com.bikenance.data.network.stravaApi.Strava
-import com.bikenance.data.network.stravaApi.StravaApiForUser
+import com.bikenance.data.network.strava.Strava
+import com.bikenance.data.network.strava.StravaApiForUser
 import com.bikenance.usecase.SyncStravaDataUseCase
 
 

@@ -9,10 +9,8 @@ import com.bikenance.data.model.ExtendedProfile
 import com.bikenance.data.model.Profile
 import com.bikenance.data.model.SetupProfileUpdate
 import com.bikenance.data.model.strava.StravaActivity
-import com.bikenance.data.network.stravaApi.Strava
-import com.bikenance.data.network.stravaApi.supportedActivityTypes
-import com.bikenance.data.repository.UserRepository
-import com.bikenance.usecase.strava.StravaBikeSync
+import com.bikenance.data.network.strava.Strava
+import com.bikenance.data.network.strava.supportedActivityTypes
 import com.bikenance.util.bknLogger
 import com.bikenance.util.formatAsIsoDate
 import io.ktor.server.application.*
@@ -20,7 +18,6 @@ import io.ktor.server.request.*
 import io.ktor.server.resources.*
 import io.ktor.server.resources.put
 import io.ktor.server.routing.*
-import io.ktor.util.logging.*
 import org.koin.ktor.ext.inject
 import org.litote.kmongo.eq
 import org.litote.kmongo.findOne

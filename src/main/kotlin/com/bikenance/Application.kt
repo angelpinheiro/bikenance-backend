@@ -1,9 +1,8 @@
 package com.bikenance
 
-import com.bikenance.api.api
+import com.bikenance.api.exposeApi
 import com.bikenance.di.appModule
 import com.bikenance.extensions.*
-import com.bikenance.util.listAllRoutes
 import io.ktor.server.application.*
 import io.ktor.server.netty.*
 import org.koin.ktor.plugin.Koin
@@ -19,23 +18,22 @@ fun main(args: Array<String>) = EngineMain.main(args)
 @Suppress("unused")
 fun Application.module() {
 
+    // Setup dependency injection
     install(Koin) {
         slf4jLogger()
         modules(appModule)
     }
 
+    // Load app config
     loadConfig()
 
+    // Configure app modules
     configurePlugins()
     configureLogin()
     configureMongoDB()
-
-    api()
-
     configureFirebase()
     configureStrava()
 
-    listAllRoutes()
-
-
+    // Deploy api
+    exposeApi()
 }

@@ -35,10 +35,9 @@ fun Application.listAllRoutes() {
         registeredRoutes.addAll(children.flatMap { it.getAllRoutes() })
     }
 
-    environment.monitor.subscribe(ApplicationStarted) {
+    environment.monitor.subscribe(ServerReady) {
         val scope = CoroutineScope(Job() + Dispatchers.IO)
         scope.launch {
-            delay(2000)
             client.get("http://localhost:8080/api/ping")
             log.info("API Routes: ")
             registeredRoutes.forEach {

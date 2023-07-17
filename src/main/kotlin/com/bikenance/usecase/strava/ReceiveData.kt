@@ -10,8 +10,8 @@ import com.bikenance.data.repository.UserRepository
 import com.bikenance.data.model.strava.AspectType
 import com.bikenance.data.model.strava.EventData
 import com.bikenance.data.model.strava.ObjectType
-import com.bikenance.data.network.stravaApi.Strava
-import com.bikenance.data.network.stravaApi.supportedActivityTypes
+import com.bikenance.data.network.strava.Strava
+import com.bikenance.data.network.strava.supportedActivityTypes
 
 
 class ReceiveDataUseCase(

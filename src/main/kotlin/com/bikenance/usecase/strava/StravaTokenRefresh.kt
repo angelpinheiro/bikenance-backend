@@ -5,7 +5,7 @@ import com.bikenance.api.strava.AuthData
 import com.bikenance.api.strava.StravaOAuthEndpoints
 import com.bikenance.data.model.User
 import com.bikenance.data.model.strava.StravaRequestParams
-import com.bikenance.data.network.stravaApi.mapper
+import com.bikenance.data.network.strava.mapper
 import com.bikenance.data.repository.UserRepository
 import com.bikenance.util.formatAsIsoDate
 import com.fasterxml.jackson.annotation.JsonProperty

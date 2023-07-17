@@ -1,4 +1,4 @@
-package com.bikenance.data.network.stravaApi
+package com.bikenance.data.network.strava
 
 import com.bikenance.AppConfig
 import com.bikenance.data.repository.UserRepository

@@ -9,9 +9,9 @@ import com.bikenance.data.network.push.MessageData
 import com.bikenance.data.network.push.MessageSender
 import com.bikenance.data.network.push.MessageType
 import com.bikenance.data.repository.UserRepository
-import com.bikenance.data.network.stravaApi.StravaApiForUser
+import com.bikenance.data.network.strava.StravaApiForUser
 import com.bikenance.data.model.strava.StravaAthlete
-import com.bikenance.data.network.stravaApi.Strava
+import com.bikenance.data.network.strava.Strava
 import io.ktor.util.logging.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers

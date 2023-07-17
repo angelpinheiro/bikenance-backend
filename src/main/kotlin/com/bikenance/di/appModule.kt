@@ -3,15 +3,16 @@ package com.bikenance.di
 import com.bikenance.AppConfig
 import com.bikenance.data.database.UserDao
 import com.bikenance.data.database.mongodb.*
-import com.bikenance.data.network.stravaApi.Strava
 import com.bikenance.data.network.jwt.JwtConfig
 import com.bikenance.data.network.jwt.JwtMgr
 import com.bikenance.data.network.push.MessageSender
+import com.bikenance.data.network.strava.Strava
+import com.bikenance.data.network.strava.StravaWebhook
 import com.bikenance.data.repository.UserRepository
+import com.bikenance.usecase.SyncStravaDataUseCase
 import com.bikenance.usecase.strava.ReceiveDataUseCase
 import com.bikenance.usecase.strava.StravaBikeSync
 import com.bikenance.usecase.strava.StravaOAuthCallbackHandler
-import com.bikenance.usecase.SyncStravaDataUseCase
 import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.databind.SerializationFeature
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
@@ -31,6 +32,7 @@ val appModule = module {
     }
 
     single { DAOS(get()) }
+
 
     single<UserDao> {
         MongoUserDao(get())
@@ -68,6 +70,8 @@ val appModule = module {
     single {
         Strava(get(), get(), get())
     }
+
+    single { StravaWebhook(get(), get(), get()) }
 
     single { StravaOAuthCallbackHandler(get(), get(), get(), get(), get(), get()) }
 

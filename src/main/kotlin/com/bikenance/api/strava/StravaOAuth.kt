@@ -1,18 +1,13 @@
 package com.bikenance.api.strava
 
-import com.bikenance.AppConfig
-import com.bikenance.data.database.mongodb.DB
 import com.bikenance.data.model.login.TokenPair
-import com.bikenance.data.network.stravaApi.Strava
-import com.bikenance.data.repository.UserRepository
+import com.bikenance.data.network.strava.stravaAuthConfigName
 import com.bikenance.usecase.strava.StravaOAuthCallbackHandler
-import io.ktor.client.*
-import io.ktor.http.*
+import com.bikenance.util.bknLogger
 import io.ktor.server.application.*
 import io.ktor.server.auth.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
-import io.ktor.util.logging.*
 import io.ktor.util.pipeline.*
 import org.koin.ktor.ext.inject
 import java.time.Instant
@@ -22,56 +17,30 @@ object StravaOAuthEndpoints {
     const val accessTokenUrl = "https://www.strava.com/api/v3/oauth/token"
 }
 
-fun Application.configureOAuth() {
-    val log = KtorSimpleLogger("StravaAuth")
-    val config: AppConfig by inject()
-    val strava: Strava by inject()
+fun Route.stravaLoginRoutes() {
+
+    val log = bknLogger("StravaAuth")
     val oAuthCallbackHandler: StravaOAuthCallbackHandler by inject()
-    val db: DB by inject()
-    val userRepository: UserRepository by inject()
-    val httpClient: HttpClient by inject()
 
-    authentication {
-        oauth("auth-oauth-strava") {
-            urlProvider = { "${config.api.url}/${config.api.rootPath}/callback" }
-            providerLookup = {
-                OAuthServerSettings.OAuth2ServerSettings(
-                    name = "strava",
-                    authorizeUrl = StravaOAuthEndpoints.authorizeUrl,
-                    accessTokenUrl = StravaOAuthEndpoints.accessTokenUrl,
-                    requestMethod = HttpMethod.Post,
-                    clientId = config.strava.clientId,
-                    clientSecret = config.strava.clientSecret,
-                    defaultScopes = listOf("read_all,activity:read_all,profile:read_all"),
-                )
-            }
-            client = httpClient
+    authenticate(stravaAuthConfigName) {
+
+        get("/strava") {
+            // Redirects to strava authorize endpoint automatically
         }
-    }
 
+        get("/callback") {
 
-    routing {
+            log.debug("Received auth callback")
 
-        authenticate("auth-oauth-strava") {
-
-            get("/strava") {
-                // Redirects to strava authorize endpoint automatically
+            val authData = getOAuthData()
+            if (authData != null) {
+                val tokenPair: TokenPair = oAuthCallbackHandler.handleCallback(authData)
+                call.parameters["scope"]?.let { authData.scope = it }
+                call.respondRedirect("bikenance://redirect?code=${tokenPair.token}&refresh=${tokenPair.refreshToken}")
+            } else {
+                call.respond("Auth failed")
             }
 
-            get("/callback") {
-
-                log.debug("Received auth callback")
-
-                val authData = getOAuthData()
-                if (authData != null) {
-                    val tokenPair: TokenPair = oAuthCallbackHandler.handleCallback(authData)
-                    call.parameters["scope"]?.let { authData.scope = it }
-                    call.respondRedirect("bikenance://redirect?code=${tokenPair.token}&refresh=${tokenPair.refreshToken}")
-                } else {
-                    call.respond("Auth failed")
-                }
-
-            }
         }
     }
 }
