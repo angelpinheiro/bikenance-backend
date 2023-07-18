@@ -17,6 +17,7 @@ data class BikeRide(
     @JsonProperty("moving_time") var movingTime: Int? = null,
     @JsonProperty("elapsed_time") var elapsedTime: Int? = null,
     @JsonProperty("total_elevation_gain") var totalElevationGain: Int? = null,
+    @JsonProperty("average_watts") var averageWatts: Double? = null,
     @JsonProperty("date_time") var dateTime: LocalDateTime,
     @JsonProperty("map_summary_polyline") var mapSummaryPolyline: String? = null,
 ) : MongoModel<BikeRide>()
@@ -36,6 +37,6 @@ fun StravaActivity.toBikeRide(user: User, bike: Bike?): BikeRide {
         dateTime = startDate.iso8061ToLocalDateTime(),
         totalElevationGain = totalElevationGain,
         mapSummaryPolyline = map?.summaryPolyline,
-
+        averageWatts = averageWatts
     )
 }

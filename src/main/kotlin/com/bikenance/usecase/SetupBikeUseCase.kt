@@ -44,8 +44,9 @@ class SetupBikeUseCase(
             val usage = if (bikeComponent.from != null) {
                 val distance = ridesFiltered.sumOf { r -> r.distance ?: 0 }
                 val duration = ridesFiltered.sumOf { r -> r.movingTime ?: 0 }
+                val elevationGain = ridesFiltered.sumOf { r -> r.totalElevationGain ?: 0 }
                 log.info("Component ${bikeComponent.type} has an usage of [$distance  / $duration] ")
-                Usage(duration = duration.toDouble(), distance = distance.toDouble())
+                Usage(duration = duration.toDouble(), distance = distance.toDouble(), elevationGain = elevationGain.toDouble())
             } else {
                 Usage(0.0, 0.0)
             }

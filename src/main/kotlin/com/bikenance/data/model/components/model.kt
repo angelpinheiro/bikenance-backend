@@ -109,9 +109,11 @@ data class RevisionFrequency(
 
 data class Usage(
     @JsonProperty("duration")
-    val duration: Double,
+    val duration: Double = 0.0,
     @JsonProperty("distance")
-    val distance: Double
+    val distance: Double = 0.0,
+    @JsonProperty("elevationGain")
+    val elevationGain: Double = 0.0,
 )
 
 data class MaintenanceInfo(
