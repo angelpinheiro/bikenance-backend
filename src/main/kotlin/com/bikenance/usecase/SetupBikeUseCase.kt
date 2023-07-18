@@ -34,6 +34,8 @@ class SetupBikeUseCase(
         // For each component, compute usage based on the rides after the component "from" date
         val updatedComponents = bike.components?.map { bikeComponent ->
 
+
+
             // get rides after bikeComponent.from with positive distance (avoid virtual rides)
             val ridesFiltered = rides.filter { it.dateTime.isAfter(bikeComponent.from) && (it.distance ?: 0) > 0L }
 
@@ -80,6 +82,7 @@ class SetupBikeUseCase(
 
             Maintenance(
                 type = info.type,
+                componentId = bikeComponent._id,
                 description = "",
                 componentType = info.type.componentType,
                 defaultFrequency = info.defaultFrequency,

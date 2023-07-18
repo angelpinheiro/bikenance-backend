@@ -18,6 +18,10 @@ val defaultMaintenances = listOf(
         defaultFrequency = RevisionFrequency(3000, RevisionUnit.KILOMETERS),
     ),
     MaintenanceInfo(
+        type = MaintenanceTypes.REAR_DERAILLEUR_MAINTENANCE,
+        defaultFrequency = RevisionFrequency(3000, RevisionUnit.KILOMETERS),
+    ),
+    MaintenanceInfo(
         type = MaintenanceTypes.CHAIN_MAINTENANCE,
         defaultFrequency = RevisionFrequency(1000, RevisionUnit.KILOMETERS),
     ),
@@ -35,11 +39,19 @@ val defaultMaintenances = listOf(
     ),
     MaintenanceInfo(
         type = MaintenanceTypes.FRONT_HUB_MAINTENANCE,
-        defaultFrequency = RevisionFrequency(5000, RevisionUnit.KILOMETERS),
+        defaultFrequency = RevisionFrequency(6000, RevisionUnit.KILOMETERS),
+    ),
+    MaintenanceInfo(
+        type = MaintenanceTypes.REAR_HUB_MAINTENANCE,
+        defaultFrequency = RevisionFrequency(6000, RevisionUnit.KILOMETERS),
     ),
     MaintenanceInfo(
         type = MaintenanceTypes.REAR_SUSPENSION_MAINTENANCE,
         defaultFrequency = RevisionFrequency(4000, RevisionUnit.KILOMETERS),
+    ),
+    MaintenanceInfo(
+        type = MaintenanceTypes.FRAME_BEARINGS_MAINTENANCE,
+        defaultFrequency = RevisionFrequency(6000, RevisionUnit.KILOMETERS),
     ),
     MaintenanceInfo(
         type = MaintenanceTypes.THRU_AXLE_MAINTENANCE,

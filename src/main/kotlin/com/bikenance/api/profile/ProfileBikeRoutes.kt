@@ -7,7 +7,6 @@ import com.bikenance.data.model.Bike
 import com.bikenance.data.model.SyncBikesData
 import com.bikenance.data.model.components.BikeComponent
 import com.bikenance.usecase.SetupBikeUseCase
-import com.bikenance.usecase.strava.StravaBikeSync
 import io.ktor.server.application.*
 import io.ktor.server.request.*
 import io.ktor.server.resources.*
@@ -59,7 +58,7 @@ fun Route.profileBikeRoutes() {
 
     get<ProfilePath.Bikes.BikeById.Components> { r ->
         apiResult {
-            dao.componentDao.getByBikeId(r.parent.bikeId)
+            dao.bikeDao.getById(r.parent.bikeId)?.components ?: listOf()
         }
     }
 
@@ -69,8 +68,9 @@ fun Route.profileBikeRoutes() {
         val components = call.receive<List<BikeComponent>>()
 
         apiResult {
-            components.mapNotNull { component ->
-                dao.componentDao.create(component.copy(bikeId = bikeId))
+            dao.bikeDao.getById(bikeId)?.let { bike ->
+                dao.bikeDao.update(bikeId, bike.copy(components = components))
+                dao.bikeDao.getById(bikeId)?.components ?: listOf()
             }
         }
     }
@@ -91,7 +91,7 @@ fun Route.profileBikeRoutes() {
                 if (bike.stravaId != null) {
                     bike.draft = true
                     dao.bikeDao.update(bike.oid(), bike)
-//                    stravaBikeSync.onBikeRemoved(user, bike)
+                    // stravaBikeSync.onBikeRemoved(user, bike)
                 }
             }
         }
