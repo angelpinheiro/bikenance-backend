@@ -13,7 +13,7 @@ import java.time.format.DateTimeFormatter
 
 // Log Utils
 
-fun bknLogger(name: String) = KtorSimpleLogger(name)
+fun bknLogger(name: String) = KtorSimpleLogger("com.bikenance.$name")
 
 
 // DateTime Utils

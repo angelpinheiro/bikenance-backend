@@ -6,6 +6,7 @@ import com.bikenance.data.model.Bike
 import com.bikenance.data.model.components.*
 import com.bikenance.util.bknLogger
 import com.bikenance.util.formatAsIsoDate
+import java.time.Duration
 import java.time.LocalDateTime
 import java.time.Period
 import java.time.ZoneOffset
@@ -33,7 +34,6 @@ class SetupBikeUseCase(
 
         // For each component, compute usage based on the rides after the component "from" date
         val updatedComponents = bike.components?.map { bikeComponent ->
-
 
 
             // get rides after bikeComponent.from with positive distance (avoid virtual rides)
@@ -96,8 +96,11 @@ class SetupBikeUseCase(
     }
 
     private fun estimateNextMaintenanceDate(from: LocalDateTime, status: Double, until: LocalDateTime): LocalDateTime {
-        val daysBetween = Period.between(from.toLocalDate(), until.toLocalDate()).days
+        val daysBetween = Duration.between(from, until).toDays()
         val expectedDurationInDays = (daysBetween / status).toLong()
+        log.debug("Estimating next maintenance:")
+        log.debug("From: ${from.formatAsIsoDate()}, status: $status, until: ${until.formatAsIsoDate()}")
+        log.debug("DaysBetween: ${daysBetween}, expectedDuration: $expectedDurationInDays}")
         return from.plusDays(expectedDurationInDays)
     }
 
