@@ -16,6 +16,8 @@ data class BikeRide(
     @JsonProperty("distance") var distance: Long? = null,
     @JsonProperty("moving_time") var movingTime: Int? = null,
     @JsonProperty("elapsed_time") var elapsedTime: Int? = null,
+    @JsonProperty("avg_speed") var averageSpeed: Double? = null,
+    @JsonProperty("max_speed") var maxSpeed: Double? = null,
     @JsonProperty("total_elevation_gain") var totalElevationGain: Int? = null,
     @JsonProperty("average_watts") var averageWatts: Double? = null,
     @JsonProperty("date_time") var dateTime: LocalDateTime,
@@ -37,6 +39,8 @@ fun StravaActivity.toBikeRide(user: User, bike: Bike?): BikeRide {
         dateTime = startDate.iso8061ToLocalDateTime(),
         totalElevationGain = totalElevationGain,
         mapSummaryPolyline = map?.summaryPolyline,
-        averageWatts = averageWatts
+        averageWatts = averageWatts,
+        averageSpeed = averageSpeed,
+        maxSpeed = maxSpeed
     )
 }

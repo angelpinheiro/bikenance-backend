@@ -12,6 +12,7 @@ import com.bikenance.data.repository.UserRepository
 import com.bikenance.data.network.strava.StravaApiForUser
 import com.bikenance.data.model.strava.StravaAthlete
 import com.bikenance.data.network.strava.Strava
+import com.bikenance.data.network.strava.supportedActivityTypes
 import io.ktor.util.logging.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -58,11 +59,13 @@ class SyncStravaDataUseCase(
         while (keepGoing) {
             val activities = stravaClient.activitiesPaginated(page) ?: emptyList()
             if (activities.isNotEmpty()) {
-
                 activities.forEach { activity ->
-                    val performedWith = bikes.firstOrNull { it.stravaId == activity.gearId }
-                    db.activities.insertOne(activity)
-                    dao.bikeRideDao.create(activity.toBikeRide(user, performedWith))
+                    val supported = supportedActivityTypes.contains(activity.type)
+                    if(supported) {
+                        val performedWith = bikes.firstOrNull { it.stravaId == activity.gearId }
+                        db.activities.insertOne(activity)
+                        dao.bikeRideDao.create(activity.toBikeRide(user, performedWith))
+                    }
                 }
                 page = page.inc()
             } else {
@@ -74,9 +77,10 @@ class SyncStravaDataUseCase(
     private suspend fun syncBikes(user: User, stravaClient: StravaApiForUser): List<Bike>? {
 
         val stravaAthlete: StravaAthlete = stravaClient.athlete() ?: throw Exception("Could not get athlete info")
-
+        log.debug("syncBikes: ${stravaAthlete.bikeRefs?.size} bike refs")
         return stravaAthlete.bikeRefs?.mapNotNull { ref ->
             stravaClient.bike(ref.id)?.let { gear ->
+                log.debug("syncBikes: sync bike ${gear.name}")
                 val bike = Bike(
                     name = ref.name,
                     brandName = gear.brandName,

@@ -2,6 +2,7 @@ package com.bikenance.data.database.mongodb
 
 import com.bikenance.data.database.BikeRideDao
 import com.bikenance.data.model.BikeRide
+import com.mongodb.client.FindIterable
 import org.litote.kmongo.*
 import java.time.LocalDateTime
 
@@ -11,8 +12,8 @@ class MongoBikeRideDao(db: DB) : BasicDaoImpl<BikeRide>(db.bikeRides), BikeRideD
         return collection.findOne(BikeRide::stravaId eq id)
     }
 
-    override suspend fun getByBikeId(id: String): BikeRide? {
-        return collection.findOne(BikeRide::bikeId eq id)
+    override suspend fun getByBikeId(id: String): Iterable<BikeRide> {
+        return collection.find(BikeRide::bikeId eq id)
     }
 
     override suspend fun getByBikeIdAfter(id: String, date: LocalDateTime): List<BikeRide> {
