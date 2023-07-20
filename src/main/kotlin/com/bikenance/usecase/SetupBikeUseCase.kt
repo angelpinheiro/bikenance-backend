@@ -137,13 +137,13 @@ class SetupBikeUseCase(
 
     }
 
-    private fun estimateNextMaintenanceDate(from: LocalDateTime, status: Double, until: LocalDateTime): LocalDateTime {
+    private fun estimateNextMaintenanceDate(from: LocalDateTime, status: Double, until: LocalDateTime): LocalDateTime? {
         val daysBetween = Duration.between(from, until).toDays()
-        val expectedDurationInDays = (daysBetween / status).toLong()
+        val expectedDurationInDays = if(status == 0.0) null else (daysBetween / status).toLong()
         log.debug("Estimating next maintenance:")
         log.debug("From: ${from.formatAsIsoDate()}, status: $status, until: ${until.formatAsIsoDate()}")
-        log.debug("DaysBetween: ${daysBetween}, expectedDuration: $expectedDurationInDays}")
-        return from.plusDays(expectedDurationInDays)
+        log.debug("DaysBetween: ${daysBetween}, expectedDuration: $expectedDurationInDays")
+        return expectedDurationInDays ?.let { from.plusDays(it) }
     }
 
     private fun determineCurrentStatus(

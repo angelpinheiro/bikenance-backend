@@ -9,71 +9,79 @@ package com.bikenance.data.model.components
 
 val defaultMaintenances = listOf(
     MaintenanceInfo(
-        type = MaintenanceTypes.BRAKE_MAINTENANCE,
-        defaultFrequency = RevisionFrequency(5000, RevisionUnit.KILOMETERS),
+        type = MaintenanceType.BrakeMaintenance,
+        defaultFrequency = RevisionFrequency(5000, RevisionUnit.KILOMETERS)
     ),
     MaintenanceInfo(
-        type = MaintenanceTypes.DISC_PAD_MAINTENANCE,
+        type = MaintenanceType.DiscPadMaintenance,
         defaultFrequency = RevisionFrequency(1000, RevisionUnit.KILOMETERS)
     ),
     MaintenanceInfo(
-        type = MaintenanceTypes.CABLES_AND_HOUSING_MAINTENANCE,
-        defaultFrequency = RevisionFrequency(6000, RevisionUnit.KILOMETERS),
+        type = MaintenanceType.CablesAndHousingMaintenance,
+        defaultFrequency = RevisionFrequency(6000, RevisionUnit.KILOMETERS)
     ),
     MaintenanceInfo(
-        type = MaintenanceTypes.CASSETTE_MAINTENANCE,
-        defaultFrequency = RevisionFrequency(3000, RevisionUnit.KILOMETERS),
+        type = MaintenanceType.CassetteMaintenance,
+        defaultFrequency = RevisionFrequency(3000, RevisionUnit.KILOMETERS)
     ),
     MaintenanceInfo(
-        type = MaintenanceTypes.REAR_DERAILLEUR_MAINTENANCE,
-        defaultFrequency = RevisionFrequency(3000, RevisionUnit.KILOMETERS),
+        type = MaintenanceType.ChainRingMaintenance,
+        defaultFrequency = RevisionFrequency(3000, RevisionUnit.KILOMETERS)
     ),
     MaintenanceInfo(
-        type = MaintenanceTypes.CHAIN_MAINTENANCE,
-        defaultFrequency = RevisionFrequency(1200, RevisionUnit.KILOMETERS),
+        type = MaintenanceType.RearDerailleurMaintenance,
+        defaultFrequency = RevisionFrequency(3000, RevisionUnit.KILOMETERS)
     ),
     MaintenanceInfo(
-        type = MaintenanceTypes.DISC_BRAKE_MAINTENANCE,
-        defaultFrequency = RevisionFrequency(6000, RevisionUnit.KILOMETERS),
+        type = MaintenanceType.ChainMaintenance,
+        defaultFrequency = RevisionFrequency(1200, RevisionUnit.KILOMETERS)
     ),
     MaintenanceInfo(
-        type = MaintenanceTypes.DROPPER_POST_MAINTENANCE,
-        defaultFrequency = RevisionFrequency(6000, RevisionUnit.KILOMETERS),
+        type = MaintenanceType.DiscBrakeMaintenance,
+        defaultFrequency = RevisionFrequency(6000, RevisionUnit.KILOMETERS)
     ),
     MaintenanceInfo(
-        type = MaintenanceTypes.FORK_MAINTENANCE,
-        defaultFrequency = RevisionFrequency(4000, RevisionUnit.KILOMETERS),
+        type = MaintenanceType.DropperPostMaintenance,
+        defaultFrequency = RevisionFrequency(6000, RevisionUnit.KILOMETERS)
     ),
     MaintenanceInfo(
-        type = MaintenanceTypes.FRONT_HUB_MAINTENANCE,
-        defaultFrequency = RevisionFrequency(5000, RevisionUnit.KILOMETERS),
+        type = MaintenanceType.ForkMaintenance,
+        defaultFrequency = RevisionFrequency(4000, RevisionUnit.KILOMETERS)
     ),
     MaintenanceInfo(
-        type = MaintenanceTypes.REAR_HUB_MAINTENANCE,
-        defaultFrequency = RevisionFrequency(5000, RevisionUnit.KILOMETERS),
+        type = MaintenanceType.FrontHubMaintenance,
+        defaultFrequency = RevisionFrequency(5000, RevisionUnit.KILOMETERS)
     ),
     MaintenanceInfo(
-        type = MaintenanceTypes.REAR_SUSPENSION_MAINTENANCE,
-        defaultFrequency = RevisionFrequency(4000, RevisionUnit.KILOMETERS),
+        type = MaintenanceType.RearHubMaintenance,
+        defaultFrequency = RevisionFrequency(5000, RevisionUnit.KILOMETERS)
     ),
     MaintenanceInfo(
-        type = MaintenanceTypes.FRAME_BEARINGS_MAINTENANCE,
-        defaultFrequency = RevisionFrequency(4000, RevisionUnit.KILOMETERS),
+        type = MaintenanceType.RearSuspensionMaintenance,
+        defaultFrequency = RevisionFrequency(4000, RevisionUnit.KILOMETERS)
     ),
     MaintenanceInfo(
-        type = MaintenanceTypes.THRU_AXLE_MAINTENANCE,
-        defaultFrequency = RevisionFrequency(3000, RevisionUnit.KILOMETERS),
+        type = MaintenanceType.ThruAxleMaintenance,
+        defaultFrequency = RevisionFrequency(3000, RevisionUnit.KILOMETERS)
     ),
     MaintenanceInfo(
-        type = MaintenanceTypes.TIRE_MAINTENANCE,
-        defaultFrequency = RevisionFrequency(3000, RevisionUnit.KILOMETERS),
+        type = MaintenanceType.FrameBearingsMaintenance,
+        defaultFrequency = RevisionFrequency(4000, RevisionUnit.KILOMETERS)
     ),
     MaintenanceInfo(
-        type = MaintenanceTypes.WHEELSET_TUBELESS_MAINTENANCE,
-        defaultFrequency = RevisionFrequency(1000, RevisionUnit.KILOMETERS),
+        type = MaintenanceType.TireMaintenance,
+        defaultFrequency = RevisionFrequency(3000, RevisionUnit.KILOMETERS)
     ),
     MaintenanceInfo(
-        type = MaintenanceTypes.WHEELSET_WHEELS_AND_SPOKES_MAINTENANCE,
-        defaultFrequency = RevisionFrequency(2000, RevisionUnit.KILOMETERS),
+        type = MaintenanceType.WheelTubelessMaintenance,
+        defaultFrequency = RevisionFrequency(1000, RevisionUnit.KILOMETERS)
+    ),
+    MaintenanceInfo(
+        type = MaintenanceType.WheelSpokesMaintenance,
+        defaultFrequency = RevisionFrequency(2000, RevisionUnit.KILOMETERS)
+    ),
+    MaintenanceInfo(
+        type = MaintenanceType.CustomMaintenance,
+        defaultFrequency = RevisionFrequency(0, RevisionUnit.KILOMETERS) // Cambiar por la frecuencia adecuada
     )
 )

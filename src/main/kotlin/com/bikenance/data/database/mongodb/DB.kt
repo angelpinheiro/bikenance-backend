@@ -8,11 +8,13 @@ import com.bikenance.data.model.Bike
 import com.bikenance.data.model.BikeRide
 import com.bikenance.data.model.Profile
 import com.bikenance.data.model.User
+import com.bikenance.data.model.serializer.BikeTypesModule
 import com.bikenance.data.model.strava.StravaActivity
 import com.bikenance.data.model.strava.StravaAthlete
 import com.mongodb.client.MongoDatabase
 import org.litote.kmongo.KMongo
 import org.litote.kmongo.getCollection
+import org.litote.kmongo.util.KMongoConfiguration
 import org.slf4j.LoggerFactory
 
 fun createDatabase(config: AppConfig): MongoDatabase {
@@ -28,6 +30,9 @@ fun createDatabase(config: AppConfig): MongoDatabase {
     } else {
         "mongodb://${config.db.host}"
     }
+
+
+    KMongoConfiguration.registerBsonModule(BikeTypesModule())
 
     val client = KMongo.createClient(connectionString)
     return client.getDatabase(config.db.name)

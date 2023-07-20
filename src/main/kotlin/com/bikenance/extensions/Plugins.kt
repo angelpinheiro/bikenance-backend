@@ -1,5 +1,6 @@
 package com.bikenance.extensions
 
+import com.bikenance.data.model.serializer.BikeTypesModule
 import com.bikenance.data.model.serializer.DateTimeModule
 import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.databind.SerializationFeature
@@ -9,10 +10,8 @@ import io.ktor.server.auth.*
 import io.ktor.server.plugins.callloging.*
 import io.ktor.server.plugins.contentnegotiation.*
 import io.ktor.server.plugins.defaultheaders.*
-import io.ktor.server.request.*
 import io.ktor.server.resources.*
 import org.litote.kmongo.id.jackson.IdJacksonModule
-import org.slf4j.event.Level
 
 fun Application.configurePlugins() {
 
@@ -27,6 +26,7 @@ fun Application.configurePlugins() {
             disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
             registerModule(IdJacksonModule())
             registerModule(DateTimeModule())
+            registerModule(BikeTypesModule())
         }
     }
 

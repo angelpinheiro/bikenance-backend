@@ -1,7 +1,10 @@
 package com.bikenance
 
 import com.bikenance.api.exposeApi
+import com.bikenance.data.database.BikeDao
 import com.bikenance.data.database.BikeRideDao
+import com.bikenance.data.model.Bike
+import com.bikenance.data.model.BikeType
 import com.bikenance.di.appModule
 import com.bikenance.di.dataModule
 import com.bikenance.di.stravaModule
@@ -43,20 +46,26 @@ fun Application.module() {
     // Deploy api
     exposeApi()
 
-//
-//    val rideDao: BikeRideDao by inject()
-//
-//    environment.monitor.subscribe(ServerReady) {
-//
-//        launch {
-//            log.info("Looking for rides in the past 2 months")
-//            val rides1 = rideDao.getByBikeIdAfter("64b518a6a4f2433e33fe129e", LocalDateTime.now().minusMonths(2))
-//            log.info("Rides found ${rides1.size}")
-//            log.info("Looking for rides in the past 5 months")
-//            val rides2 = rideDao.getByBikeIdAfter("64b518a6a4f2433e33fe129e", LocalDateTime.now().minusMonths(5))
-//            log.info("Rides found ${rides2.size}")
-//        }
-//    }
+
+    val dao: BikeDao by inject()
+    environment.monitor.subscribe(ServerReady) {
+
+        launch {
+
+            val bike = Bike(
+                userId = "1234",
+                type = BikeType.Unknown,
+                name = "My bike"
+            )
+
+            dao.create(bike)
+
+            dao.getByUserId("1234").forEach {
+                log.info("${it.name}")
+            }
+
+        }
+    }
 
 
 }
