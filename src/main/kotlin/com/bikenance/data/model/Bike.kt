@@ -45,8 +45,8 @@ data class Bike(
     @JsonProperty("electric") val electric: Boolean = false,
     @JsonProperty("full_suspension") val fullSuspension: Boolean = false,
     @JsonProperty("configDone") val configDone: Boolean = false,
-    @JsonProperty("bike_type", ) var type: BikeType = BikeType.Unknown,
-    @JsonProperty("components") val components: List<BikeComponent>? = emptyList(),
+    @JsonProperty("bike_type") var type: BikeType = BikeType.Unknown,
+    @JsonProperty("components") val components: List<BikeComponent>? =null,
     @JsonProperty("stats") val stats: BikeStats? = null
 ) : MongoModel<Bike>()
 
@@ -70,4 +70,17 @@ data class BikeStats(
 
 data class SyncBikesData(
     @JsonProperty("syncData") val syncData: Map<String, Boolean>
+)
+
+
+data class BikeUpdate(
+    @JsonProperty("name") var name: String? = null,
+    @JsonProperty("brand_name") var brandName: String? = null,
+    @JsonProperty("model_name") var modelName: String? = null,
+    @JsonProperty("photo_url") var photoUrl: String? = null,
+    @JsonProperty("draft") var draft: Boolean = false,
+    @JsonProperty("electric") val electric: Boolean = false,
+    @JsonProperty("full_suspension") val fullSuspension: Boolean = false,
+    @JsonProperty("configDone") val configDone: Boolean = false,
+    @JsonProperty("bike_type") var type: BikeType = BikeType.Unknown,
 )

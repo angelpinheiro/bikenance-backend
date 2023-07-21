@@ -5,10 +5,9 @@ import com.bikenance.data.model.*
 import com.bikenance.data.model.components.BikeComponent
 import com.bikenance.data.model.strava.StravaActivity
 import com.bikenance.data.model.strava.StravaAthlete
-import com.mongodb.client.FindIterable
 import java.time.LocalDateTime
 
-interface UserDao : BasicDao<User> {
+interface UserDao : BasicDao<User,Unit> {
     suspend fun getByUsername(username: String): User?
     suspend fun getByAthleteId(athleteId: String): User?
     suspend fun findAll(): List<User>
@@ -20,18 +19,18 @@ interface UserDao : BasicDao<User> {
 }
 
 
-interface ProfileDao : BasicDao<Profile> {
+interface ProfileDao : BasicDao<Profile, Unit> {
     suspend fun getByUserId(id: String): Profile?
 }
 
 
-interface BikeDao : BasicDao<Bike> {
+interface BikeDao : BasicDao<Bike, BikeUpdate> {
     suspend fun getByStravaId(id: String): Bike?
     suspend fun getByUserId(id: String): List<Bike>
     suspend fun updateSyncStatus(bikeId: String, sync: Boolean): Boolean
 }
 
-interface BikeRideDao : BasicDao<BikeRide> {
+interface BikeRideDao : BasicDao<BikeRide, Unit> {
     suspend fun getByStravaId(id: String): BikeRide?
     suspend fun getByBikeId(id: String): Iterable<BikeRide>
     suspend fun getByBikeIdAfter(id: String, date: LocalDateTime): List<BikeRide>
@@ -40,16 +39,16 @@ interface BikeRideDao : BasicDao<BikeRide> {
     suspend fun getByUserIdPaginatedByKey(id: String, before: LocalDateTime?, pageSize: Int): List<BikeRide>
 }
 
-interface ComponentDao : BasicDao<BikeComponent> {
+interface ComponentDao : BasicDao<BikeComponent, Unit> {
     suspend fun getByBikeId(id: String): List<BikeComponent>
 }
 
 
-interface StravaAthleteDao : BasicDao<StravaAthlete> {
+interface StravaAthleteDao : BasicDao<StravaAthlete, Unit> {
     suspend fun getByAthleteId(id: String): StravaAthlete?
 }
 
-interface StravaActivityDao : BasicDao<StravaActivity> {
+interface StravaActivityDao : BasicDao<StravaActivity, Unit> {
     suspend fun getByStravaId(id: String): StravaActivity?
 }
 

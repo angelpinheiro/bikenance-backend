@@ -6,7 +6,7 @@ import com.mongodb.client.FindIterable
 import org.litote.kmongo.*
 import java.time.LocalDateTime
 
-class MongoBikeRideDao(db: DB) : BasicDaoImpl<BikeRide>(db.bikeRides), BikeRideDao {
+class MongoBikeRideDao(db: DB) : BasicDaoImpl<BikeRide, Unit>(db.bikeRides), BikeRideDao {
 
     override suspend fun getByStravaId(id: String): BikeRide? {
         return collection.findOne(BikeRide::stravaId eq id)

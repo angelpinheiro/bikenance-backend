@@ -12,7 +12,7 @@ import com.bikenance.data.model.strava.StravaAthlete
 import org.bson.types.ObjectId
 import org.litote.kmongo.*
 
-class MongoUserDao(private val db: DB) : BasicDaoImpl<User>(db.users), UserDao {
+class MongoUserDao(private val db: DB) : BasicDaoImpl<User, Unit>(db.users), UserDao {
 
     override suspend fun getByUsername(username: String): User? {
         return db.users.findOne(User::username eq username)
@@ -46,13 +46,13 @@ class MongoUserDao(private val db: DB) : BasicDaoImpl<User>(db.users), UserDao {
     }
 }
 
-class MongoStravaAthleteDao(private val db: DB) : BasicDaoImpl<StravaAthlete>(db.athletes), StravaAthleteDao {
+class MongoStravaAthleteDao(private val db: DB) : BasicDaoImpl<StravaAthlete,Unit>(db.athletes), StravaAthleteDao {
     override suspend fun getByAthleteId(id: String): StravaAthlete? {
         return db.athletes.findOne(StravaAthlete::id eq id)
     }
 }
 
-class MongoStravaActivityDao(private val db: DB) : BasicDaoImpl<StravaActivity>(db.activities), StravaActivityDao {
+class MongoStravaActivityDao(private val db: DB) : BasicDaoImpl<StravaActivity,Unit>(db.activities), StravaActivityDao {
     override suspend fun getByStravaId(id: String): StravaActivity? {
         return db.activities.findOne(StravaActivity::id eq id)
     }

@@ -4,6 +4,7 @@ import com.bikenance.api.apiResult
 import com.bikenance.api.authApiResult
 import com.bikenance.data.database.mongodb.DAOS
 import com.bikenance.data.model.Bike
+import com.bikenance.data.model.BikeUpdate
 import com.bikenance.data.model.SyncBikesData
 import com.bikenance.data.model.components.BikeComponent
 import com.bikenance.usecase.SetupBikeUseCase
@@ -77,9 +78,9 @@ fun Route.profileBikeRoutes() {
 
 
     put<ProfilePath.Bikes.BikeById> { r ->
-        val bike = call.receive<Bike>()
+        val bike = call.receive<BikeUpdate>()
         apiResult {
-            dao.bikeDao.update(r.bikeId, bike)
+            dao.bikeDao.partialUpdate(r.bikeId, bike)
             dao.bikeDao.getById(r.bikeId)
         }
     }
