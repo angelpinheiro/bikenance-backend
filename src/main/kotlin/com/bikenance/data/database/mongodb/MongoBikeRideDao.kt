@@ -2,7 +2,6 @@ package com.bikenance.data.database.mongodb
 
 import com.bikenance.data.database.BikeRideDao
 import com.bikenance.data.model.BikeRide
-import com.mongodb.client.FindIterable
 import org.litote.kmongo.*
 import java.time.LocalDateTime
 
@@ -23,6 +22,10 @@ class MongoBikeRideDao(db: DB) : BasicDaoImpl<BikeRide, Unit>(db.bikeRides), Bik
 
     override suspend fun getByUserId(id: String): List<BikeRide> {
         return collection.find(BikeRide::userId eq id).toList()
+    }
+
+    override suspend fun getLastByUserId(id: String): BikeRide? {
+        return collection.find(BikeRide::userId eq id).sort(descending(BikeRide::dateTime)).limit(1).firstOrNull()
     }
 
     override suspend fun getByUserIdPaginated(id: String, page: Int, pageSize: Int): List<BikeRide> {

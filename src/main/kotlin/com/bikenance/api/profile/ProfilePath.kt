@@ -10,7 +10,12 @@ class ProfilePath {
 
     @Serializable
     @Resource("/rides")
-    class Rides(val parent: ProfilePath = ProfilePath(), val page: Int = 0, val pageSize: Int = 10)
+    class Rides(val parent: ProfilePath = ProfilePath(), val page: Int = 0, val pageSize: Int = 10) {
+
+        @Serializable
+        @Resource("refresh")
+        class Refresh(val parent: Rides = Rides())
+    }
 
     @Serializable
     @Resource("/pagedRides")

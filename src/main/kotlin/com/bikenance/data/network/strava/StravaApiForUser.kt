@@ -1,12 +1,13 @@
 package com.bikenance.data.network.strava
 
 import com.bikenance.AppConfig
-import com.bikenance.data.repository.UserRepository
 import com.bikenance.api.strava.AuthData
+import com.bikenance.data.model.serializer.formatAsIso8061
 import com.bikenance.data.model.strava.AthleteStats
 import com.bikenance.data.model.strava.StravaActivity
 import com.bikenance.data.model.strava.StravaAthlete
 import com.bikenance.data.model.strava.StravaDetailedGear
+import com.bikenance.data.repository.UserRepository
 import com.bikenance.usecase.strava.StravaTokenRefresh
 import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.databind.ObjectMapper
@@ -17,6 +18,7 @@ import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
 import java.time.LocalDateTime
+import java.time.ZoneId
 import java.time.ZoneOffset
 
 val supportedActivityTypes = listOf("Ride", "EBikeRide", "VirtualRide")
@@ -57,10 +59,18 @@ class Strava(private val client: HttpClient, val config: AppConfig, private val 
         }
     }
 
-    suspend fun activitiesPaginated(auth: AuthData, page: Int, perPage: Int = 30): List<StravaActivity>? {
+    suspend fun activitiesPaginated(
+        auth: AuthData,
+        page: Int,
+        perPage: Int = 30,
+        after: LocalDateTime?
+    ): List<StravaActivity>? {
         return authorizedGet(StravaApiEndpoints.activitiesPaginatedEndpoint, auth) {
             parameter("page", page)
             parameter("per_page", perPage)
+            after?.let {
+                parameter("after", after.atZone(ZoneId.systemDefault()).toEpochSecond())
+            }
         }
     }
 
@@ -96,6 +106,11 @@ class StravaApiForUser(private val auth: AuthData, private val strava: Strava) {
     suspend fun athleteStats(athleteId: String): AthleteStats? = strava.athleteStats(auth, athleteId)
     suspend fun activity(activityId: String): StravaActivity? = strava.activity(auth, activityId)
     suspend fun activities(from: LocalDateTime): List<StravaActivity>? = strava.activities(auth, from)
-    suspend fun activitiesPaginated(page: Int, perPage: Int = 100): List<StravaActivity>? = strava.activitiesPaginated(auth, page, perPage)
+    suspend fun activitiesPaginated(
+        page: Int,
+        perPage: Int = 100,
+        after: LocalDateTime? = null
+    ): List<StravaActivity>? = strava.activitiesPaginated(auth, page, perPage, after)
+
     suspend fun bike(id: String): StravaDetailedGear? = strava.bike(auth, id)
 }

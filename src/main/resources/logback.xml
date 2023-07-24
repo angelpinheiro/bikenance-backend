@@ -4,11 +4,11 @@
             <pattern>%d{YYYY-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
         </encoder>
     </appender>
-    <root level="INFO">
+    <root level="DEBUG">
         <appender-ref ref="STDOUT"/>
     </root>
     <logger name="org.eclipse.jetty" level="TRACE"/>
     <logger name="io.netty" level="INFO"/>
     <logger name="io.ktor.routing.Routing" level="INFO"/>
-    <logger name="com.bikenance" level="TRACE"/>
+    <logger name="com.bikenance" level="DEBUG"/>
 </configuration>

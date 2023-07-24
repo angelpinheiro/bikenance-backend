@@ -59,18 +59,6 @@ fun Route.profileRoutes() {
         }
     }
 
-    get<ProfilePath.Rides> { r ->
-        authApiResult { userId ->
-            dao.bikeRideDao.getByUserIdPaginated(userId, r.page, r.pageSize)
-        }
-    }
-
-    get<ProfilePath.PagedByKeyRides> { r ->
-        authApiResult { userId ->
-            dao.bikeRideDao.getByUserIdPaginatedByKey(userId, r.key?.iso8061ToLocalDateTime(), r.pageSize)
-        }
-    }
-
 }
 
 

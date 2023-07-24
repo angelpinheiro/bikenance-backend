@@ -47,7 +47,7 @@ fun Application.module() {
     exposeApi()
 
 
-    val dao: BikeDao by inject()
+    /*val dao: BikeDao by inject()
     environment.monitor.subscribe(ServerReady) {
 
         launch {
@@ -65,7 +65,7 @@ fun Application.module() {
             }
 
         }
-    }
+    }*/
 
 
 }

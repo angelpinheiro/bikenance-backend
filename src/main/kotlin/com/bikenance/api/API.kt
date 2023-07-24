@@ -2,6 +2,7 @@ package com.bikenance.api
 
 import com.bikenance.api.profile.profileBikeRoutes
 import com.bikenance.api.profile.profileRoutes
+import com.bikenance.api.profile.profileRideRoutes
 import io.ktor.server.application.*
 import io.ktor.server.auth.*
 import io.ktor.server.routing.*
@@ -18,6 +19,7 @@ fun Application.exposeApi() {
             athleteRoutes()
             profileRoutes()
             profileBikeRoutes()
+            profileRideRoutes()
         }
     }
 }

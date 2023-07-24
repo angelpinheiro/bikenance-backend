@@ -35,6 +35,7 @@ interface BikeRideDao : BasicDao<BikeRide, Unit> {
     suspend fun getByBikeId(id: String): Iterable<BikeRide>
     suspend fun getByBikeIdAfter(id: String, date: LocalDateTime): List<BikeRide>
     suspend fun getByUserId(id: String): List<BikeRide>
+    suspend fun getLastByUserId(id: String): BikeRide?
     suspend fun getByUserIdPaginated(id: String, page: Int, pageSize: Int): List<BikeRide>
     suspend fun getByUserIdPaginatedByKey(id: String, before: LocalDateTime?, pageSize: Int): List<BikeRide>
 }
