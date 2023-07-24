@@ -11,8 +11,8 @@ import com.bikenance.data.network.push.MessageSender
 import com.bikenance.data.network.push.MessageType
 import com.bikenance.data.network.strava.Strava
 import com.bikenance.data.network.strava.StravaApiForUser
+import com.bikenance.data.network.strava.StravaApiResponse
 import com.bikenance.data.network.strava.supportedActivityTypes
-import com.bikenance.data.repository.UserRepository
 import io.ktor.util.logging.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -67,7 +67,19 @@ class SyncStravaDataUseCase(
         // this is the recommended approach from strava api docs
 
         while (keepGoing) {
-            val activities = stravaClient.activitiesPaginated(page, after = lastRide?.dateTime) ?: emptyList()
+
+            val activities = when (val response = stravaClient.activitiesPaginated(page, after = lastRide?.dateTime)) {
+                is StravaApiResponse.Success -> {
+                    response.data ?: emptyList()
+                }
+                is StravaApiResponse.Error -> {
+                    emptyList()
+                }
+                is StravaApiResponse.Failure -> {
+                    emptyList()
+                }
+            }
+
             if (activities.isNotEmpty()) {
                 log.info("Received ${activities.size} activities")
                 activities.forEach { activity ->

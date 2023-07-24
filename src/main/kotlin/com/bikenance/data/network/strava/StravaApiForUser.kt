@@ -2,13 +2,13 @@ package com.bikenance.data.network.strava
 
 import com.bikenance.AppConfig
 import com.bikenance.api.strava.AuthData
-import com.bikenance.data.model.serializer.formatAsIso8061
 import com.bikenance.data.model.strava.AthleteStats
 import com.bikenance.data.model.strava.StravaActivity
 import com.bikenance.data.model.strava.StravaAthlete
 import com.bikenance.data.model.strava.StravaDetailedGear
 import com.bikenance.data.repository.UserRepository
 import com.bikenance.usecase.strava.StravaTokenRefresh
+import com.bikenance.util.bknLogger
 import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
@@ -23,6 +23,11 @@ import java.time.ZoneOffset
 
 val supportedActivityTypes = listOf("Ride", "EBikeRide", "VirtualRide")
 
+sealed class StravaApiResponse<T> {
+    data class Success<T>(val data: T) : StravaApiResponse<T>()
+    data class Error<T>(val status: HttpStatusCode) : StravaApiResponse<T>()
+    data class Failure<T>(val e: Exception) : StravaApiResponse<T>()
+}
 
 object StravaApiEndpoints {
     const val athleteEndpoint = "https://www.strava.com/api/v3/athlete"
@@ -34,6 +39,8 @@ object StravaApiEndpoints {
 }
 
 class Strava(private val client: HttpClient, val config: AppConfig, private val userRepository: UserRepository) {
+
+    val log = bknLogger("Strava")
 
     val refresher = StravaTokenRefresh(client, config.strava, userRepository)
 
@@ -64,8 +71,8 @@ class Strava(private val client: HttpClient, val config: AppConfig, private val 
         page: Int,
         perPage: Int = 30,
         after: LocalDateTime?
-    ): List<StravaActivity>? {
-        return authorizedGet(StravaApiEndpoints.activitiesPaginatedEndpoint, auth) {
+    ): StravaApiResponse<List<StravaActivity>?> {
+        return authorizedGetResponse(StravaApiEndpoints.activitiesPaginatedEndpoint, auth) {
             parameter("page", page)
             parameter("per_page", perPage)
             after?.let {
@@ -78,20 +85,58 @@ class Strava(private val client: HttpClient, val config: AppConfig, private val 
         return authorizedGet(StravaApiEndpoints.bikeEndpoint(id), auth)
     }
 
+
+    private suspend inline fun <reified T> authorizedGetResponse(
+        url: String,
+        auth: AuthData,
+        block: HttpRequestBuilder.() -> Unit = {}
+    ): StravaApiResponse<T> {
+        val token = refresher.refreshAccessTokenIfNecessary(auth).accessToken
+
+        return try {
+            val r = client.prepareGet(url) {
+                headers["Authorization"] = "Bearer $token"
+                block()
+            }.execute()
+
+            if (r.status.isSuccess()) {
+                log.error("Strava API success [${r.status}] <- [$url] ")
+                StravaApiResponse.Success(mapper.readValue<T>(r.bodyAsText()))
+            } else {
+                log.error("Strava API error [${r.status}] <- [$url] ")
+                StravaApiResponse.Error(r.status)
+            }
+
+        } catch (e: Exception) {
+            log.error("Strava API Exception", e)
+            StravaApiResponse.Failure(e)
+        }
+    }
+
     private suspend inline fun <reified T> authorizedGet(
         url: String,
         auth: AuthData,
         block: HttpRequestBuilder.() -> Unit = {}
     ): T? {
         val token = refresher.refreshAccessTokenIfNecessary(auth).accessToken
-        val r = client.prepareGet(url) {
-            headers["Authorization"] = "Bearer $token"
-            block()
-        }.execute()
 
-        return if (r.status.isSuccess()) {
-            mapper.readValue(r.bodyAsText())
-        } else {
+        log.info("Strava authorizedGet to [$url]")
+        return try {
+            val r = client.prepareGet(url) {
+                headers["Authorization"] = "Bearer $token"
+                block()
+            }.execute()
+
+            log.info("Strava authorizedGet response status [${r.status}]")
+
+            if (r.status.isSuccess()) {
+                mapper.readValue(r.bodyAsText())
+            } else {
+                null
+            }
+
+        } catch (e: Exception) {
+            log.error("Strava API authorizedGet exception", e)
             null
         }
     }
@@ -110,7 +155,7 @@ class StravaApiForUser(private val auth: AuthData, private val strava: Strava) {
         page: Int,
         perPage: Int = 100,
         after: LocalDateTime? = null
-    ): List<StravaActivity>? = strava.activitiesPaginated(auth, page, perPage, after)
+    ): StravaApiResponse<List<StravaActivity>?> = strava.activitiesPaginated(auth, page, perPage, after)
 
     suspend fun bike(id: String): StravaDetailedGear? = strava.bike(auth, id)
 }
