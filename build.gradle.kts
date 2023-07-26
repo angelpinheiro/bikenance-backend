@@ -58,10 +58,10 @@ dependencies {
     implementation("org.jetbrains.exposed:exposed-core:$exposed_version")
     implementation("org.jetbrains.exposed:exposed-dao:$exposed_version")
     implementation("org.jetbrains.exposed:exposed-jdbc:$exposed_version")
-//    implementation("com.h2database:h2:$h2_version")
 
     // Koin for Ktor
     implementation("io.insert-koin:koin-ktor:$koin_version")
+
     // SLF4J Logger
     implementation("io.insert-koin:koin-logger-slf4j:$koin_version")
     implementation("org.litote.kmongo:kmongo:$kmongo_version")
@@ -76,5 +76,9 @@ dependencies {
 
     testImplementation("io.ktor:ktor-server-tests-jvm:$ktor_version")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit:$kotlin_version")
+
+    testImplementation("io.insert-koin:koin-test:$koin_version")
+    testImplementation("io.insert-koin:koin-test-junit4:$koin_version")
+
 
 }

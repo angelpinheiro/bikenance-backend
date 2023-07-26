@@ -1,44 +1,43 @@
 package com.bikenance.usecase.strava
 
 import com.bikenance.data.database.mongodb.DAOS
+import com.bikenance.data.model.BikeRide
 import com.bikenance.data.model.User
+import com.bikenance.data.model.strava.AspectType
+import com.bikenance.data.model.strava.EventData
+import com.bikenance.data.model.strava.ObjectType
 import com.bikenance.data.model.toBikeRide
 import com.bikenance.data.network.push.MessageData
 import com.bikenance.data.network.push.MessageSender
 import com.bikenance.data.network.push.MessageType
-import com.bikenance.data.repository.UserRepository
-import com.bikenance.data.model.strava.AspectType
-import com.bikenance.data.model.strava.EventData
-import com.bikenance.data.model.strava.ObjectType
-import com.bikenance.data.network.strava.Strava
+import com.bikenance.data.network.strava.StravaApi
 import com.bikenance.data.network.strava.supportedActivityTypes
+import com.bikenance.data.repository.UserRepository
+import com.bikenance.util.bknLogger
 
 
 class StravaEventReceivedUseCase(
     private val userRepository: UserRepository,
     private val dao: DAOS,
-    private val strava: Strava,
+    private val strava: StravaApi,
     private val messageSender: MessageSender
 ) {
 
-    suspend fun handleEventData(eventData: EventData) {
-        println("Event data $eventData")
+    private val log = bknLogger("StravaEventReceivedUseCase")
+
+    suspend operator fun invoke(eventData: EventData) {
+        log.info("Event data $eventData")
         userRepository.getByAthleteId(eventData.ownerId)?.let { user ->
-            println("Event: ${eventData.aspectType.type} ${eventData.objectType.type}")
+            log.debug("Event: ${eventData.aspectType.type} ${eventData.objectType.type}")
             when (eventData.objectType) {
                 ObjectType.ACTIVITY -> {
                     when (eventData.aspectType) {
-                        AspectType.CREATE -> {
-                            handleActivityCreate(user, eventData)
-                        }
-                        AspectType.UPDATE -> {
-                            handleActivityUpdate(user, eventData)
-                        }
-                        AspectType.DELETE -> {
-                            handleActivityDelete(user, eventData)
-                        }
+                        AspectType.CREATE -> handleActivityCreate(user, eventData)
+                        AspectType.UPDATE -> handleActivityUpdate(user, eventData)
+                        AspectType.DELETE -> handleActivityDelete(user, eventData)
                     }
                 }
+
                 ObjectType.ATHLETE -> {
                     println("Received athlete update: $eventData")
                 }
@@ -47,39 +46,36 @@ class StravaEventReceivedUseCase(
     }
 
     private suspend fun handleActivityCreate(user: User, eventData: EventData) {
-        println("handleActivityCreate")
-        user.stravaAuthData?.let { authData ->
-            strava.withAuth(authData).activity(eventData.objectId)?.let { activity ->
-                val supported = supportedActivityTypes.contains(activity.type)
-                if (supported) {
-                    val bike = activity.gearId?.let { dao.bikeDao.getByStravaId(it) }
-                    dao.stravaActivityDao.create(activity)
-                    dao.bikeRideDao.create(
-                        activity.toBikeRide(user, bike)
-                    )?.let {
-                        messageSender.sendMessage(
-                            user, MessageData(
-                                MessageType.NEW_ACTIVITY, mapOf(
-                                    "id" to it.oid(),
-                                )
-                            )
-                        )
-                    }
-                }
+
+        val api = strava.withAuth(user.stravaAuthData ?: throw Exception("User auth not found"))
+        val activity = api.activity(eventData.objectId).successOrFail("Could not get activity from API")
+
+        if (supportedActivityTypes.contains(activity.type)) {
+            val bike = activity.gearId?.let { stravaBikeId ->
+                dao.bikeDao.getByStravaId(stravaBikeId)
+            }
+            dao.stravaActivityDao.create(activity)
+            val createdBikeRide = dao.bikeRideDao.create(activity.toBikeRide(user, bike))
+            if (createdBikeRide != null) {
+                sendNewRideMessage(user, createdBikeRide)
+            } else {
+                log.error("Could not save new ride $activity")
             }
         }
     }
 
+    private fun sendNewRideMessage(user: User, createdBikeRide: BikeRide) {
+        messageSender.sendMessage(
+            user, MessageData(
+                MessageType.NEW_ACTIVITY, mapOf(
+                    "id" to createdBikeRide.oid(),
+                )
+            )
+        )
+    }
+
     private suspend fun handleActivityUpdate(user: User, eventData: EventData) {
-        println("handleActivityUpdate")
-        user.stravaAuthData?.let {
-            strava.withAuth(it).activity(eventData.objectId)?.let { new ->
-                when (val current = dao.stravaActivityDao.getByStravaId(eventData.objectId)) {
-                    null -> dao.stravaActivityDao.create(new)
-                    else -> dao.stravaActivityDao.update(current.oid(), new)
-                }
-            }
-        }
+        TODO("Not implemented yet")
     }
 
     private suspend fun handleActivityDelete(user: User, eventData: EventData) {

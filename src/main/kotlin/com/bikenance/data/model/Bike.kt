@@ -47,7 +47,8 @@ data class Bike(
     @JsonProperty("configDone") val configDone: Boolean = false,
     @JsonProperty("bike_type") var type: BikeType = BikeType.Unknown,
     @JsonProperty("components") val components: List<BikeComponent>? =null,
-    @JsonProperty("stats") val stats: BikeStats? = null
+    @JsonProperty("stats") val stats: BikeStats? = null,
+    @JsonProperty("sync") var sync: Boolean = false,
 ) : MongoModel<Bike>()
 
 

@@ -1,14 +1,15 @@
 package com.bikenance.usecase.strava
 
+import com.bikenance.AppConfig
 import com.bikenance.StravaConfig
 import com.bikenance.api.strava.AuthData
 import com.bikenance.api.strava.StravaOAuthEndpoints
 import com.bikenance.data.model.User
 import com.bikenance.data.model.strava.StravaRequestParams
-import com.bikenance.data.network.strava.mapper
 import com.bikenance.data.repository.UserRepository
 import com.bikenance.util.formatAsIsoDate
 import com.fasterxml.jackson.annotation.JsonProperty
+import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
 import io.ktor.client.*
 import io.ktor.client.request.*
@@ -27,13 +28,18 @@ data class RefreshTokenResponse(
     @JsonProperty("access_token") var accessToken: String,
 )
 
-class StravaTokenRefresh(
-    private val client: HttpClient,
-    val config: StravaConfig,
-    private val userRepository: UserRepository
-) {
+interface TokenRefresher {
+    suspend fun refreshAccessTokenIfNecessary(auth: AuthData): AuthData
+}
 
-    suspend fun refreshAccessTokenIfNecessary(auth: AuthData): AuthData {
+class StravaTokenRefresh(
+    private val config: AppConfig,
+    private val client: HttpClient,
+    private val mapper: ObjectMapper,
+    private val userRepository: UserRepository
+) : TokenRefresher {
+
+    override suspend fun refreshAccessTokenIfNecessary(auth: AuthData): AuthData {
         if (needsTokenRefresh(auth)) {
             val user = findTargetUser(auth);
             user?.let {
@@ -66,8 +72,8 @@ class StravaTokenRefresh(
 
     private suspend fun refreshAccessToken(token: String): RefreshTokenResponse {
         val response = client.post(StravaOAuthEndpoints.accessTokenUrl) {
-            parameter(StravaRequestParams.CLIENT_ID, config.clientId)
-            parameter(StravaRequestParams.CLIENT_SECRET, config.clientSecret)
+            parameter(StravaRequestParams.CLIENT_ID, config.strava.clientId)
+            parameter(StravaRequestParams.CLIENT_SECRET, config.strava.clientSecret)
             parameter(StravaRequestParams.GRANT_TYPE, "refresh_token")
             parameter(StravaRequestParams.REFRESH_TOKEN, token)
         }

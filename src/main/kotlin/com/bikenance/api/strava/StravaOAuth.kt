@@ -48,14 +48,23 @@ fun Route.stravaLoginRoutes() {
 
 fun getOAuthData(pipelineContext: PipelineContext<*, ApplicationCall>): AuthData {
     val principal: OAuthAccessTokenResponse.OAuth2? = pipelineContext.call.principal()
-
     return if (principal != null) {
-        val expiration = Instant.now().plusSeconds(principal.expiresIn - 10).epochSecond
-        AuthData(
-            principal.accessToken, principal.refreshToken, principal.expiresIn, expiration, lastRefresh = "Pending"
+        createAuth(
+            principal.accessToken, principal.refreshToken, principal.expiresIn
         )
     } else {
         throw Exception("Could not get auth principal")
     }
 
+}
+
+fun createAuth(
+    accessToken: String,
+    refreshToken: String?,
+    expiresIn: Long
+) : AuthData {
+    val expiration = Instant.now().plusSeconds(expiresIn).epochSecond
+   return AuthData(
+        accessToken, refreshToken, expiresIn, expiration, lastRefresh = "Pending"
+    )
 }

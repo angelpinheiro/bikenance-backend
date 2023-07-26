@@ -45,7 +45,7 @@ fun Route.stravaWebhookRoutes() {
         // launch a new coroutine for processing event data
         // and return Ok to avoid strava request cancellation
         application.launch {
-            receiveDataUseCase.handleEventData(eventData)
+            receiveDataUseCase.invoke(eventData)
         }
         call.respond(HttpStatusCode.OK)
     }

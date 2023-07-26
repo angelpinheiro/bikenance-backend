@@ -9,7 +9,7 @@ import com.bikenance.data.model.toBikeRide
 import com.bikenance.data.network.push.MessageData
 import com.bikenance.data.network.push.MessageSender
 import com.bikenance.data.network.push.MessageType
-import com.bikenance.data.network.strava.Strava
+import com.bikenance.data.network.strava.StravaApi
 import com.bikenance.data.network.strava.StravaApiForUser
 import com.bikenance.data.network.strava.StravaApiResponse
 import com.bikenance.data.network.strava.supportedActivityTypes
@@ -20,10 +20,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 
 class SyncStravaDataUseCase(
-    val strava: Strava,
-    val db: DB,
-    val dao: DAOS,
-    private val messageSender: MessageSender
+    val strava: StravaApi, val db: DB, val dao: DAOS, private val messageSender: MessageSender
 ) {
 
     val log = KtorSimpleLogger("UpdateRidesUseCase")
@@ -68,17 +65,8 @@ class SyncStravaDataUseCase(
 
         while (keepGoing) {
 
-            val activities = when (val response = stravaClient.activitiesPaginated(page, after = lastRide?.dateTime)) {
-                is StravaApiResponse.Success -> {
-                    response.data ?: emptyList()
-                }
-                is StravaApiResponse.Error -> {
-                    emptyList()
-                }
-                is StravaApiResponse.Failure -> {
-                    emptyList()
-                }
-            }
+            val activities =
+                stravaClient.activitiesPaginated(page, after = lastRide?.dateTime).successOrElse(emptyList())
 
             if (activities.isNotEmpty()) {
                 log.info("Received ${activities.size} activities")
@@ -100,23 +88,41 @@ class SyncStravaDataUseCase(
 
     private suspend fun syncBikes(user: User, stravaClient: StravaApiForUser): List<Bike>? {
 
-        val stravaAthlete: StravaAthlete = stravaClient.athlete() ?: throw Exception("Could not get athlete info")
-        log.debug("syncBikes: ${stravaAthlete.bikeRefs?.size} bike refs")
+        val stravaAthlete: StravaAthlete = stravaClient.athlete().successOrFail("Could not get athlete")
+
         return stravaAthlete.bikeRefs?.mapNotNull { ref ->
-            dao.bikeDao.getByStravaId(ref.id)
-                ?: stravaClient.bike(ref.id)?.let { gear ->
-                    log.debug("syncBikes: sync bike ${gear.name}")
-                    val bike = Bike(
-                        name = ref.name,
-                        brandName = gear.brandName,
-                        modelName = gear.modelName,
-                        distance = gear.distance,
-                        userId = user.oid(),
-                        stravaId = ref.id,
-                        draft = true
-                    )
-                    dao.bikeDao.create(bike)
+            dao.bikeDao.getByStravaId(ref.id) ?: stravaClient.bike(ref.id).let { gear ->
+                val newBike = when (gear) {
+                    is StravaApiResponse.Success -> {
+                        Bike(
+                            name = ref.name,
+                            brandName = gear.data.brandName,
+                            modelName = gear.data.modelName,
+                            distance = gear.data.distance,
+                            userId = user.oid(),
+                            stravaId = ref.id,
+                            sync = true,
+                            draft = true
+                        )
+                    }
+
+                    else -> {
+                        // If we cant get detailed gear info from strava,
+                        // create a default bike with sync false for later update
+                        Bike(
+                            name = ref.name,
+                            brandName = "",
+                            modelName = "",
+                            distance = 0,
+                            userId = user.oid(),
+                            stravaId = ref.id,
+                            sync = false,
+                            draft = true
+                        )
+                    }
                 }
+                dao.bikeDao.create(newBike)
+            }
 
         }
     }
