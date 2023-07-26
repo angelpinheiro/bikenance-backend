@@ -75,6 +75,7 @@ class StravaApi(
         auth: AuthData,
         block: HttpRequestBuilder.() -> Unit = {}
     ): StravaApiResponse<T> {
+
         val token = refresher.refreshAccessTokenIfNecessary(auth).accessToken
 
         return try {

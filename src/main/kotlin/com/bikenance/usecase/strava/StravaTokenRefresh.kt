@@ -58,7 +58,7 @@ class StravaTokenRefresh(
         val expiration = Date(expirationSeconds * 1000).toLocalDateTime().formatAsIsoDate()
         val now = Date(nowSeconds * 1000).toLocalDateTime().formatAsIsoDate()
         println("Token expires at $expiration ($expirationSeconds) | $now ($nowSeconds)")
-        return expirationSeconds <= nowSeconds
+        return expirationSeconds + 60 <= nowSeconds
     }
 
     private suspend fun updateUserAuthInDB(user: User, auth: AuthData): User? {

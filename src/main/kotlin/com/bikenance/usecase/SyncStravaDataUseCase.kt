@@ -43,11 +43,13 @@ class SyncStravaDataUseCase(
 
         dao.profileDao.update(profile.oid(), profile.copy(sync = true))
 
-        messageSender.sendMessage(
-            user, MessageData(
-                MessageType.PROFILE_SYNC
+        dao.userDao.getById(userId)?.let {
+            messageSender.sendMessage(
+                it, MessageData(
+                    MessageType.PROFILE_SYNC
+                )
             )
-        )
+        }
     }
 
     private suspend fun syncRides(user: User, stravaClient: StravaApiForUser) {

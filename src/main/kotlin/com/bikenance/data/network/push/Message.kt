@@ -8,7 +8,7 @@ enum class MessageType(
     @JsonValue
     @JsonProperty("message_type") val type: String
 ) {
-    PROFILE_SYNC("PROFILE_UPDATED"),
+    PROFILE_SYNC("PROFILE_SYNC"),
     NEW_ACTIVITY("NEW_ACTIVITY"),
     RIDES_UPDATED("RIDES_UPDATED"),
     RIDES_DELETED("RIDES_DELETED")

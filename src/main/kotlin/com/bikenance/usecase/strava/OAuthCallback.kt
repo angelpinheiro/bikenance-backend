@@ -9,11 +9,15 @@ import com.bikenance.data.model.login.TokenPair
 import com.bikenance.data.model.strava.AthleteStats
 import com.bikenance.data.model.strava.StravaAthlete
 import com.bikenance.data.network.jwt.JwtMgr
+import com.bikenance.data.network.push.MessageData
+import com.bikenance.data.network.push.MessageSender
+import com.bikenance.data.network.push.MessageType
 import com.bikenance.data.network.strava.StravaApi
 import com.bikenance.data.network.strava.StravaApiForUser
 import com.bikenance.data.repository.UserRepository
 import com.bikenance.usecase.SyncStravaDataUseCase
 import com.bikenance.util.bknLogger
+import kotlinx.coroutines.*
 
 
 class StravaAuthCallbackHandler(
@@ -22,10 +26,12 @@ class StravaAuthCallbackHandler(
     val dao: DAOS,
     val userRepository: UserRepository,
     val syncStravaDataUseCase: SyncStravaDataUseCase,
+    val messageSender: MessageSender,
     private val jwtMgr: JwtMgr,
 ) {
 
     val log = bknLogger("StravaAuthCallbackHandler")
+    val scope = CoroutineScope(Job() + Dispatchers.IO)
 
     suspend fun handleCallback(auth: AuthData): TokenPair {
 
@@ -78,28 +84,7 @@ class StravaAuthCallbackHandler(
             )
         )
 
-
-        // TODO: Use this
-        // syncStravaDataUseCase.syncBikesAndRides(newUser.oid(), stravaClient)
         syncStravaDataUseCase.invoke(newUser.oid(), stravaClient)
-
-        // get and create athlete bikes
-//        val bikes = stravaAthlete.bikeRefs?.mapNotNull { ref ->
-//            stravaClient.bike(ref.id)?.let { gear ->
-//                println("Bike details for id ${ref.id}: ${gear.name}")
-//                val bike = Bike(
-//                    name = ref.name,
-//                    brandName = gear.brandName,
-//                    modelName = gear.modelName,
-//                    distance = gear.distance,
-//                    userId = newUser.oid(),
-//                    stravaId = ref.id,
-//                    draft = true
-//
-//                )
-//                dao.bikeDao.create(bike)
-//            }
-//        }
     }
 }
 

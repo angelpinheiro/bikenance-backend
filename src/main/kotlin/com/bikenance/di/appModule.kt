@@ -38,7 +38,7 @@ val appModule = module {
     }
 
     single<MessageSender> {
-        MessageSender(get(), get(), get())
+        MessageSender()
     }
 
     single<ObjectMapper> {

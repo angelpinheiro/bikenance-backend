@@ -27,7 +27,7 @@ val stravaModule = module {
 
     single<StravaWebhook> { StravaWebhook(get(), get(), get()) }
 
-    single<StravaAuthCallbackHandler> { StravaAuthCallbackHandler(get(), get(), get(), get(), get(), get()) }
+    single<StravaAuthCallbackHandler> { StravaAuthCallbackHandler(get(), get(), get(), get(), get(), get(), get()) }
 
     single { StravaEventReceivedUseCase(get(), get(), get(), get()) }
 

@@ -1,6 +1,10 @@
 package com.bikenance.api
 
+import com.bikenance.data.database.mongodb.DAOS
 import com.bikenance.data.model.UserUpdate
+import com.bikenance.data.network.push.MessageData
+import com.bikenance.data.network.push.MessageSender
+import com.bikenance.data.network.push.MessageType
 import com.bikenance.data.repository.UserRepository
 import io.ktor.resources.*
 import io.ktor.server.application.*
@@ -8,6 +12,7 @@ import io.ktor.server.request.*
 import io.ktor.server.resources.*
 import io.ktor.server.resources.put
 import io.ktor.server.routing.*
+import kotlinx.coroutines.*
 import kotlinx.serialization.Serializable
 import org.koin.ktor.ext.inject
 
@@ -30,7 +35,11 @@ class Users(val filter: String? = null) {
 
 fun Route.userRoutes() {
 
+    val scope = CoroutineScope(Job() + Dispatchers.IO)
+
     val userRepository: UserRepository by inject()
+    val daos: DAOS by inject()
+    val messageSender: MessageSender by inject()
 
     get<Users> { r ->
         apiResult {
@@ -59,9 +68,26 @@ fun Route.userRoutes() {
     put<Users.MessagingToken> { r ->
         val tokenWrapper = call.receive<TokenWrapper>()
         authApiResult { userId ->
-            userRepository.getById(userId)?.let {
-                it.firebaseToken = tokenWrapper.token
-                userRepository.update(userId, it)
+
+
+            userRepository.getById(userId)?.let {user ->
+
+                val differentToken = user.firebaseToken != tokenWrapper.token
+
+                user.firebaseToken = tokenWrapper.token
+                userRepository.update(userId, user)
+
+                daos.profileDao.getByUserId(userId)?.let { profile ->
+                    if (profile.sync && differentToken) {
+                        scope.launch {
+                            messageSender.sendMessage(
+                                user, MessageData(
+                                    MessageType.PROFILE_SYNC
+                                )
+                            )
+                        }
+                    }
+                }
                 true
             }
         }
