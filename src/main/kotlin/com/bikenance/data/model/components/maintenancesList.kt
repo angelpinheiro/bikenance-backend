@@ -58,15 +58,15 @@ val defaultMaintenances = listOf(
     ),
     MaintenanceInfo(
         type = MaintenanceType.RearSuspensionMaintenance,
-        defaultFrequency = RevisionFrequency(4000, RevisionUnit.KILOMETERS)
+        defaultFrequency = RevisionFrequency(12, RevisionUnit.MONTHS)
     ),
     MaintenanceInfo(
         type = MaintenanceType.ThruAxleMaintenance,
-        defaultFrequency = RevisionFrequency(3000, RevisionUnit.KILOMETERS)
+        defaultFrequency = RevisionFrequency(6, RevisionUnit.MONTHS)
     ),
     MaintenanceInfo(
         type = MaintenanceType.FrameBearingsMaintenance,
-        defaultFrequency = RevisionFrequency(4000, RevisionUnit.KILOMETERS)
+        defaultFrequency = RevisionFrequency(12, RevisionUnit.MONTHS)
     ),
     MaintenanceInfo(
         type = MaintenanceType.TireMaintenance,
@@ -78,10 +78,10 @@ val defaultMaintenances = listOf(
     ),
     MaintenanceInfo(
         type = MaintenanceType.WheelSpokesMaintenance,
-        defaultFrequency = RevisionFrequency(2000, RevisionUnit.KILOMETERS)
+        defaultFrequency = RevisionFrequency(6, RevisionUnit.MONTHS)
     ),
     MaintenanceInfo(
         type = MaintenanceType.CustomMaintenance,
-        defaultFrequency = RevisionFrequency(0, RevisionUnit.KILOMETERS) // Cambiar por la frecuencia adecuada
+        defaultFrequency = RevisionFrequency(0, RevisionUnit.KILOMETERS)
     )
 )

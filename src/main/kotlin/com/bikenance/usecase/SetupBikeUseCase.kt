@@ -6,6 +6,7 @@ import com.bikenance.data.model.Bike
 import com.bikenance.data.model.BikeStats
 import com.bikenance.data.model.components.*
 import com.bikenance.util.bknLogger
+import com.bikenance.util.determineWear
 import com.bikenance.util.formatAsIsoDate
 import java.time.Duration
 import java.time.LocalDateTime
@@ -117,7 +118,7 @@ class SetupBikeUseCase(
         return defaultMaintenances.filter { it.type.componentType == bikeComponent.type }.map { info ->
 
             val freq = info.defaultFrequency
-            val status = determineCurrentStatus(freq, usage)
+            val status = bikeComponent.determineWear(freq)
             val estimatedDate = bikeComponent.from?.let {
                 estimateNextMaintenanceDate(it, status, LocalDateTime.now())
             }
@@ -146,23 +147,6 @@ class SetupBikeUseCase(
         return expectedDurationInDays ?.let { from.plusDays(it) }
     }
 
-    private fun determineCurrentStatus(
-        freq: RevisionFrequency, usage: Usage
-    ): Double {
-        return when (freq.unit) {
-            RevisionUnit.KILOMETERS -> {
-                val maxKm = freq.every
-                if (usage.distance > 0) {
-                    (usage.distance / 1000) / maxKm
-                } else {
-                    0.0
-                }
-            }
 
-            else -> {
-                0.0
-            }
-        }
-    }
 
 }

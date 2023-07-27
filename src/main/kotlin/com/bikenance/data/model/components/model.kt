@@ -32,8 +32,7 @@ enum class RevisionUnit {
     KILOMETERS,
     HOURS,
     WEEKS,
-    MONTHS,
-    YEARS
+    MONTHS
 }
 
 data class RevisionFrequency(
