@@ -30,7 +30,7 @@ interface BikeDao : BasicDao<Bike, BikeUpdate> {
     suspend fun updateSyncStatus(bikeId: String, sync: Boolean): Boolean
 }
 
-interface BikeRideDao : BasicDao<BikeRide, Unit> {
+interface BikeRideDao : BasicDao<BikeRide, BikeRideUpdate> {
     suspend fun getByStravaId(id: String): BikeRide?
     suspend fun getByBikeId(id: String): Iterable<BikeRide>
     suspend fun getByBikeIdAfter(id: String, date: LocalDateTime): List<BikeRide>

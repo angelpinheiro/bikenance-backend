@@ -2,10 +2,11 @@ package com.bikenance.data.database.mongodb
 
 import com.bikenance.data.database.BikeRideDao
 import com.bikenance.data.model.BikeRide
+import com.bikenance.data.model.BikeRideUpdate
 import org.litote.kmongo.*
 import java.time.LocalDateTime
 
-class MongoBikeRideDao(db: DB) : BasicDaoImpl<BikeRide, Unit>(db.bikeRides), BikeRideDao {
+class MongoBikeRideDao(db: DB) : BasicDaoImpl<BikeRide, BikeRideUpdate>(db.bikeRides), BikeRideDao {
 
     override suspend fun getByStravaId(id: String): BikeRide? {
         return collection.findOne(BikeRide::stravaId eq id)

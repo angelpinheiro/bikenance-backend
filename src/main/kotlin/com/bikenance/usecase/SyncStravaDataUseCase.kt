@@ -78,7 +78,7 @@ class SyncStravaDataUseCase(
                     if (supported) {
                         val performedWith = bikes.firstOrNull { it.stravaId == activity.gearId }
                         db.activities.insertOne(activity)
-                        dao.bikeRideDao.create(activity.toBikeRide(user, performedWith))
+                        dao.bikeRideDao.create(activity.toBikeRide(user, performedWith, true))
                     }
                 }
                 page = page.inc()

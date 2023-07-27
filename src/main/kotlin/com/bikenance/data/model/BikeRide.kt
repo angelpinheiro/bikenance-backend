@@ -9,6 +9,7 @@ import java.time.LocalDateTime
 data class BikeRide(
     @JsonProperty("user_id") var userId: String? = null,
     @JsonProperty("bike_id") var bikeId: String? = null,
+    @JsonProperty("bike_confirmed") var bikeConfirmed: Boolean = false,
     @JsonProperty("strava_activity_id") var stravaId: String? = null,
     @JsonProperty("activity_type") var type: String? = null,
     @JsonProperty("sport_type") var sportType: String? = null,
@@ -25,7 +26,7 @@ data class BikeRide(
 ) : MongoModel<BikeRide>()
 
 
-fun StravaActivity.toBikeRide(user: User, bike: Bike?): BikeRide {
+fun StravaActivity.toBikeRide(user: User, bike: Bike?, confirmed: Boolean): BikeRide {
     return BikeRide(
         userId = user.oid(),
         stravaId = id,
@@ -41,6 +42,12 @@ fun StravaActivity.toBikeRide(user: User, bike: Bike?): BikeRide {
         mapSummaryPolyline = map?.summaryPolyline,
         averageWatts = averageWatts,
         averageSpeed = averageSpeed,
-        maxSpeed = maxSpeed
+        maxSpeed = maxSpeed,
+        bikeConfirmed = confirmed
     )
 }
+
+data class BikeRideUpdate(
+    @JsonProperty("bike_id") var bikeId: String? = null,
+    @JsonProperty("bike_confirmed") var bikeConfirmed: Boolean = false,
+)

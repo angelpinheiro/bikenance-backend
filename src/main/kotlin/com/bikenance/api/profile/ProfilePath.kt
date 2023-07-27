@@ -15,6 +15,10 @@ class ProfilePath {
         @Serializable
         @Resource("refresh")
         class Refresh(val parent: Rides = Rides())
+
+        @Serializable
+        @Resource("{rideId}")
+        class RideById(val parent: Rides = Rides(), val rideId: String)
     }
 
     @Serializable

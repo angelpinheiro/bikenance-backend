@@ -55,7 +55,7 @@ class StravaEventReceivedUseCase(
                 dao.bikeDao.getByStravaId(stravaBikeId)
             }
             dao.stravaActivityDao.create(activity)
-            val createdBikeRide = dao.bikeRideDao.create(activity.toBikeRide(user, bike))
+            val createdBikeRide = dao.bikeRideDao.create(activity.toBikeRide(user, bike, false))
             if (createdBikeRide != null) {
                 sendNewRideMessage(user, createdBikeRide)
             } else {
