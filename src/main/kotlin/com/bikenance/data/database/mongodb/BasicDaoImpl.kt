@@ -12,10 +12,10 @@ import org.litote.kmongo.id.toId
 import org.litote.kmongo.updateOneById
 
 
-abstract class MongoModel<T>(
-    @BsonId
-    val _id: Id<T> = ObjectId().toId()
-) {
+abstract class MongoModel<T> {
+
+    abstract val _id: Id<T>
+
     fun oid(): String {
         return _id.toString()
     }

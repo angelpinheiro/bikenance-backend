@@ -1,10 +1,18 @@
 package com.bikenance.data.model.strava
 
 import com.bikenance.data.database.mongodb.MongoModel
+import com.bikenance.data.model.BikeRide
 import com.fasterxml.jackson.annotation.JsonProperty
+import org.bson.codecs.pojo.annotations.BsonId
+import org.bson.types.ObjectId
+import org.litote.kmongo.Id
+import org.litote.kmongo.id.toId
 
 
 data class StravaActivity(
+
+    @BsonId
+    override val _id: Id<StravaActivity> = ObjectId().toId(),
 
     // strava do not send this, it's filled after
     val bike: StravaDetailedGear? = null,

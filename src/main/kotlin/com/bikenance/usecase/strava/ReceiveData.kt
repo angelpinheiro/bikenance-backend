@@ -1,6 +1,7 @@
 package com.bikenance.usecase.strava
 
 import com.bikenance.data.database.mongodb.DAOS
+import com.bikenance.data.model.Bike
 import com.bikenance.data.model.BikeRide
 import com.bikenance.data.model.User
 import com.bikenance.data.model.strava.AspectType
@@ -14,6 +15,7 @@ import com.bikenance.data.network.strava.StravaApi
 import com.bikenance.data.network.strava.supportedActivityTypes
 import com.bikenance.data.repository.UserRepository
 import com.bikenance.util.bknLogger
+import com.bikenance.util.updateWear
 
 
 class StravaEventReceivedUseCase(
@@ -56,6 +58,16 @@ class StravaEventReceivedUseCase(
             }
             dao.stravaActivityDao.create(activity)
             val createdBikeRide = dao.bikeRideDao.create(activity.toBikeRide(user, bike, false))
+
+            // update bike wear
+            if (bike != null && createdBikeRide != null) {
+                log.info("Updating wear of bike [${bike.oid()}] [${bike.name}] with [${createdBikeRide.name}]")
+                val updatedBike = updateBikeWear(bike, createdBikeRide)
+                log.info("Updated bike [${updatedBike}]")
+                val result = dao.bikeDao.update(updatedBike.oid(), updatedBike)
+                log.info("Updated result [${result}]")
+            }
+
             if (createdBikeRide != null) {
                 sendNewRideMessage(user, createdBikeRide)
             } else {
@@ -80,6 +92,41 @@ class StravaEventReceivedUseCase(
 
     private suspend fun handleActivityDelete(user: User, eventData: EventData) {
         TODO("Not implemented yet")
+    }
+
+
+    private fun updateBikeWear(bike: Bike, ride: BikeRide): Bike {
+
+        val distance = ride.distance ?: 0
+        val movingTime = ride.elapsedTime ?: 0
+        val elevationGain = ride.totalElevationGain ?: 0
+
+        val updatedComponents = bike.components?.map { bikeComponent ->
+            // update maintenance usage and wear
+            val updatedMaintenances = bikeComponent.maintenance?.map { m ->
+                val maintenance = m.copy(
+                    usageSinceLast = m.usageSinceLast.plus(movingTime, distance, elevationGain)
+                )
+                maintenance.updateWear(ride.dateTime)
+            }
+            // update component usage
+            bikeComponent.copy(
+                usage = bikeComponent.usage.plus(movingTime, distance, elevationGain),
+                maintenance = updatedMaintenances
+            )
+        }
+
+        updatedComponents?.forEach { c ->
+            log.info("Component ${c.type} has an usage of ${c.usage.distance}")
+            c.maintenance?.forEach { m ->
+                log.info("     - Maintenance ${m.type} has an usage of ${m.usageSinceLast.distance}")
+            }
+        }
+
+        return bike.copy(
+            name = bike.name + " *",
+            components = updatedComponents
+        )
     }
 
 

@@ -4,7 +4,10 @@ import com.bikenance.data.database.BikeDao
 import com.bikenance.data.database.BikeRideDao
 import com.bikenance.data.model.Bike
 import com.bikenance.data.model.BikeStats
-import com.bikenance.data.model.components.*
+import com.bikenance.data.model.components.BikeComponent
+import com.bikenance.data.model.components.Maintenance
+import com.bikenance.data.model.components.Usage
+import com.bikenance.data.model.components.defaultMaintenances
 import com.bikenance.util.bknLogger
 import com.bikenance.util.determineWear
 import com.bikenance.util.formatAsIsoDate
@@ -118,7 +121,8 @@ class SetupBikeUseCase(
         return defaultMaintenances.filter { it.type.componentType == bikeComponent.type }.map { info ->
 
             val freq = info.defaultFrequency
-            val status = bikeComponent.determineWear(freq)
+            val status =
+                bikeComponent.from?.let { determineWear(it, bikeComponent.usage, freq, LocalDateTime.now()) } ?: 0.0
             val estimatedDate = bikeComponent.from?.let {
                 estimateNextMaintenanceDate(it, status, LocalDateTime.now())
             }
@@ -138,15 +142,15 @@ class SetupBikeUseCase(
 
     }
 
-    private fun estimateNextMaintenanceDate(from: LocalDateTime, status: Double, until: LocalDateTime): LocalDateTime? {
-        val daysBetween = Duration.between(from, until).toDays()
-        val expectedDurationInDays = if(status == 0.0) null else (daysBetween / status).toLong()
-        log.debug("Estimating next maintenance:")
-        log.debug("From: ${from.formatAsIsoDate()}, status: $status, until: ${until.formatAsIsoDate()}")
-        log.debug("DaysBetween: ${daysBetween}, expectedDuration: $expectedDurationInDays")
-        return expectedDurationInDays ?.let { from.plusDays(it) }
-    }
 
+}
 
-
+val log = bknLogger("estimateNextMaintenanceDate")
+fun estimateNextMaintenanceDate(from: LocalDateTime, status: Double, until: LocalDateTime): LocalDateTime? {
+    val daysBetween = Duration.between(from, until).toDays()
+    val expectedDurationInDays = if (status == 0.0) null else (daysBetween / status).toLong()
+    log.debug("Estimating next maintenance:")
+    log.debug("From: ${from.formatAsIsoDate()}, status: $status, until: ${until.formatAsIsoDate()}")
+    log.debug("DaysBetween: ${daysBetween}, expectedDuration: $expectedDurationInDays")
+    return expectedDurationInDays?.let { from.plusDays(it) }
 }

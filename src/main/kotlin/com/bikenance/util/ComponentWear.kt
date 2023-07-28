@@ -1,8 +1,7 @@
 package com.bikenance.util
 
-import com.bikenance.data.model.components.BikeComponent
-import com.bikenance.data.model.components.RevisionFrequency
-import com.bikenance.data.model.components.RevisionUnit
+import com.bikenance.data.model.components.*
+import com.bikenance.usecase.estimateNextMaintenanceDate
 import java.time.Duration
 import java.time.LocalDateTime
 
@@ -24,7 +23,7 @@ fun wearByHours(durationInSeconds: Double, freqInHours: Double): Double {
     }
 }
 
-fun wearByElapsedTime(from: LocalDateTime?, freq: RevisionFrequency, now: LocalDateTime = LocalDateTime.now()): Double {
+fun wearByElapsedTime(from: LocalDateTime?, freq: RevisionFrequency, now: LocalDateTime): Double {
 
     if (from == null || from.isAfter(now)) {
         return 0.0
@@ -49,22 +48,38 @@ fun wearByElapsedTime(from: LocalDateTime?, freq: RevisionFrequency, now: LocalD
 }
 
 
-fun BikeComponent.determineWear(
-    freq: RevisionFrequency
+fun Maintenance.determineWear(untilDateTime: LocalDateTime): Double {
+    return lastMaintenanceDate?.let { determineWear(it, usageSinceLast, defaultFrequency, untilDateTime) } ?: 0.0
+}
+
+
+fun Maintenance.updateWear(until: LocalDateTime): Maintenance {
+    val status = determineWear(until)
+    val estimatedDate = lastMaintenanceDate?.let {
+        estimateNextMaintenanceDate(it, status, until)
+    }
+    return copy(
+        status = status,
+        estimatedDate = estimatedDate
+    )
+}
+
+fun determineWear(
+    lastMaintenanceDate: LocalDateTime, usageSinceLast: Usage, freq: RevisionFrequency, untilDateTime: LocalDateTime
 ): Double {
 
 
     return when (freq.unit) {
         RevisionUnit.KILOMETERS -> {
-            wearByKm(usage.distance, freq.every.toDouble())
+            wearByKm(usageSinceLast.distance, freq.every.toDouble())
         }
 
         RevisionUnit.HOURS -> {
-            wearByHours(usage.duration, freq.every.toDouble())
+            wearByHours(usageSinceLast.duration, freq.every.toDouble())
         }
 
         RevisionUnit.WEEKS, RevisionUnit.MONTHS -> {
-            wearByElapsedTime(from, freq)
+            wearByElapsedTime(lastMaintenanceDate, freq, untilDateTime)
         }
     }
 }

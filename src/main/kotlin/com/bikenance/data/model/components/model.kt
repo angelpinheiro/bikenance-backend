@@ -18,7 +18,7 @@ data class BikeComponent(
     @JsonProperty("modifier")
     val modifier: ComponentModifier? = null,
     @JsonProperty("usage")
-    var usage: Usage = Usage(0.0, 0.0),
+    val usage: Usage = Usage(0.0, 0.0),
     @JsonProperty("from")
     var from: LocalDateTime? = null
 )
@@ -49,7 +49,15 @@ data class Usage(
     val distance: Double = 0.0,
     @JsonProperty("elevationGain")
     val elevationGain: Double = 0.0,
-)
+) {
+    fun plus(addMovingTime: Number, addDistance: Number, addElevationGain: Number): Usage {
+        return copy(
+            duration = this.duration + addMovingTime.toDouble(),
+            distance = this.distance + addDistance.toDouble(),
+            elevationGain = this.elevationGain + addElevationGain.toDouble()
+        )
+    }
+}
 
 enum class MaintenancePriority {
     LOW, MEDIUM, HIGH
@@ -78,7 +86,7 @@ data class Maintenance(
     @JsonProperty("componentType")
     val componentType: ComponentType,
     @JsonProperty("usageSinceLast")
-    var usageSinceLast: Usage?,
+    var usageSinceLast: Usage = Usage(),
     @JsonProperty("status")
     var status: Double = 0.0,
     @JsonProperty("lastDate")

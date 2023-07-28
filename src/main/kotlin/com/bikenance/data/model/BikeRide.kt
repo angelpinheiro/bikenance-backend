@@ -4,9 +4,17 @@ import com.bikenance.data.database.mongodb.MongoModel
 import com.bikenance.data.model.serializer.iso8061ToLocalDateTime
 import com.bikenance.data.model.strava.StravaActivity
 import com.fasterxml.jackson.annotation.JsonProperty
+import org.bson.codecs.pojo.annotations.BsonId
+import org.bson.types.ObjectId
+import org.litote.kmongo.Id
+import org.litote.kmongo.id.toId
 import java.time.LocalDateTime
 
 data class BikeRide(
+
+    @BsonId
+    override val _id: Id<BikeRide> = ObjectId().toId(),
+
     @JsonProperty("user_id") var userId: String? = null,
     @JsonProperty("bike_id") var bikeId: String? = null,
     @JsonProperty("bike_confirmed") var bikeConfirmed: Boolean = false,

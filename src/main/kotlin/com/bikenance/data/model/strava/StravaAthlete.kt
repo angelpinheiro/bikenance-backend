@@ -1,7 +1,12 @@
 package com.bikenance.data.model.strava
 
 import com.bikenance.data.database.mongodb.MongoModel
+import com.bikenance.data.model.BikeRide
 import com.fasterxml.jackson.annotation.JsonProperty
+import org.bson.codecs.pojo.annotations.BsonId
+import org.bson.types.ObjectId
+import org.litote.kmongo.Id
+import org.litote.kmongo.id.toId
 
 
 data class StravaBikeRef(
@@ -13,6 +18,10 @@ data class StravaBikeRef(
 )
 
 data class StravaAthlete(
+
+    @BsonId
+    override val _id: Id<StravaAthlete> = ObjectId().toId(),
+
     @JsonProperty("id") var id: String,
     @JsonProperty("username") var username: String? = null,
     @JsonProperty("resource_state") var resourceState: Int? = null,

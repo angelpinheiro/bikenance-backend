@@ -44,7 +44,7 @@ class StravaAuthCallbackHandler(
 
         val loggedUser: User = when (val user = dao.userDao.getByAthleteId(stravaAthlete.id)) {
             null -> {
-                val newUser = dao.userDao.create(User(null, null, stravaAthlete.id, auth))
+                val newUser = dao.userDao.create(User(username = null, password = null, athleteId = stravaAthlete.id, stravaAuthData = auth))
                     ?: throw Exception("Could not create user")
                 createUserProfile(newUser, stravaAthlete, stravaStats, stravaClient)
                 newUser
