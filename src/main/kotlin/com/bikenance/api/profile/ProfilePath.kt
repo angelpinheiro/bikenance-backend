@@ -42,6 +42,9 @@ class ProfilePath {
             @Serializable
             @Resource("components")
             class Components(val parent: BikeById)
+            @Serializable
+            @Resource("maintenance/{maintenanceId}")
+            class Maintenance(val parent: BikeById, val maintenanceId: String)
         }
     }
 

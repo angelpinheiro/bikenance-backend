@@ -15,7 +15,6 @@ import com.bikenance.data.network.strava.StravaApi
 import com.bikenance.data.network.strava.supportedActivityTypes
 import com.bikenance.data.repository.UserRepository
 import com.bikenance.util.bknLogger
-import com.bikenance.util.updateWear
 
 
 class StravaEventReceivedUseCase(
@@ -102,12 +101,11 @@ class StravaEventReceivedUseCase(
         val elevationGain = ride.totalElevationGain ?: 0
 
         val updatedComponents = bike.components?.map { bikeComponent ->
-            // update maintenance usage and wear
+            // update maintenance usage
             val updatedMaintenances = bikeComponent.maintenance?.map { m ->
-                val maintenance = m.copy(
+                m.copy(
                     usageSinceLast = m.usageSinceLast.plus(movingTime, distance, elevationGain)
                 )
-                maintenance.updateWear(ride.dateTime)
             }
             // update component usage
             bikeComponent.copy(

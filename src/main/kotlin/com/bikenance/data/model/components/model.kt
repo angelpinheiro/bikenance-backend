@@ -1,12 +1,14 @@
 package com.bikenance.data.model.components
 
+import com.bikenance.util.expectedNextMaintenanceDate
+import com.bikenance.util.wearPercentage
 import com.fasterxml.jackson.annotation.JsonProperty
 import java.time.LocalDateTime
 import java.util.*
 
 data class BikeComponent(
     @JsonProperty("_id")
-    val _id: String = UUID.randomUUID().toString(),
+    val _id: String = newId(),
     @JsonProperty("bikeId")
     val bikeId: String?,
     @JsonProperty("alias")
@@ -21,7 +23,15 @@ data class BikeComponent(
     val usage: Usage = Usage(0.0, 0.0),
     @JsonProperty("from")
     var from: LocalDateTime? = null
-)
+) {
+    companion object {
+        fun newId() = UUID.randomUUID().toString()
+    }
+
+    fun ensureId(): BikeComponent {
+        return copy(_id = _id.ifEmpty { newId() })
+    }
+}
 
 enum class ComponentModifier {
     REAR,
@@ -32,7 +42,8 @@ enum class RevisionUnit {
     KILOMETERS,
     HOURS,
     WEEKS,
-    MONTHS
+    MONTHS,
+    YEARS
 }
 
 data class RevisionFrequency(
@@ -87,13 +98,17 @@ data class Maintenance(
     val componentType: ComponentType,
     @JsonProperty("usageSinceLast")
     var usageSinceLast: Usage = Usage(),
-    @JsonProperty("status")
-    var status: Double = 0.0,
     @JsonProperty("lastDate")
-    var lastMaintenanceDate: LocalDateTime? = null,
-    @JsonProperty("estimatedDate")
-    var estimatedDate: LocalDateTime? = null,
-)
+    val lastMaintenanceDate: LocalDateTime? = null,
+) {
+    val status: Double by lazy {
+        wearPercentage(LocalDateTime.now())
+    }
+
+    val estimatedDate: LocalDateTime? by lazy {
+        expectedNextMaintenanceDate(LocalDateTime.now())
+    }
+}
 
 
 

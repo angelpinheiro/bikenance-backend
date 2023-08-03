@@ -7,6 +7,7 @@ import com.bikenance.data.model.Bike
 import com.bikenance.data.model.BikeUpdate
 import com.bikenance.data.model.SyncBikesData
 import com.bikenance.data.model.components.BikeComponent
+import com.bikenance.data.model.components.Maintenance
 import com.bikenance.usecase.SetupBikeUseCase
 import io.ktor.server.application.*
 import io.ktor.server.request.*
@@ -63,6 +64,42 @@ fun Route.profileBikeRoutes() {
         }
     }
 
+    put<ProfilePath.Bikes.BikeById.Maintenance> { r ->
+        apiResult {
+
+            val bikeId = r.parent.bikeId
+            val maintenanceId = r.maintenanceId
+            val maintenance = call.receive<Maintenance>()
+
+            log.debug("BikeById.Maintenance: $bikeId, $maintenanceId, areEqual: ${maintenanceId == maintenance._id}")
+
+            if (maintenanceId != maintenance._id) {
+                null
+            } else {
+                val r = dao.bikeDao.getById(bikeId)?.let { bike ->
+                    bike.components?.firstOrNull { it.maintenance?.any { m -> m._id == maintenanceId } ?: false }
+                        ?.let { targetComp ->
+                            targetComp.maintenance?.find { it._id == maintenanceId }?.let { targetMaintenance ->
+
+                                val newComponent = targetComp.copy(
+                                    maintenance = targetComp.maintenance.minus(targetMaintenance).plus(maintenance)
+                                )
+                                val bikeUpdate =
+                                    bike.copy(components = bike.components.minus(targetComp).plus(newComponent))
+                                dao.bikeDao.update(bikeId, bikeUpdate)
+                            }
+                        }
+                }
+
+                if (r == true) {
+                    dao.bikeDao.getById(bikeId)
+                } else {
+                    null
+                }
+            }
+        }
+    }
+
     post<ProfilePath.Bikes.BikeById.Components> { r ->
 
         val bikeId = r.parent.bikeId
@@ -103,7 +140,9 @@ fun Route.profileBikeRoutes() {
         apiResult {
             val bikeId = r.parent.bikeId
             val bike = call.receive<Bike>()
-            SetupBikeUseCase(dao.bikeDao, dao.bikeRideDao).invoke(bikeId, bike)
+            SetupBikeUseCase(dao.bikeDao, dao.bikeRideDao).invoke(bikeId, bike.copy(
+                components = bike.components?.map { it.ensureId() }
+            ))
         }
     }
 
