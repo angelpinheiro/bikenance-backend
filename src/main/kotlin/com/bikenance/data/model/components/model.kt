@@ -31,6 +31,10 @@ data class BikeComponent(
     fun ensureId(): BikeComponent {
         return copy(_id = _id.ifEmpty { newId() })
     }
+
+    fun withNewId(): BikeComponent {
+        return copy(_id = newId())
+    }
 }
 
 enum class ComponentModifier {
@@ -107,6 +111,18 @@ data class Maintenance(
 
     val estimatedDate: LocalDateTime? by lazy {
         expectedNextMaintenanceDate(LocalDateTime.now())
+    }
+
+    companion object {
+        fun newId() = UUID.randomUUID().toString()
+    }
+
+    fun ensureId(): Maintenance {
+        return copy(_id = _id.ifEmpty { newId() })
+    }
+
+    fun withNewId(): Maintenance {
+        return copy(_id = newId())
     }
 }
 

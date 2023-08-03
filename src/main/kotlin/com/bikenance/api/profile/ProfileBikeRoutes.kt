@@ -8,6 +8,7 @@ import com.bikenance.data.model.BikeUpdate
 import com.bikenance.data.model.SyncBikesData
 import com.bikenance.data.model.components.BikeComponent
 import com.bikenance.data.model.components.Maintenance
+import com.bikenance.data.model.components.Usage
 import com.bikenance.usecase.SetupBikeUseCase
 import io.ktor.server.application.*
 import io.ktor.server.request.*
@@ -15,6 +16,7 @@ import io.ktor.server.resources.*
 import io.ktor.server.routing.Route
 import io.ktor.util.logging.*
 import org.koin.ktor.ext.inject
+import java.time.LocalDateTime
 
 fun Route.profileBikeRoutes() {
 
@@ -110,6 +112,51 @@ fun Route.profileBikeRoutes() {
                 dao.bikeDao.update(bikeId, bike.copy(components = components))
                 dao.bikeDao.getById(bikeId)?.components ?: listOf()
             }
+        }
+    }
+
+    put<ProfilePath.Bikes.BikeById.ComponentReplace> { r ->
+        apiResult {
+
+            val bikeId = r.parent.bikeId
+            val componentId = r.componentId
+
+            val newComponentId = dao.bikeDao.getById(bikeId)?.let { bike ->
+                bike.components?.find { it._id == componentId }?.let { component ->
+
+                    // TODO: Do not discard old components and maintenances.
+                    //  Check them as done (or not) and save to history
+
+                    val newComponentId = BikeComponent.newId()
+
+                    // copy all maintenances and reset usage and last maintenance date
+                    val newMaintenances = component.maintenance?.map {
+                        it.copy(
+                            componentId = newComponentId,
+                            usageSinceLast = Usage(),
+                            lastMaintenanceDate = LocalDateTime.now()
+                        ).withNewId()
+                    }
+
+                    // Create a new component from the old one with the new maintenances
+                    val newComponent = component.copy(
+                        _id = newComponentId,
+                        usage = Usage(),
+                        maintenance = newMaintenances,
+                        from = LocalDateTime.now()
+                    )
+
+                    // remove the  old component and add the new one
+                    val bikeUpdate = bike.copy(
+                        components = bike.components.minus(component).plus(newComponent)
+                    )
+                    // Save the updated bike
+                    dao.bikeDao.update(bikeId, bikeUpdate)
+                    newComponent._id
+                }
+
+            }
+            newComponentId
         }
     }
 

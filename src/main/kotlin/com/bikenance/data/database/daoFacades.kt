@@ -41,7 +41,7 @@ interface BikeRideDao : BasicDao<BikeRide, BikeRideUpdate> {
 }
 
 interface ComponentDao : BasicDao<BikeComponent, Unit> {
-    suspend fun getByBikeId(id: String): List<BikeComponent>
+
 }
 
 

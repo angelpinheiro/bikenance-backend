@@ -8,6 +8,7 @@ import com.bikenance.data.model.Bike
 import com.bikenance.data.model.BikeRide
 import com.bikenance.data.model.Profile
 import com.bikenance.data.model.User
+import com.bikenance.data.model.components.BikeComponent
 import com.bikenance.data.model.serializer.BikeTypesModule
 import com.bikenance.data.model.strava.StravaActivity
 import com.bikenance.data.model.strava.StravaAthlete
@@ -47,6 +48,7 @@ class DB(mongoDatabase: MongoDatabase) {
     val profiles = mongoDatabase.getCollection<Profile>()
     val bikes = mongoDatabase.getCollection<Bike>()
     val bikeRides = mongoDatabase.getCollection<BikeRide>()
+    // val components = mongoDatabase.getCollection<BikeComponent>()
 }
 
 class DAOS(db: DB) {
@@ -54,8 +56,7 @@ class DAOS(db: DB) {
     val profileDao: ProfileDao = MongoProfileDao(db)
     val bikeDao: BikeDao = MongoBikeDao(db)
     val bikeRideDao: BikeRideDao = MongoBikeRideDao(db)
-//    val componentDao: MongoComponentDao = MongoComponentDao(db)
-
+    // val componentDao: ComponentDao = MongoBikeComponentDao(db)
     val stravaAthleteDao: StravaAthleteDao = MongoStravaAthleteDao(db)
     val stravaActivityDao: StravaActivityDao = MongoStravaActivityDao(db)
 }
