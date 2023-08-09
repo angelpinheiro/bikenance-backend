@@ -23,7 +23,6 @@ fun Route.profileBikeRoutes() {
     val log = KtorSimpleLogger("ProfileRoutes")
 
     val dao: DAOS by inject()
-//    val stravaBikeSync: StravaBikeSync by inject()
 
 
     get<ProfilePath.Bikes> {

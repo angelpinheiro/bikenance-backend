@@ -14,7 +14,7 @@ import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import org.koin.ktor.ext.inject
 
-val ApplicationCall.authData get() = authentication.principal<LoginData>()?.let { AuthData(it.username)  }
+val ApplicationCall.authData get() = authentication.principal<LoginData>()?.let { AuthData(it.username) }
 
 fun Route.loginRoutes() {
 
@@ -23,9 +23,6 @@ fun Route.loginRoutes() {
 
     val loginUseCase = LoginUseCase(jwtMgr, userRepository)
 
-    /**
-     *
-     */
     post("/login") {
         val user = call.receive<LoginData>()
         val loginResult = loginUseCase.loginUser(user)

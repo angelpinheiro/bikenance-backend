@@ -2,9 +2,7 @@ package com.bikenance.api.profile
 
 import com.bikenance.api.authApiResult
 import com.bikenance.data.database.mongodb.DAOS
-import com.bikenance.data.model.ExtendedProfile
 import com.bikenance.data.model.Profile
-import com.bikenance.data.model.serializer.iso8061ToLocalDateTime
 import com.bikenance.util.bknLogger
 import com.bikenance.util.formatAsIsoDate
 import io.ktor.server.application.*
@@ -14,18 +12,6 @@ import io.ktor.server.resources.put
 import io.ktor.server.routing.*
 import org.koin.ktor.ext.inject
 import java.time.LocalDateTime
-
-
-suspend fun getUserProfile(dao: DAOS, userId: String, includeDraftBikes: Boolean): ExtendedProfile {
-    val profile = dao.profileDao.getByUserId(userId)
-    val bikes = dao.bikeDao.getByUserId(userId)
-    val bikeRides = dao.bikeRideDao.getByUserId(userId)
-
-    return ExtendedProfile(
-        profile, if (includeDraftBikes) bikes else bikes.filter { !it.draft }, bikeRides
-    )
-}
-
 
 fun Route.profileRoutes() {
 
