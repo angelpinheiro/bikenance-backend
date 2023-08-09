@@ -1,60 +1,60 @@
 # Bikenance Server
 
-This repository contains the backend server code for the Bikenance Android application. Bikenance is an application that allows users to keep complete control over bike and component maintenance. The server acts as a central hub for data synchronization and integration with the Strava platform.
+This repository contains the backend server off [Bikenance](https://github.com/angelpinheiro/bikenance-backend), an
+Android app that allows users to keep complete control over bike and component maintenance. This server acts as a
+central hub for data
+synchronization and integration with the Strava platform.
 
-**This is an ongoing learning project** that I build to explore and enhance my programming skills and try new stuff. There may be changes or updates made at any time without prior notice.
+> **Bikenance is an ongoing learning project**, there may be changes or updates made at any time without prior notice.
 
 ## Features
 
-The Bikenance Server offers the following features:
+This server provides features below to the app:
 
-- OAuth-based authentication with Strava for user login and access token management.
+- OAuth-based authentication with Strava.
 - Integration with the Strava API to allow requesting user data like the user profile and bike list.
-- Storage and management of user profiles, bike data, and cycling activity information.
 - Implementation of the Strava WebHooks API for synchronization of new cycling activities.
+- Storage and management of user profiles, cycling activities, and bike information.
 - Push notifications using Firebase Cloud Messaging (FCM).
 
 ## Architecture
 
-The Bikenance Server is part of a client-server architecture, with the Android app serving as the client and the server handling data management and integration:
+The server is built upon the Clean Architecture philosophy, emphasizing a pragmatic approach, which means avoiding
+overengineering while integrating essential principles of clean and modular design.
 
-- The server is build in Kotlin using Ktor, a flexible and asynchronous web framework for building server applications.
-- A MongoDB database is used to store user profiles, bike data, and activity information.
-- The communication between the Bikenance Android app and the server is primarily done through RESTful services. The server exposes a set of endpoints that the app can interact with to perform various operations such as user authentication, bike and components registration, maintenance tracking, and more. In addition to RESTful services, the server utilizes Firebase Cloud Messaging (FCM) to send push notifications to the app.
+#### Tech stack
 
+- The server is build in Kotlin using Ktor.
+- MongoDB is used for data storage (along with KMongo).
+- The communication between the Bikenance Android app and the server is primarily done through REST services, you can
+  find them on the `api` package.
+- Firebase Cloud Messaging (FCM) is used to send push notifications to the app.
+- Koin is used for dependency injection
 
 ### Flow of Information
 
-The flow of information involves the app, the Bikenance server, and Strava:
+The server communicates with the app and with Strava as shown below:
 
-1. User Authentication:
-    - Users log in to the Bikenance mobile app using OAuth with Strava. The app requests authorization from the Strava API, and upon successful authentication, the app receives an access token.
-    - The app sends the access token and the user's Strava athlete ID to the Bikenance server.
+1. User Authentication with Strava: Users log in to the Bikenance app using OAuth with Strava. The server acts as
+   a gateway for authentication, adding sensitive info to the client requests.
 
-   For the secure storage of the "client_id" and "secret" parameters required for OAuth with Strava, this server acts as a gateway for authentication, adding sensitive info to the client requests.
+2. User Profile creation: After a successful login, the server queries the Strava API to retrieve user's bikes and rides
+   and store them in the Bikenance database.
 
-2. User Profile Creation and Bike Data Retrieval:
-    - The Bikenance server receives the access token and athlete ID.
-    - If it's the user's first login, the server creates a user profile and stores the access token for future use.
-    - The server queries the Strava API to retrieve the user's bike list and store it in the Bikenance database.
-
-3. Activity Synchronization:
-    - When a user completes a cycling activity, Strava sends the activity data to the Bikenance server.
-    - The server identifies the user based on the received Strava athlete ID and associates the activity with the corresponding user in the database.
-    - The activity data is stored in the Bikenance server's database.
-
-4. Notification to the App:
-    - After the activity is successfully synchronized, the Bikenance server sends a push notification to the user's mobile app using Firebase Cloud Messaging (FCM).
-    - The app receives the notification and displays it to the user, indicating that the new activity has been synchronized.
-
+3. Activity Synchronization: When a user completes a cycling activity, Strava sends the activity data to the Bikenance
+   server. The activity data is stored in the Bikenance server's database, and the app is notified.
 
 ## Deployment
 
-The repository includes a Dockerfile and a docker-compose file. Before deployment, it's important 
+The repository includes a Dockerfile and a docker-compose file. Before deployment, it's important
 to obtain the necessary files and credentials from Strava and Firebase and customize configuration.
 
-* To use the Strava API you need to register an application on the Strava Developers website. This registration will provide you with the necessary parameters to make requests: `strava.client_id` and `strava.client_secret`.
-* This server also uses Firebase for push notifications, so you need to create a Firebase project and configure it. Then replace the existing `firebase-adminsdk.json` file with the one generated from your Firebase project.
+* To use the Strava API you need to register an application on the Strava Developers website. This registration will
+  provide you with the necessary parameters to make requests: `strava.client_id` and `strava.client_secret`.
+* This server also uses Firebase for push notifications, so you need to create a Firebase project and configure it. Then
+  replace the existing `firebase-adminsdk.json` file with the one generated from your Firebase project.
 
 ## License
-Bikenance is [licensed](LICENSE.md) under the [CC BY-NC-SA 4.0 License](https://creativecommons.org/licenses/by-nc-sa/4.0/)
+
+Bikenance is [licensed](LICENSE.md) under
+the [CC BY-NC-SA 4.0 License](https://creativecommons.org/licenses/by-nc-sa/4.0/)
