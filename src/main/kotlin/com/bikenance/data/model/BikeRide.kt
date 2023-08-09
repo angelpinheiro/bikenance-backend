@@ -49,7 +49,7 @@ fun StravaActivity.toBikeRide(user: User, bike: Bike?, confirmed: Boolean): Bike
         totalElevationGain = totalElevationGain,
         mapSummaryPolyline = map?.summaryPolyline,
         averageWatts = averageWatts,
-        averageSpeed = averageSpeed,
+        averageSpeed = averageSpeed?.let { it * 3.6f }, // convert from mps to kmh
         maxSpeed = maxSpeed,
         bikeConfirmed = confirmed
     )

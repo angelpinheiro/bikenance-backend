@@ -1,12 +1,15 @@
 package com.bikenance
 
 import com.bikenance.api.exposeApi
+import com.bikenance.data.database.mongodb.DAOS
 import com.bikenance.di.appModule
 import com.bikenance.di.dataModule
 import com.bikenance.di.stravaModule
 import com.bikenance.extensions.*
 import io.ktor.server.application.*
 import io.ktor.server.netty.*
+import kotlinx.coroutines.launch
+import org.koin.ktor.ext.inject
 import org.koin.ktor.plugin.Koin
 import org.koin.logger.slf4jLogger
 
@@ -38,4 +41,19 @@ fun Application.module() {
 
     // Deploy api
     exposeApi()
+
+    /*val daos: DAOS by inject()
+
+    environment.monitor.subscribe(ServerReady) {
+        launch {
+            daos.bikeRideDao.all().forEach { ride ->
+                val updated = ride.copy(averageSpeed = ride.averageSpeed?.let { (it * 100).toInt() / 100.0 })
+                log.debug("Updating ride avg speed from ${ride.averageSpeed} to ${updated.averageSpeed}")
+                daos.bikeRideDao.update(ride.oid(), updated)
+            }
+        }
+
+    }*/
+
+
 }

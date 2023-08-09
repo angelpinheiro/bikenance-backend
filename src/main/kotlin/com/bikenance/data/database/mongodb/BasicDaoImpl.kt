@@ -2,13 +2,11 @@ package com.bikenance.data.database.mongodb
 
 import com.mongodb.client.MongoCollection
 import com.mongodb.client.model.UpdateOptions
-import org.bson.codecs.pojo.annotations.BsonId
 import org.bson.conversions.Bson
 import org.bson.types.ObjectId
 import org.litote.kmongo.Id
 import org.litote.kmongo.deleteOneById
 import org.litote.kmongo.findOneById
-import org.litote.kmongo.id.toId
 import org.litote.kmongo.updateOneById
 
 
@@ -22,6 +20,7 @@ abstract class MongoModel<T> {
 }
 
 interface BasicDao<T, U> {
+    suspend fun all(): Iterable<T>
     suspend fun getById(id: String): T?
     suspend fun delete(id: String): Boolean
     suspend fun create(item: T): T?
@@ -31,6 +30,10 @@ interface BasicDao<T, U> {
 }
 
 abstract class BasicDaoImpl<T : MongoModel<T>, U : Any>(val collection: MongoCollection<T>) : BasicDao<T, U> {
+
+    override suspend fun all(): Iterable<T> {
+        return collection.find()
+    }
 
     override suspend fun getById(id: String): T? {
         return collection.findOneById(ObjectId(id))

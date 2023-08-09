@@ -10,7 +10,6 @@ import com.bikenance.data.model.components.Usage
 import com.bikenance.data.model.components.defaultMaintenances
 import com.bikenance.util.bknLogger
 import com.bikenance.util.formatAsIsoDate
-import com.bikenance.util.wearPercentage
 import java.time.LocalDateTime
 import java.time.ZoneOffset
 
